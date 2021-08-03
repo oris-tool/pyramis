@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<tpn-editor>
+  <tpn-entities>
+    <transition rotation-angle="0.0" uuid="0402e891-67fc-4c5f-aad5-b61eb3c08bf9" x="555" y="359">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="mrepair" satellite-x="592" satellite-y="360"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update=""/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property efts="0.5" expressions="-41.7333 * Exp[-3.22812 x] + 97.3777 * Exp[-3.22812 x] * x + -27.8222 * Exp[-3.22812 x] * x^2" id="transition.stochastic" lfts="3" normalizationFactor="0.9999988824655345" property-data-type="5.type.expolynomial" satellite-x="555" satellite-y="389"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="2574f93a-fd1d-4391-897d-d703807e4805" x="344" y="145">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="repair" satellite-x="384" satellite-y="157"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update=""/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property efts="0.25" expressions="-71.0006 * Exp[-6.41167 x] + 319.503 * Exp[-6.41167 x] * x + -142.001 * Exp[-6.41167 x] * x^2" id="transition.stochastic" lfts="2" normalizationFactor="0.9999962125608038" property-data-type="5.type.expolynomial" satellite-x="344" satellite-y="175"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="67687e0c-3b8e-4417-8356-e8b103ac1f8a" x="577" y="251">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="rest" satellite-x="602" satellite-y="263"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update=""/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property efts="0.25" expressions="-686.089 * Exp[-11.3061 x] + 3087.4 * Exp[-11.3061 x] * x + -1372.18 * Exp[-11.3061 x] * x^2" id="transition.stochastic" lfts="2" normalizationFactor="1.0000064788681096" property-data-type="5.type.expolynomial" satellite-x="577" satellite-y="281"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="768b40aa-0e9c-4c3d-a64a-25b5587be636" x="397" y="441">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="mrest" satellite-x="442" satellite-y="450"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update=""/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property efts="0.5" expressions="-1369.71 * Exp[-7.28859 x] + 3195.98 * Exp[-7.28859 x] * x + -913.137 * Exp[-7.28859 x] * x^2" id="transition.stochastic" lfts="3" normalizationFactor="1.0000184105663141" property-data-type="5.type.expolynomial" satellite-x="397" satellite-y="471"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="b449380e-e31b-404c-b5f7-b55c9ce9f53c" x="666" y="371">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="mrejuv" satellite-x="698" satellite-y="379"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update=""/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property efts="0.1" expressions="-10.24 * Exp[3.86164 x] + 136.534 * Exp[3.86164 x] * x + -341.335 * Exp[3.86164 x] * x^2" id="transition.stochastic" lfts="0.3" normalizationFactor="0.9999779820608894" property-data-type="5.type.expolynomial" satellite-x="666" satellite-y="401"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="e6d2cb41-cc14-4e04-9fc5-e7d2f8e0735a" x="344" y="260">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="rejuv" satellite-x="378" satellite-y="273"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update=""/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property efts="0.1" expressions="-318523 * Exp[-57.5509 x] + 4777840* Exp[-57.5509 x] * x + -15926100 * Exp[-57.5509 x] * x^2" id="transition.stochastic" lfts="0.2" normalizationFactor="0.9999893996609198" property-data-type="5.type.expolynomial" satellite-x="344" satellite-y="290"/>
+      </properties>
+    </transition>
+  </tpn-entities>
+</tpn-editor>

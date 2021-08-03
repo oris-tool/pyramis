@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<tpn-editor>
+  <tpn-entities>
+    <joint uuid="87542e24-e3a1-402c-8924-9336a6527e1c" x="304" y="221">
+      <features/>
+      <properties/>
+    </joint>
+    <joint uuid="a97989ce-15e9-4c1f-b91d-4e892f383256" x="303" y="124">
+      <features/>
+      <properties/>
+    </joint>
+    <place uuid="037ca560-46f1-4fbf-a414-c439eb37bffa" x="744" y="221">
+      <features/>
+      <properties>
+        <property id="0.default.name" name="VmRejuvenating" satellite-x="766" satellite-y="250"/>
+        <property id="default.marking" marking="0"/>
+      </properties>
+    </place>
+    <place uuid="087c49f6-5fd1-4fbd-bb94-37df3b26d184" x="1047" y="124">
+      <features/>
+      <properties>
+        <property id="0.default.name" name="VmRepairing" satellite-x="1036" satellite-y="152"/>
+        <property id="default.marking" marking="0"/>
+      </properties>
+    </place>
+    <place uuid="95ecbbc1-a001-4904-b761-740d67751430" x="1026" y="233">
+      <features/>
+      <properties>
+        <property id="0.default.name" name="p0" satellite-x="1004" satellite-y="255"/>
+        <property id="default.marking" marking="0"/>
+      </properties>
+    </place>
+    <place uuid="97460b28-e437-40a0-9cc6-7dfe07fc5b9c" x="209" y="166">
+      <features/>
+      <properties>
+        <property id="0.default.name" name="VmRestarting" satellite-x="208" satellite-y="196"/>
+        <property id="default.marking" marking="1"/>
+      </properties>
+    </place>
+    <place uuid="99342975-91bb-445a-8f52-e7c1462a23bc" x="744" y="124">
+      <features/>
+      <properties>
+        <property id="0.default.name" name="VmFailureDetecting" satellite-x="760" satellite-y="152"/>
+        <property id="default.marking" marking="0"/>
+      </properties>
+    </place>
+    <place uuid="9deea44f-4ac3-492a-85bb-d3e355cd87a3" x="579" y="124">
+      <features/>
+      <properties>
+        <property id="0.default.name" name="VmFailing" satellite-x="578" satellite-y="154"/>
+        <property id="default.marking" marking="0"/>
+      </properties>
+    </place>
+    <place uuid="9e7457e0-ec8c-48c2-be53-6025d80bc609" x="439" y="124">
+      <features/>
+      <properties>
+        <property id="0.default.name" name="VmAging" satellite-x="437" satellite-y="154"/>
+        <property id="default.marking" marking="0"/>
+      </properties>
+    </place>
+    <place uuid="d909e7de-763b-468c-8b8e-678bd4b54c22" x="435" y="221">
+      <features/>
+      <properties>
+        <property id="0.default.name" name="VmRejWaiting" satellite-x="496" satellite-y="250"/>
+        <property id="default.marking" marking="0"/>
+      </properties>
+    </place>
+    <transition rotation-angle="0.0" uuid="1687e642-431a-483d-a65f-bf7bb7affd3d" x="649" y="124">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="vmFailing" satellite-x="651" satellite-y="152"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update="VmRejWaiting=0"/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property id="transition.stochastic" k="4" lambda="0.056" property-data-type="4.type.erlang" satellite-x="650" satellite-y="97"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="18c1f926-88aa-4259-ae39-3ec3ea380edc" x="1132" y="124">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="vmRepairing" satellite-x="1136" satellite-y="149"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update="VmAging=1;VmRejWaiting=1;"/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property eft="0.2" id="transition.stochastic" lft="1" property-data-type="1.type.uniform" satellite-x="1148" satellite-y="97"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="8b6ee6bd-c67f-45b0-bfc1-1e48365a89f0" x="649" y="220">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="vmRejWaiting" satellite-x="651" satellite-y="250"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update="VmAging=0;VmFailing=0;"/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property id="transition.stochastic" priority="0" property-data-type="2.type.deterministic" satellite-x="647" satellite-y="193" value="24" weight="1"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="ae618b5b-ef50-45db-8255-6c23e23f80c3" x="897" y="124">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="vmFailuredetecting" satellite-x="902" satellite-y="150"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update=""/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property eft="0" id="transition.stochastic" lft="0.2" property-data-type="1.type.uniform" satellite-x="895" satellite-y="96"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="b2ebd975-faca-4fb9-9f56-652bdeb99e18" x="897" y="221">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="vmRejuvenating" satellite-x="901" satellite-y="249"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update="VmAging=1;VmRejWaiting=1;"/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property eft="0.1" id="transition.stochastic" lft="0.2" property-data-type="1.type.uniform" satellite-x="902" satellite-y="192"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="c93a1574-c6a7-45a3-9ab8-7a19bb4696c1" x="303" y="166">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="vmRestarting" satellite-x="364" satellite-y="173"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update=""/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property eft="0.2" id="transition.stochastic" lft="1" property-data-type="1.type.uniform" satellite-x="348" satellite-y="157"/>
+      </properties>
+    </transition>
+    <transition rotation-angle="0.0" uuid="ec509409-54c1-4154-aaa7-b17e6de62a18" x="503" y="124">
+      <features>
+        <feature id="transition.stochastic"/>
+      </features>
+      <properties>
+        <property id="0.default.name" name="vmAging" satellite-x="507" satellite-y="154"/>
+        <property enabling-function="" id="10.default.enablingFunction"/>
+        <property id="11.default.markingUpdate" marking-update=""/>
+        <property id="12.default.resetTransitions" reset-transitions=""/>
+        <property id="transition.stochastic" k="4" lambda="0.024" property-data-type="4.type.erlang" satellite-x="507" satellite-y="96"/>
+      </properties>
+    </transition>
+    <note height="150" uuid="d96fbae1-dd3a-422f-9156-3cf1c45a2c27" width="200" x="399" y="-60">
+      <features/>
+      <properties/>
+                        4 * 1/0.024 = 168  (166,66)
+
+4 * 1/0.056 = 72
+    
+    
+    
+    </note>
+    <arc from="9deea44f-4ac3-492a-85bb-d3e355cd87a3" to="1687e642-431a-483d-a65f-bf7bb7affd3d" uuid="3b10a696-5c68-46cd-b78a-553bc1b231cd">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="97460b28-e437-40a0-9cc6-7dfe07fc5b9c" to="c93a1574-c6a7-45a3-9ab8-7a19bb4696c1" uuid="4ed17fac-f2eb-4b45-a964-eb87a32f35f0">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="c93a1574-c6a7-45a3-9ab8-7a19bb4696c1" to="87542e24-e3a1-402c-8924-9336a6527e1c" uuid="5f7671ca-961b-4233-97e2-aa846802a1b5">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="b2ebd975-faca-4fb9-9f56-652bdeb99e18" to="95ecbbc1-a001-4904-b761-740d67751430" uuid="659b0eaf-376e-4283-b51d-1b928bd2d92d">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="ec509409-54c1-4154-aaa7-b17e6de62a18" to="9deea44f-4ac3-492a-85bb-d3e355cd87a3" uuid="6e97241f-3401-4ff9-bfb0-d7b9a4d794a0">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="8b6ee6bd-c67f-45b0-bfc1-1e48365a89f0" to="037ca560-46f1-4fbf-a414-c439eb37bffa" uuid="7bd5ca5a-2874-4b73-b38a-146fb2fde959">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="c93a1574-c6a7-45a3-9ab8-7a19bb4696c1" to="a97989ce-15e9-4c1f-b91d-4e892f383256" uuid="8277eed8-646c-46b4-95b4-566f5e9c6571">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="1687e642-431a-483d-a65f-bf7bb7affd3d" to="99342975-91bb-445a-8f52-e7c1462a23bc" uuid="8b4f645e-18d6-4b33-a6cc-4a5a952f4d93">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="a97989ce-15e9-4c1f-b91d-4e892f383256" to="9e7457e0-ec8c-48c2-be53-6025d80bc609" uuid="8dfa18d7-bf18-4095-90de-7ab8f92b45fe">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="9e7457e0-ec8c-48c2-be53-6025d80bc609" to="ec509409-54c1-4154-aaa7-b17e6de62a18" uuid="a5e90887-2fb7-4e91-9a9d-5055dfdbe0f8">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="ae618b5b-ef50-45db-8255-6c23e23f80c3" to="087c49f6-5fd1-4fbd-bb94-37df3b26d184" uuid="e2e18d4d-2a56-4b77-ad63-734634caa6fa">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="d909e7de-763b-468c-8b8e-678bd4b54c22" to="8b6ee6bd-c67f-45b0-bfc1-1e48365a89f0" uuid="e4ec8dbe-28f5-4e1c-8c63-e10f90fe03cc">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="87542e24-e3a1-402c-8924-9336a6527e1c" to="d909e7de-763b-468c-8b8e-678bd4b54c22" uuid="e7d15207-1931-4a32-905a-f0be1a2babdc">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="99342975-91bb-445a-8f52-e7c1462a23bc" to="ae618b5b-ef50-45db-8255-6c23e23f80c3" uuid="e8dba9a3-ca47-4c75-ace8-5fadd07222df">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="18c1f926-88aa-4259-ae39-3ec3ea380edc" to="95ecbbc1-a001-4904-b761-740d67751430" uuid="f009167f-42d4-401c-ae9c-7cffdac7ca78">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="087c49f6-5fd1-4fbd-bb94-37df3b26d184" to="18c1f926-88aa-4259-ae39-3ec3ea380edc" uuid="f3d3e4e7-11ee-4d19-9e81-be994e414b84">
+      <features/>
+      <properties/>
+    </arc>
+    <arc from="037ca560-46f1-4fbf-a414-c439eb37bffa" to="b2ebd975-faca-4fb9-9f56-652bdeb99e18" uuid="fa5f31e7-fe93-4de9-b03c-9ef6af0c4c92">
+      <features/>
+      <properties/>
+    </arc>
+  </tpn-entities>
+</tpn-editor>
