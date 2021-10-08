@@ -1,0 +1,103 @@
+Step by step guide to reproduce experiments:
+
+
+Experiments on scalability
+
+
+-Preparatory steps to create the files with pre-calculated samples
+To lower the time required in the following experiments we create a file of pre-sampled values for each state of the model:
+
+Execute PyramisCreateSampFiles to create c*100 files containing pre-sampled expolinomials, the current setting is generating samples from the expolinomial with average 10 unit of time ( 0.22517 * Exp[-0.311427 x] * x + -0.022517 * Exp[-0.311427 x] * x^2 ), 
+
+Execute PyramisCreateSampFiles to create the same number of expolinomials samples for the 1 unit of time version by changing the line
+GEN exp = GEN.newExpolynomial("0.22517 * Exp[-0.311427 x] * x + -0.022517 * Exp[-0.311427 x] * x^2", OmegaBigDecimal.ZERO, OmegaBigDecimal.TEN); 
+
+to
+
+GEN exp = GEN.newExpolynomial("22.517 * Exp[-3.11427 x] * x + -22.517 * Exp[-3.11427 x] * x^2", OmegaBigDecimal.ZERO, OmegaBigDecimal.ONE);
+
+and the line 
+
+String print= "10sample"+(c*100+i)+".txt"; to String print= "sample"+(c*100+i)+".txt";
+
+Manually move the earlier files to the src\main\resources\samplesExpolinomial10 folder and the latter to src\main\resources\samplesExpolinomial
+
+
+-Generate the ground truth/long sampling 
+To create the ground truth from long sampling the following steps are to be executed:
+
+
+Execute analysisScalability\PyramisSamplerFromFiles.java, this produces a sampling bounded by the time written at line 73 in ms, stopped once two iterations (of RUNS_AT_A_TIME=100000 executions of the fault tree) have relative change < 0.0001, the samples are taken from the files in  src\main\resources\samplesExpolinomial folder
+
+The analysis is done for all combinations of the variables Behaviour length(seq values 2 to 4), parallelism degree(parallel values 2 to 4), hierarchy depth(depth values 2 to 4) and type of Regions in the HSMP (respectively of type FIRST and LAST, in the code RegionType.EXIT and RegionType.FINAL)
+
+Every 100 iterations (and the last one) a file with states probabilities is created.
+
+For the purpose of visualizing the distribution of the failure time, for each combination of variables, a file containing 1000000 samples of the times to failure of the fault tree under study is generated.
+
+Move the distribution files in src//main//resources//pyramisSimulation and execute PyrStudyDrawCDF to create secondary files in src//main//resources//pyramisRes containing the cdf of the samplings  
+
+Empty src//main//resources//pyramisSimulation and move there the files obtained from the last iteration for each of the combinations of variables.
+
+
+
+-Analysis 
+
+All analysis methods in analysisScalability are coupled with the subsequent sampling with identical time duration, to have uncertainty measures  multiple samplings are associated to the same analysis, by inserting in input the number of times the sampling must be repeated  
+
+Execute analysisScalability/Pyramis.java with input parameter 20, for 20 repetitions of the sampling so as to obtain measures of average and variance in the sampling. 
+
+This produces an analysis of the model for all the combinations of the variables Behaviour length(seq values 2 to 4), parallelism degree(parallel values 2 to 4), hierarchy depth(depth values 2 to 4) and type of Regions in the HSMP (respectively of type FIRST and LAST, in the code RegionType.EXIT and RegionType.FINAL); for all combinations 20 files of samples are produced.
+
+In analysisScalability/Pyramis.java two different global variables have been fixed TIME_LIMIT and TIME_STEP: TIME_LIMIT depends on the model under study and corresponds to an upper bound on time for the numerical analysis: it can be manually set by seeing how the model never takes more than 16 units of time even on the case with behavior length, parallelism degree and hierarchy all set to 4.
+
+TIME_STEP is instead the granularity of time used in the study: lower the value and higher the precision, but also higher complexity, it can be changed at will, it is currently set to 0.0025.
+
+
+-Comparisons between sampling and analyses
+
+All comparisons are made by manually moving corresponding ground truth files in src//main//resources//pyramisSimulation and the analyses and same-time simulations in src//main//resources//pyramisAnalytic, 
+the same comparison function distinguishes the files belonging to different properties combinations (Behavior Lenght, parallelism degree and hierarchy depth) based on the name of the files,
+the artifacts produced by the comparison functions are all generated to the src//main//resources//pyramisRes folder. 
+
+
+PyrStudyResults  is utilised to obtain the min max average errors and standard deviation of values from the corresponding ground truth.(Not for cycles)
+PyrStudyResultsRareEvents is utilised to obtain from the "normal" version of the ground truth the corresponding ground truth with rare events (where in the switch a branch has 0.005 probability instead of 0.5), without going through the long duration and complexity of rare events simulation
+
+
+PyrStudyResultsVarianceOverSimulations is used to obtain average errors on the many runs of same-time simulations: to do so execute the function 
+after having removed the files corresponding to the analyses from src//main//resources//pyramisRes (the folder must contain only the same-time simulation results, automatically it reads all the folder files and groups them based on the name) in src//main//resources//summa produces the averages of errors over same-time simulation batches for each combination of properties
+
+-FOR CYCLES
+PyrStudyResultsVarianceCycles  generates a standard model so as to link the name of the states in the simulation and in the analyses, associates analogous states and obtains the corresponding results
+
+
+PyrStudyResultsVarianceOld
+PyrStudyResultsVarianceOld2 
+
+
+Experiments on case study
+
+All experiments on the case study refers to the analysis// folder rather than analysisScalability
+
+
+PyramisSampler.java simulates the execution over 36000000 ms, repeatedly generating log files every 1M units of time of the model execution,
+in the logs produced one can also finds informations over the probability of executing the cycle in the model 2,3,4 times and the probability of the model being "available" at time 96, respectively required to choose a suitable number of cycles to analyze and find the probability for the external switch between VmSW and VmmRejuvenation (0.9997 in this case)
+
+PyramisSamplerRelative allows the execution of the simulation with a give time limit (the same time of the analyses) and receives in input a value corresponding to how many time the sampling must be reproduced to allow for measures of means and variance
+
+Execute Pyramis.java to obtain the analysis up to LOOPS (default=5) cycles with time steps specified in the array "tics"
+
+PyramisVariableTicks is used to obtain the analysis with varying values of time steps at different levels in the model 
+
+for these results comparisons are achieved by moving manually the results of same-time sampling and analyses to src//main//resources//pyramis and renaming the chosen ground truth to "sample.txt".
+PyrStudyResults generates in src//main//resources//pyramisRes// such files.
+For the same-time sampling PyrStudyResultsVarianceOld and PyrStudyResultsVarianceOld2  must be executed: the corresponding files must be moved in src//main//resources//pyramisAnalytic , the ground truth must be moved to src//main//resources//pyramisSimulation and produce results in src//main//resources//pyramisRes
+
+Respectively PyrStudyResultsVarianceOld give the average and variance of the states distribution values' relative errors, PyrStudyResultsVarianceOld gives the average and variance of the states distribution values.
+
+
+Production of images/plots
+
+All images can be produced by executing the python scripts present in src//main//resources//plots
+
