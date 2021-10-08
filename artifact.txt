@@ -72,10 +72,6 @@ after having removed the files corresponding to the analyses from src//main//res
 PyrStudyResultsVarianceCycles  generates a standard model so as to link the name of the states in the simulation and in the analyses, associates analogous states and obtains the corresponding results
 
 
-PyrStudyResultsVarianceOld
-PyrStudyResultsVarianceOld2 
-
-
 Experiments on case study
 
 All experiments on the case study refers to the analysis// folder rather than analysisScalability
@@ -99,5 +95,4 @@ Respectively PyrStudyResultsVarianceOld give the average and variance of the sta
 
 Production of images/plots
 
-All images can be produced by executing the python scripts present in src//main//resources//plots
-
+All images referring to the scalability analysis can be reproduced by executing the python scripts present in src//main//resources//plots
