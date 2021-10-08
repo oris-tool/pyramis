@@ -34,7 +34,7 @@ public class Pyramis {
 	
 	
 	public static void test1() {    
-		double[] tics= new double[]{0.01,0.005,0.0025};
+		double[] tics= new double[]{0.01,0.005,0.0025}; 
 
 		double TIME_STEP;
 

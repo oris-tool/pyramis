@@ -144,55 +144,6 @@ public class NumericalUtils {
 
 
 
-	//    public static double[] maxCDF(double[] firstCDF, double[] secondCDF, BigDecimal step) {
-	//        final int firstLen = firstCDF.length;
-	//        final int secondLen = secondCDF.length;
-	//        if (firstLen != secondLen) {
-	//            throw new IllegalArgumentException("Distributions values vectors must have the same length");
-	//        }
-	//
-	//        double[] resultCDF = new double[firstCDF.length];
-	//        for (int i = 0; i < resultCDF.length; i++) {
-	//            resultCDF[i] = firstCDF[i] * secondCDF[i];
-	//        }
-	//
-	//        return resultCDF;
-	//    }
-
-	//    public static double[] maxPDF(double[] firstPDF, double[] secondPDF, BigDecimal step) {
-	//
-	//        final int firstLen = firstPDF.length;
-	//        final int secondLen = secondPDF.length;
-	//        if (firstLen != secondLen) {
-	//            throw new IllegalArgumentException("Distributions values vectors must have the same length");
-	//        }
-	//
-	//        double[] firstCDF = NumericalUtils.computeCDFFromPDF(firstPDF, step);
-	//        double[] secondCDF = NumericalUtils.computeCDFFromPDF(secondPDF, step);
-	//
-	//        double[] resultCDF = new double[firstCDF.length];
-	//        for (int i = 0; i < resultCDF.length; i++) {
-	//            resultCDF[i] = firstCDF[i] * secondCDF[i];
-	//        }
-	//
-	//        double[] result = NumericalUtils.computePDFFromCDF(resultCDF, step);
-	//
-	//        return result;
-	//    }
-
-
-	//	public static double[] normalizePDF(double[] original, int outOfBoundSamplesCounter, BigDecimal step) {
-	//		double[] normalized = new double[original.length];
-	//		double sum = outOfBoundSamplesCounter;
-	//		for (int i = 0; i < original.length; i++) {
-	//			sum += original[i];
-	//		}
-	//		for (int i = 0; i < original.length; i++) {
-	//			normalized[i] = (original[i] / sum) / step.doubleValue();
-	//		}
-	//
-	//		return normalized;
-	//	}
 
 	public static double[] computeCDFFromPDF(double[] pdf, BigDecimal step) {
 		double[] cdf = new double[pdf.length];
@@ -237,8 +188,8 @@ public class NumericalUtils {
 
 		}
 
-		//FIXME Gives errors when for example 0.2 and 0.3 are compared, should be penalizing, 
-		//but interpolation is not yet implemented
+		//REMARK Gives errors when for example 0.2 and 0.3 are compared, because 
+		//we don't allow interpolation, only exact multiples
 		int multiplier = (int) Math.round(newStep/oldStep);
 		if(multiplier==1) {
 			return cdf;

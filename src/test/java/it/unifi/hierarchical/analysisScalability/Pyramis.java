@@ -18,7 +18,6 @@ import it.unifi.hierarchical.analysis.NumericalValues;
 import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.example.hsmp.HSMP_Journal;
 import it.unifi.hierarchical.model.example.hsmp_scalability.HSMP_JournalScalabilityVerbose;
 import it.unifi.hierarchical.model.example.hsmp_scalability.HSMP_JournalScalability;
 
@@ -33,34 +32,31 @@ public class Pyramis {
 	//Need to be chosen according to the model, based on which is the maximum time elapsed in a region or a state
 	private static  double TIME_LIMIT =17;
 	private static final double TIME_STEP = 0.0025;
-	private static final boolean expolSame = true;
-
+	
+	
+	
 
 	public static void main(String[] args){
 
-		Integer x = null;
-		Integer y= null;
+		Integer repetitionsOfSampling= null;
 		if(args.length>0) {
-			x=Integer.valueOf(args[0]);
-			y = Integer.valueOf(args[1]);
+			repetitionsOfSampling = Integer.valueOf(args[0]);
 		}
 		
-		test1(x,y);
+		test1(repetitionsOfSampling);
 		
 	}
 
 
-	public static void test1(Integer x, Integer y) {    
+	public static void test1(Integer repetitionsOfSampling) {    
 
 
-		//cambia <4 -> <6
-		// cambia last=0 > 1
 		for(int last=1; last>-1;last--) {
 			RegionType lastB = (last==1)? RegionType.FINAL : RegionType.EXIT;
 
-			for(int parallel=4;parallel<5; parallel++) {
-				for(int depth=3;depth<4;depth++) {
-					for(int seq=4;seq<5;seq++) {
+			for(int parallel=2;parallel<5; parallel++) {
+				for(int depth=1;depth<4;depth++) {
+					for(int seq=2;seq<5;seq++) {
 
 
 
@@ -72,7 +68,7 @@ public class Pyramis {
 
 							//HSMP
 							//Build the model
-							HierarchicalSMP model = HSMP_JournalScalability.build(parallel,depth,seq,expolSame, lastB);
+							HierarchicalSMP model = HSMP_JournalScalability.build(parallel,depth,seq,true, lastB);
 
 							Set<String> sList = HSMP_JournalScalability.getStates();
 
@@ -132,7 +128,7 @@ public class Pyramis {
 							}
 							
 
-							PyramisSampler.sampleFromTime(time, parallel,depth,seq,expolSame,lastB, x,y);
+							PyramisSampler.sampleFromTime(time, parallel,depth,seq,true,lastB, repetitionsOfSampling);
 
 
 						}

@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -17,14 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jfree.util.StringUtils;
-import org.oristool.math.OmegaBigDecimal;
-import org.oristool.math.domain.DBMZone;
-import org.oristool.math.expression.Expolynomial;
-import org.oristool.math.expression.Variable;
-import org.oristool.math.function.Erlang;
-import org.oristool.math.function.Function;
-import org.oristool.math.function.GEN;
 import org.oristool.simulator.samplers.Sampler;
 
 import it.unifi.hierarchical.model.CompositeState;
@@ -52,14 +42,12 @@ public class PyramisSamplerFromFiles {
 
 	public static void main(String[] args){
 
-		for(int last=1; last>0;last--) {
+		for(int last=1; last>-1;last--) {
 			RegionType lastB = (last==1)? RegionType.FINAL : RegionType.EXIT;
 
-			for(int parallel=2;parallel<4; parallel++) {
+			for(int parallel=2;parallel<5; parallel++) {
 				for(int depth=1;depth<4;depth++) {
 					for(int seq=2;seq<5;seq++) {
-						//FIXME
-						//if( !(parallel==2 && depth==1 && seq==2) )
 						sample(0,parallel,depth,seq,sameExp, lastB);
 
 					}}}}

@@ -49,10 +49,10 @@ public class PyramisSampler {
 	public static final boolean sameExp = true;
 
 
-	public static void sampleFromTime(long time, int parallel, int depth, int seq,boolean expolSame, RegionType lastB, int x, int y) {
+	public static void sampleFromTime(long time, int parallel, int depth, int seq,boolean expolSame, RegionType lastB, int y) {
 
-		int q=x;
-		for(int i=q*y;i<(q+1)*y;i++) {
+		
+		for(int i=0;i<y;i++) {
 			sample(time, parallel,depth,seq,expolSame, lastB, i);
 		}
 	}
@@ -66,8 +66,6 @@ public class PyramisSampler {
 			for(int parallel=2;parallel<5; parallel++) {
 				for(int depth=1;depth<4;depth++) {
 					for(int seq=2;seq<5;seq++) {
-						//FIXME
-						//if( !(parallel==2 && depth==1 && seq==2) )
 						sample(0,parallel,depth,seq,sameExp, lastB, 0);
 
 					}}}}

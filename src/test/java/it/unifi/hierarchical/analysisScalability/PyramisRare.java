@@ -18,7 +18,6 @@ import it.unifi.hierarchical.analysis.NumericalValues;
 import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.example.hsmp.HSMP_Journal;
 import it.unifi.hierarchical.model.example.hsmp_scalability.HSMP_JournalScalabilityVerbose;
 import it.unifi.hierarchical.model.example.hsmp_scalability.HSMP_JournalScalabilityRare;
 

@@ -23,7 +23,7 @@ import org.oristool.simulator.samplers.Sampler;
 public class PyramisCreateSampFiles {
 
 
-	public static int c =5;
+	public static int c =10;
 
 
 	public static void main(String[] args){
@@ -86,10 +86,6 @@ public class PyramisCreateSampFiles {
 
 		@Override
 		public BigDecimal getSample() {
-
-			//			for(int i=0; i<100;i++) {
-			//				mp.getSample();
-			//			}
 
 			return mp.getSample();
 		}
