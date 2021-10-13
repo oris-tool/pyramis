@@ -68,7 +68,7 @@ public class PyramisSampler {
 
 			double TIME_LIMIT=1000000;
 
-			String print= "s24high_"+VMMTIME+"_"+(i*TIME_LIMIT)+".txt";
+			String print="src//main//resources//pyramisCaseStudyGrundTruth//"+"s24high_"+VMMTIME+"_"+(i*TIME_LIMIT)+".txt";
 
 
 		

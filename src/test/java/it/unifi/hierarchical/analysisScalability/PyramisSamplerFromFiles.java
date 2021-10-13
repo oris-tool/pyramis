@@ -123,46 +123,49 @@ public class PyramisSamplerFromFiles {
 
 			changed = isChanged(probabs,probabsOld,i);
 
-			if(i%100==0) {
-				String g="";
-				if(timeSS>0)
-					g="sameTime_";
-
-				String print= g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+".txt";
-
-				File file = new File(print);
-				try (PrintWriter writer = new PrintWriter(file)) {
-
-					writer.write("TIME=  "		+((EndTime-toEndTime))	+"ms \n\n");
-
-
-
-					for(String s: sList) {
-
-						int n = s.length();
-						String x = s;
-						for(int r=0;r<10-n;r++) {
-							x=x+" ";
-						}
-
-						writer.write(x+ (probabs.get(s)/probabs.get("S0") )+"\n");
-					}
-					writer.write("\n");
-
-
-				} catch (FileNotFoundException e) {
-					System.out.println("errore");
-					System.out.println(e.getMessage());
-				}
-
-			}
+			// Can be used to print every 100 iterations so as to obtain information on the sampling evolution
+			
+			
+//			if(i%100==0) {
+//				String g="";
+//				if(timeSS>0)
+//					g="sameTime_";
+//
+//				String print= g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+".txt";
+//
+//				File file = new File(print);
+//				try (PrintWriter writer = new PrintWriter(file)) {
+//
+//					writer.write("TIME=  "		+((EndTime-toEndTime))	+"ms \n\n");
+//
+//
+//
+//					for(String s: sList) {
+//
+//						int n = s.length();
+//						String x = s;
+//						for(int r=0;r<10-n;r++) {
+//							x=x+" ";
+//						}
+//
+//						writer.write(x+ (probabs.get(s)/probabs.get("S0") )+"\n");
+//					}
+//					writer.write("\n");
+//
+//
+//				} catch (FileNotFoundException e) {
+//					System.out.println("errore");
+//					System.out.println(e.getMessage());
+//				}
+//
+//			}
 
 		}
 		String g="";
 		if(timeSS>0)
 			g="sameTime_";
 
-		String print= g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+".txt";
+		String print="src//main//resources//pyramisSimulation//"+ g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+".txt";
 
 		File file = new File(print);
 		try (PrintWriter writer = new PrintWriter(file)) {
@@ -189,7 +192,7 @@ public class PyramisSamplerFromFiles {
 			System.out.println(e.getMessage());
 		}
 
-		print="distribution_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+".txt";
+		print="src//main//resources//groundTruthDistributions//distribution_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+".txt";
 
 		file = new File(print);
 		try (PrintWriter writer = new PrintWriter(file)) {

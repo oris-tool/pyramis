@@ -211,7 +211,7 @@ public class PyramisSamplerFromFilesRareEvents {
 		if(timeSS>0)
 			g="sameTime_";
 
-		String print= g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+"rare.txt";
+		String print="src//main//resources//pyramisSimulation//"+ g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+"rare.txt";
 
 		File file = new File(print);
 		try (PrintWriter writer = new PrintWriter(file)) {
@@ -238,7 +238,7 @@ public class PyramisSamplerFromFilesRareEvents {
 			System.out.println(e.getMessage());
 		}
 
-		print="distribution_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+"rare.txt";
+		print="src//main//resources//groundTruthDistributions//distribution_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+"rare.txt";
 
 		file = new File(print);
 		try (PrintWriter writer = new PrintWriter(file)) {

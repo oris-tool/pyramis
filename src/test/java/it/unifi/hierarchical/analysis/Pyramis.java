@@ -45,7 +45,7 @@ public class Pyramis {
 
 //				"8_cycles_vmmRejExpol_"+TIME_STEP+".txt";
 
-				String print= "5_cycles_DoubleExp_"+TIME_STEP+".txt";
+				String print="src//main//resources//pyramis//"+ "5_cycles_DoubleExp_"+TIME_STEP+".txt";
 				
 	
 				//HSMP

@@ -29,7 +29,7 @@ public class PyrStudyResultsVarianceOld {
 
 		String[] pathnamesSample;
 
-		File fDirec = new File("src//main//resources//pyramisSimulation");
+		File fDirec = new File("src//main//resources//pyramis");
 
 		// Populates the array with names of files and directories
 		pathnamesSample = fDirec.list();
@@ -39,7 +39,7 @@ public class PyrStudyResultsVarianceOld {
 			Map<String,Double> mapSimul = new HashMap<String,Double>();
 			Map<String,LinkedList<Double>> mapAnalytic= new HashMap<String,LinkedList<Double>>();
 
-			File sample = new File("src//main//resources//pyramisSimulation//"+pathnameS);
+			File sample = new File("src//main//resources//pyramisCaseStudyGroundTruth//"+pathnameS);
 
 			try (BufferedReader br = new BufferedReader(new FileReader(sample))) {
 				String line;
@@ -62,7 +62,7 @@ public class PyrStudyResultsVarianceOld {
 
 			String[] pathnames;
 
-			File f = new File("src//main//resources//pyramisAnalytic");
+			File f = new File("src//main//resources//pyramis");
 
 			// Populates the array with names of files and directories
 			pathnames = f.list();
@@ -70,7 +70,7 @@ public class PyrStudyResultsVarianceOld {
 			// For each pathname in the pathnames array
 			for (String pathname : pathnames) {
 
-				File in = new File("src//main//resources//pyramisAnalytic//"+pathname);
+				File in = new File("src//main//resources//pyramis//"+pathname);
 
 				try (BufferedReader br = new BufferedReader(new FileReader(in))) {
 					String line;
@@ -128,7 +128,7 @@ public class PyrStudyResultsVarianceOld {
 
 			}
 
-			File file = new File("src//main//resources//pyramisRes//res_"+pathnames[0].substring(0,3));
+			File file = new File("src//main//resources//pyramisCaseStudyRes//res_"+pathnames[0].substring(0,3));
 			try (PrintWriter writer = new PrintWriter(file)) {
 				int ccc=0;
 				for(String st: mapSimul.keySet()) {

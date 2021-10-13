@@ -40,7 +40,7 @@ public class Pyramis {
 
 		Integer repetitionsOfSampling= null;
 		if(args.length>0) {
-			repetitionsOfSampling = Integer.valueOf(args[0]);
+			repetitionsOfSampling = Integer.valueOf(20);
 		}
 		
 		test1(repetitionsOfSampling);
@@ -63,7 +63,7 @@ public class Pyramis {
 						try {
 
 
-							String print= ""+TIME_STEP+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+".txt";
+							String print= "src//main//resources//pyramisAnalytic//"+""+TIME_STEP+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+".txt";
 
 
 							//HSMP

@@ -159,7 +159,7 @@ public class PyramisSamplerFromFilesLongEvents {
 		if(timeSS>0)
 			g="sameTime_";
 
-		String print= g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_l-"+numberLongLeaves+"_"+(i*RUNS_AT_A_TIME)+it+".txt";
+		String print="src//main//resources//pyramisSimulation//"+ g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_l-"+numberLongLeaves+"_"+(i*RUNS_AT_A_TIME)+it+".txt";
 
 		File file = new File(print);
 		try (PrintWriter writer = new PrintWriter(file)) {
@@ -185,20 +185,20 @@ public class PyramisSamplerFromFilesLongEvents {
 			System.out.println("errore");
 			System.out.println(e.getMessage());
 		}
-		//		print="distribution_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_l-"+numberLongLeaves+"_"+(i*RUNS_AT_A_TIME)+".txt";
-		//
-		//		file = new File(print);
-		//		try (PrintWriter writer = new PrintWriter(file)) {
-		//
-		//			for(int ii=0;ii<arrSave.length;ii++) {
-		//				if(arrSave[ii]>0.)
-		//					writer.write(arrSave[ii]+" ");
-		//			}
-		//
-		//		} catch (FileNotFoundException e) {
-		//			System.out.println("errore");
-		//			System.out.println(e.getMessage());
-		//		}
+				print="src//main//resources//groundTruthDistributions//distribution_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_l-"+numberLongLeaves+"_"+(i*RUNS_AT_A_TIME)+".txt";
+		
+				file = new File(print);
+				try (PrintWriter writer = new PrintWriter(file)) {
+		
+					for(int ii=0;ii<arrSave.length;ii++) {
+						if(arrSave[ii]>0.)
+							writer.write(arrSave[ii]+" ");
+					}
+		
+				} catch (FileNotFoundException e) {
+					System.out.println("errore");
+					System.out.println(e.getMessage());
+				}
 
 
 

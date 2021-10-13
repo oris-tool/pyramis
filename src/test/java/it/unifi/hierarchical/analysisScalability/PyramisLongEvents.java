@@ -31,7 +31,7 @@ public class PyramisLongEvents {
 
 	public static void main(String[] args){
 		for(int i=0;i<5;i++) {
-			test1(3,1, i);
+			test1(3,20, i);
 		}
 		
 	}
@@ -54,7 +54,7 @@ public class PyramisLongEvents {
 						try {
 
 
-							String print= ""+TIME_STEP+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+"_l-"+l+"-"+iter+".txt";
+							String print="src//main//resources//pyramisAnalytic//"+ ""+TIME_STEP+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+"_l-"+l+"-"+iter+".txt";
 
 
 							//HSMP

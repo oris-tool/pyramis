@@ -33,7 +33,7 @@ public class PyramisSamplerRelative {
 	public static void main(String[] args){
 		int[] time = new int[] {190,487,2197};
 		for(int i=0;i<time.length;i++) {
-			sample(time[i], args[0]);
+			sample(time[i], ""+1);
 		}
 	}
 
@@ -86,7 +86,7 @@ public class PyramisSamplerRelative {
 				toEndTime-=time;
 
 			}
-			String print=timeE+"_"+I+"_"+(i*TIME_LIMIT)+".txt";
+			String print="src//main//resources//pyramis//"+timeE+"_"+I+"_"+(i*TIME_LIMIT)+".txt";
 
 			File file = new File(print);
 			try (PrintWriter writer = new PrintWriter(file)) {

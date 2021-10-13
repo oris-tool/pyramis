@@ -33,7 +33,7 @@ public class PyramisCycles {
 	public static void main(String[] args){
 		//Integer.valueOf(args[0])
 		
-			test1(Integer.valueOf(args[0]));
+			test1(Integer.valueOf(20));
 		
 	}
 
@@ -53,7 +53,7 @@ public class PyramisCycles {
 			try {
 
 
-				String print= "cycle_"+TIME_STEP+"_L"+LOOPS+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+"_l-"+cycles+".txt";
+				String print="src//main//resources//pyramisAnalytic//"+ "cycle_"+TIME_STEP+"_L"+LOOPS+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+"_l-"+cycles+".txt";
 
 				//HSMP
 				//Build the model

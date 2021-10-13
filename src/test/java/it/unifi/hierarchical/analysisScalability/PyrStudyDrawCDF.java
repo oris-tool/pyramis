@@ -35,7 +35,7 @@ public class PyrStudyDrawCDF {
 
 		String[] pathnamesSample;
 
-		File fDirec = new File("src//main//resources//pyramisSimulation");
+		File fDirec = new File("src//main//resources//groundTruthDistributions");
 
 		// Populates the array with names of files and directories
 		pathnamesSample = fDirec.list();
@@ -46,7 +46,7 @@ public class PyrStudyDrawCDF {
 			int count=0;
 			double[] mille = new double[1000];
 			
-			File sample = new File("src//main//resources//pyramisSimulation//"+pathnameS);
+			File sample = new File("src//main//resources//groundTruthDistributions//"+pathnameS);
 
 			try (BufferedReader br = new BufferedReader(new FileReader(sample))) {
 				String line;
@@ -83,7 +83,7 @@ public class PyrStudyDrawCDF {
 			}
 			
 			
-			File file = new File("src//main//resources//pyramisRes//cdf_"+pathnameS);
+			File file = new File("src//main//resources//groundTruthCDF//cdf_"+pathnameS);
 			try (PrintWriter writer = new PrintWriter(file)) {
 				for(int i=0;i<1000;i++) {
 					writer.write(i*step+" "+mille[i]+"\n");
