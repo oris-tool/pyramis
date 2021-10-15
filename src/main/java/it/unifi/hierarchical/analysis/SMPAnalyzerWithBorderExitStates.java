@@ -1,3 +1,20 @@
+/* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
+ * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package it.unifi.hierarchical.analysis;
 
 import java.math.BigDecimal;
@@ -45,9 +62,9 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		this(initialState, sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, timeStep, absorbingState, variable, 0);
 	}
 
-	// analyzer da dove è chiamato? Da Sojourn per valutare il tempo di soggiorno in una regione: prob from to
+	// analyzer da dove ï¿½ chiamato? Da Sojourn per valutare il tempo di soggiorno in una regione: prob from to
 	// Si riferisce solo ad una regione di volta in volta vero? SI
-	// Quindi la riconversione è fatta regione per regione immediatamente
+	// Quindi la riconversione ï¿½ fatta regione per regione immediatamente
 	/**
 	 * 
 	 * @param initialState
@@ -231,7 +248,7 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		List<Double> branchingProbs = new ArrayList<>();
 		List<State> nextStates = new ArrayList<>();
 
-		//fo un self loop, ogni uscita è riportata sullo stesso
+		//fo un self loop, ogni uscita ï¿½ riportata sullo stesso
 		if(oldstate.equals(absorbingState)) {
 			branchingProbs.add(1.0);
 			nextStates.add(newState);

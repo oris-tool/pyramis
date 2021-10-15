@@ -1,3 +1,20 @@
+/* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
+ * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package it.unifi.hierarchical.analysis;
 
 import java.math.BigDecimal;
@@ -14,9 +31,9 @@ import it.unifi.hierarchical.model.CompositeState;
 import it.unifi.hierarchical.model.ExitState;
 import it.unifi.hierarchical.model.FinalState;
 import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.SimpleState;
 import it.unifi.hierarchical.model.State;
+import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
@@ -159,8 +176,8 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 	}
 
 
-	//INFO: I calcoli si basano sul fatto che il ciclo è tale da non permettere mai l'uscita!!
-	// Reaching prob nella never è sempre 1!!
+	//INFO: I calcoli si basano sul fatto che il ciclo ï¿½ tale da non permettere mai l'uscita!!
+	// Reaching prob nella never ï¿½ sempre 1!!
 	private void evaluateLowerLevelStateSojournTime(State state) {
 
 
@@ -328,7 +345,7 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 
 
-				// calcola separatamente alle exit modificate, la probabilità che non falliscano prima
+				// calcola separatamente alle exit modificate, la probabilitï¿½ che non falliscano prima
 				//4- Evaluate reaching probability of target sub-state, given that we are in the parent state
 
 
@@ -427,7 +444,7 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 			}
 		}
 
-		//FIXME viene fatto più volte...
+		//FIXME viene fatto piï¿½ volte...
 		shiftedExitDistributions.put(parentRegion, new NumericalValues(finalExitDistribution, greatestTimeStep));
 
 		if(vm) {

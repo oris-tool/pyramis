@@ -1,41 +1,46 @@
-package it.unifi.hierarchical.analysisScalability;
+/* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
+ * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
+package it.unifi.hierarchical.analysisScalability;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jfree.util.StringUtils;
 import org.oristool.math.OmegaBigDecimal;
-import org.oristool.math.domain.DBMZone;
-import org.oristool.math.expression.Expolynomial;
-import org.oristool.math.expression.Variable;
-import org.oristool.math.function.Erlang;
 import org.oristool.math.function.Function;
 import org.oristool.math.function.GEN;
-import org.oristool.simulator.samplers.ErlangSampler;
-import org.oristool.simulator.samplers.ExponentialSampler;
 import org.oristool.simulator.samplers.MetropolisHastings;
 import org.oristool.simulator.samplers.Sampler;
-import org.oristool.simulator.samplers.UniformSampler;
 
 import it.unifi.hierarchical.model.CompositeState;
 import it.unifi.hierarchical.model.ExitState;
 import it.unifi.hierarchical.model.FinalState;
 import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.Region;
+import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.example.hsmp_scalability.HSMP_JournalLongEvents;
-import it.unifi.hierarchical.utils.StateUtils;
-import it.unifi.hierarchical.model.State;
-
 
 /**
  * Execution of calculations
@@ -303,7 +308,7 @@ public class PyramisSamplerLongEvents {
 
 			double d = Math.random();
 			boolean expDiffBool = d<0.5;
-			//inizializzo samp con i comp (contiene anche S0 ma va ignorato, in ogni caso è 0)
+			//inizializzo samp con i comp (contiene anche S0 ma va ignorato, in ogni caso ï¿½ 0)
 			for(State s: compS) {
 				samp.put(s, 0.0);
 			}
@@ -430,7 +435,7 @@ public class PyramisSamplerLongEvents {
 			init=initQ;
 		}
 
-		//attenzione allo zero, se depth diversa il primo è un composite
+		//attenzione allo zero, se depth diversa il primo ï¿½ un composite
 		if(init instanceof CompositeState  ) {
 			if(samp.get(init)>timeToEnd) {
 				add(init.getName(), timeToEnd, probabs);
@@ -473,7 +478,7 @@ public class PyramisSamplerLongEvents {
 
 			}
 
-			//init è a depth max
+			//init ï¿½ a depth max
 		}else {
 
 
