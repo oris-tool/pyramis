@@ -1,19 +1,20 @@
 # Pyramis library
 
-This repository provides Pyramis, a Java library for quantitative modeling and analysis of non-Markovian systems specified as an extension of UML statecharts. Specifically: 
-- Models can be defined through the formalism of Hierarchical Semi-Markov Processes with parallel regions (HSMPs), a class of statecharts capturing concurrency, hierarchy, stochastic timing, and probabilistic choices. In particular, steps modeling activities with non-Markovian duration can be either simple steps representing atomic activities or they can be composite steps obtained by composition of concurrent regions.  
+This repository provides Pyramis, a Java library for quantitative modeling and analysis of **non-Markovian systems** specified as an **extension of UML statecharts**. Specifically: 
+- Models can be defined through the formalism of **Hierarchical Semi-Markov Processes with parallel regions (HSMPs)**, a class of statecharts capturing concurrency, hierarchy, stochastic timing, and probabilistic choices. In particular, in HSMPs, steps model activities, possibly characterized by a non-Markovian duration, and they can be either **simple steps**, representing atomic activities, or **composite steps**, obtained by composition of concurrent **regions**. In turn, regions consist of steps, in a recursive composition yielding a **hierarchy** of HSMPs. 
 - Models can be evaluated by a compositional technique that performs separate analysis of the Semi-Markov Process (SMP) underlying each region, supporting both evaluation of steady-state behaviour of stationary models and evaluation of transient behaviour until absorption of non-stationary models. 
 
 The approach is presented in the paper titled "Compositional Analysis of Hierarchical UML Statecharts" authored by Laura Carnevali, Reinhard German, Francesco Santoni, and Enrico Vicario, currently submitted to the IEEE Transactions on Software Engineering after a minor revision. 
 
-To support reproducibility of the experimental results reported in the paper, this repository contains the code that builds and evaluates the considered models, and this document illustrates the steps needed to repeat the experiments. Given that some of them require a significant amount of time, this repository already contains all the intermediate and final results. Specifically:
+To support reproducibility of the experimental results reported in the paper, this repository contains the code that builds and evaluates the considered models, and this document illustrates the steps needed to repeat the experiments. Given that some of them require a significant amount of time, this repository already contains the files storing all the intermediate and final results. Specifically:
 - Navigate to `src/test/java/it/unifi/hierarchical/analysisScalability`and execute the `main` method of the Java classes inside the package `it.unifi.hierarchical.analysisScalability` to reproduce the experiments of the case study on transient timed failure logic analysis of component-based systems (reported in Section 4 of the paper). 
 - Navigate to `src/test/java/it/unifi/hierarchical/analysis`and execute the `main` method of the Java classes inside the package `it.unifi.hierarchical.analysis` to reproduce the experiments of the case study on steady-state analysis of software rejuvenation in virtual servers (reported in Section 5 of the paper). 
+
 To execute the main method of a Java class, open the class and click on the menu `Run > Run as > Java Application`.
 
 ## Installation
 
-This repository provides a ready-to-use Maven project that you can easily import into an Eclipse workspace to start working with the [Pyramis library](https://github.com/oris-tool/pyramis) (the repository includes the version `2.0.0-SNAPSHOT` of the Sirio library as a Maven dependency). Just follow these steps:
+This repository provides a ready-to-use Maven project that you can easily import into an Eclipse workspace to start working with the [Pyramis library](https://github.com/oris-tool/pyramis) (the version `2.0.0-SNAPSHOT` of the [Sirio library](https://github.com/oris-tool/sirio) is included as a Maven dependency). Just follow these steps:
 
 1. **Install Java >= 11.** For Windows, you can download a [package from Oracle](https://www.oracle.com/java/technologies/downloads/#java11); for linux, you can run `apt-get install openjdk-11-jdk`; for macOS, you can run `brew install --cask java`. 
 
@@ -68,4 +69,4 @@ Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyrSt
 
 ## Production of plots
 
-Plots of Figs. 5, 6, 7, 9, and 10 can be obtained by executing the python scripts in `src/main/resources/plots`.
+Plots of Figs. 5, 6, 7, 9, and 10 can be obtained by executing the python scripts in `src/main/resources/plots`, which already contain the required packages. Just run `python3` followed by the name of each python script.
