@@ -46,7 +46,7 @@ Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalab
 
 Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyramisLongEvents.java` to run the analysis of the model variants with large-support duration distributions and the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyramisCyles.java` to run the analysis of the model variants with cycles. Also in this case, for each of these models, 100 simulation runs are also performed, with each run lasting at least as long as the analysis. 
 
-The files contaning the analysis computation times (reported in Table 1 and Fig. 5), the files containing the probability of each step (before absorption) produced by analysis and simulation, the files containing the CDF of the duration of the failure process produced by the analysis (used for the plots in Fig. 7) are placed in `src/main/resources/pyramisAnalytic`.
+The files contaning the analysis computation times (reported in Table 1 and Fig. 5), the files containing the probability of each step (before absorption) produced by analysis and simulation are placed in respectively `src/main/resources/pyramisAnalytic`,`/pyramisAnalyticLong`,`/pyramisAnalyticCycles`  while the files corresponding to the 100 simulation runs are placed in `src/main/resources/pyramisAnalyticSameTime` and so on.
 
 Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResults.java` to compare the analysis results with the ground truth for each model except the variant with cycles and execute `src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResultsVarianceCycles.java` to compare the analysis results with the ground truth for the model variant with cycles, obtaining mean value and standard deviation of relative errors of analysis over simple steps (reported in Table 2 and Fig. 6). 
 
@@ -65,11 +65,11 @@ Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/Pyram
 
 Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/Pyramis.java` to run the analysis with fixed time tick for all the steps of the model, execute the `main` method of and `src/test/java/it/unifi/hierarchical/analysis/PyramisVariableTicks.java` to run the analysis with different time tick for different steps of the model. The files contaning the analysis computation times (reported in Table 7) and the files containing the steady-state probability of each step are placed in `src/main/resources/pyramis/`.
 
-Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyramisSamplerRelative.java` to run, for each analysis with variable time tick, 100 simulation runs of the model, with each run lasting at least as long as the analysis. The files containing the steady-state probability of each step are placed in `src/main/resources/pyramis/`.
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyramisSamplerRelative.java` to run, for each analysis with variable time tick, 100 simulation runs of the model, with each run lasting at least as long as the analysis. The files containing the steady-state probability of each step are placed in `src/main/resources/pyramisSameTime/`.
 
-Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyrStudyResults.java` to compare the analysis results with the ground truth, obtaining, for each step, the relative error achieved by the analysis with respect to the ground truth (reported in Table 8 and Fig. 10).
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyrStudyResults.java` to compare the analysis results with the ground truth, obtaining, for each step, the relative error achieved by the analysis with respect to the ground truth (reported in Table 8 and Fig. 10). The files are placed in `src/main/resources/pyramisCaseStudyRes/`.
 
-Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyrStudyResultsVariance.java` to compare the simulation results with the ground truth, obtaining, for each step, the mean value and standard deviation (over 100 runs) of relative errors achieved by the simulation with respect to the ground truth (reported in Table 9 and Fig. 10).
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyrStudyResultsVariance.java` to compare the simulation results with the ground truth, obtaining, for each step, the mean value and standard deviation (over 100 runs) of relative errors achieved by the simulation with respect to the ground truth (reported in Table 9 and Fig. 10).The files are placed in `src/main/resources/pyramisResSameTime/`.
 
 ## Production of plots
 
