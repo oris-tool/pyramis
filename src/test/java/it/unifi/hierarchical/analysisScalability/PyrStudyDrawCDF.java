@@ -55,7 +55,7 @@ public class PyrStudyDrawCDF {
 		for(String pathnameS: pathnamesSample) {
 			System.out.println(pathnameS);
 
-			int count=0;
+			int count=0;	
 			double[] mille = new double[1000];
 			
 			File sample = new File("src//main//resources//groundTruthDistributions//"+pathnameS);
