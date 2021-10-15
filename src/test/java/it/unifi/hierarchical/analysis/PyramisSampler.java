@@ -32,21 +32,21 @@ import org.oristool.simulator.samplers.UniformSampler;
 public class PyramisSampler {
 
 	public static void main(String[] args){
-		int[] i96b = new int[] {24};
+		int[] i96b = new int[] {10,15,20,25};
 		for(int i=0;i<i96b.length;i++) {
 			sample(i96b[i]);
 		}
 	}
 
-	public static void sample(int VMMTIME){
-		long EndTime = 36000000;
+	public static void sample(int MILLIONS){
+		long EndTime = MILLIONS*1000000;
 		long toEndTime = EndTime;
 
 		//dove raccolgo
 		Map<String,Double> probabs = new HashMap<>();
 		Map<String,Sampler> samplers = new HashMap<>();
 
-		initialize(VMMTIME,probabs,samplers);
+		initialize(24,probabs,samplers);
 		
 		probabs.put("2", 0.0);
 		probabs.put("3", 0.0);
@@ -66,9 +66,9 @@ public class PyramisSampler {
 			//Analyze
 			Date start = new Date();
 
-			double TIME_LIMIT=1000000;
+			double TIME_LIMIT=1000000; //prints intermediate results every 1000 seconds
 
-			String print="src//main//resources//pyramisCaseStudyGrundTruth//"+"s24high_"+VMMTIME+"_"+(i*TIME_LIMIT)+".txt";
+			String print="src//main//resources//pyramisCaseStudyGrundTruth//"+"s24high_"+MILLIONS+"_"+(i*TIME_LIMIT)+".txt";
 
 
 		
@@ -82,7 +82,7 @@ public class PyramisSampler {
 			long time = end.getTime() - start.getTime();
 			System.out.println("Time Hierarchical SMP analysis:" + time + "ms");
 
-			toEndTime-=time;
+			toEndTime-=num;
 
 			File file = new File(print);
 			try (PrintWriter writer = new PrintWriter(file)) {

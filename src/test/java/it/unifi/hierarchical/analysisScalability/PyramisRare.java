@@ -39,11 +39,10 @@ public class PyramisRare {
 
 		Integer x = null;
 		Integer y= null;
-		if(args.length>0) {
-			x=Integer.valueOf(args[0]);
-			y = Integer.valueOf(args[1]);
-		}
 		
+		x=Integer.valueOf(100);
+		y = Integer.valueOf(1);
+
 		test1(x,y);
 		
 	}
@@ -52,21 +51,19 @@ public class PyramisRare {
 	public static void test1(Integer x, Integer y) {    
 
 
-		//cambia <4 -> <6
-		// cambia last=0 > 1
-		for(int last=1; last>-1;last--) {
+		for(int last=0; last>-1;last--) {
 			RegionType lastB = (last==1)? RegionType.FINAL : RegionType.EXIT;
 
-			for(int parallel=4;parallel<5; parallel++) {
-				for(int depth=3;depth<4;depth++) {
-					for(int seq=4;seq<5;seq++) {
+			for(int parallel=3;parallel<4; parallel++) {
+				for(int depth=2;depth<3;depth++) {
+					for(int seq=3;seq<4;seq++) {
 
 
 
 						try {
 
 
-							String print= ""+TIME_STEP+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+".txt";
+							String print="src//main//resources//pyramisAnalyticRare//"+ ""+TIME_STEP+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+".txt";
 
 
 							//HSMP
@@ -87,6 +84,8 @@ public class PyramisRare {
 							System.out.println("Time Hierarchical SMP analysis:" + time + "ms");
 							
 							File file = new File(print);
+							file.getParentFile().mkdirs();
+							
 							try (PrintWriter writer = new PrintWriter(file)) {
 								writer.write("TIME=  "		+time 		+"ms \n\n");
 								writer.write("p="+parallel+" d="+(depth+1)+" s="+seq+ "\n");

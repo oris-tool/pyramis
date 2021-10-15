@@ -52,7 +52,7 @@ public class PyramisSamplerLongEvents {
 
 	public static void sampleFromTime(int numberLeaves, long time, int parallel, int depth, int seq,boolean expolSame, RegionType lastB, int y) {
 
-	
+
 		for(int i=y*0;i<=10*(y+1);i++) {
 			sample(numberLeaves,time, parallel,depth,seq,expolSame, lastB, i);
 		}
@@ -152,12 +152,17 @@ public class PyramisSamplerLongEvents {
 			it="_"+iteration;
 		}
 		String g="";
-		if(timeSS>0)
-			g="sameTime_";
+		if(timeSS>0) {
+			g="src//main//resources//pyramisAnalyticSameTimeLong//"+"sameTime_";
+		}else {
 
+			g= "src//main//resources//pyramisSimulationLong//";
+		}
 		String print= g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_l-"+numberLongLeaves+"_"+(i*RUNS_AT_A_TIME)+it+".txt";
 
 		File file = new File(print);
+		file.getParentFile().mkdirs();
+		
 		try (PrintWriter writer = new PrintWriter(file)) {
 
 			writer.write("TIME=  "		+((EndTime-toEndTime))	+"ms \n\n");
@@ -181,21 +186,22 @@ public class PyramisSamplerLongEvents {
 			System.out.println("errore");
 			System.out.println(e.getMessage());
 		}
-//		print="distribution_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_l-"+numberLongLeaves+"_"+(i*RUNS_AT_A_TIME)+".txt";
-//
-//		file = new File(print);
-//		try (PrintWriter writer = new PrintWriter(file)) {
-//
-//			for(int ii=0;ii<arrSave.length;ii++) {
-//				if(arrSave[ii]>0.)
-//					writer.write(arrSave[ii]+" ");
-//			}
-//
-//		} catch (FileNotFoundException e) {
-//			System.out.println("errore");
-//			System.out.println(e.getMessage());
-//		}
+		if(timeSS==0) {
+			print=g="src//main//resources//groundTruthDistributions//distributionLong_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_l-"+numberLongLeaves+"_"+(i*RUNS_AT_A_TIME)+".txt";
 
+			file = new File(print);
+			try (PrintWriter writer = new PrintWriter(file)) {
+
+				for(int ii=0;ii<arrSave.length;ii++) {
+					if(arrSave[ii]>0.)
+						writer.write(arrSave[ii]+" ");
+				}
+
+			} catch (FileNotFoundException e) {
+				System.out.println("errore");
+				System.out.println(e.getMessage());
+			}
+		}
 
 
 
@@ -218,7 +224,7 @@ public class PyramisSamplerLongEvents {
 	}
 
 
-	
+
 
 	private static class ExpolSampler implements Sampler {
 
@@ -232,14 +238,14 @@ public class PyramisSamplerLongEvents {
 		@Override
 		public BigDecimal getSample() {
 
-	
+
 			return mp.getSample();
 		}
 
 
 	}
 
-	
+
 
 	private static void initialize(Map<String,Sampler> samplers) {
 
@@ -418,12 +424,12 @@ public class PyramisSamplerLongEvents {
 		Set<String> setZero =HSMP_JournalLongEvents.zeros;
 		if(setZero.contains(initQ.getName())) {
 			List<State> kl = initQ.getNextStates();
-			
+
 			init=samp.get(kl.get(0)) >0. ? kl.get(0) : kl.get(1);
 		}else {
 			init=initQ;
 		}
-		
+
 		//attenzione allo zero, se depth diversa il primo è un composite
 		if(init instanceof CompositeState  ) {
 			if(samp.get(init)>timeToEnd) {
@@ -442,7 +448,7 @@ public class PyramisSamplerLongEvents {
 				if(!(remaining>0.0)) {
 					return;
 				}
-				
+
 				List<State> list= init.getNextStates();
 
 				win = samp.get(list.get(0)) >0. ? list.get(0) : list.get(1);
@@ -470,7 +476,7 @@ public class PyramisSamplerLongEvents {
 			//init è a depth max
 		}else {
 
-			
+
 			State win =init;
 			Double remaining = timeToEnd;
 

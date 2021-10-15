@@ -66,8 +66,6 @@ public class PyramisSamplerRare {
 			for(int parallel=2;parallel<5; parallel++) {
 				for(int depth=1;depth<4;depth++) {
 					for(int seq=2;seq<5;seq++) {
-						//FIXME
-						//if( !(parallel==2 && depth==1 && seq==2) )
 						sample(0,parallel,depth,seq,sameExp, lastB, 0);
 
 					}}}}
@@ -121,7 +119,6 @@ public class PyramisSamplerRare {
 
 
 
-			System.out.println("in "+i);
 			i++;
 			//Analyze
 			Date start = new Date();
@@ -148,12 +145,17 @@ public class PyramisSamplerRare {
 		if(iteration>0) {
 			it="_"+iteration;
 		}
-		if(timeSS>0)
-			g="sameTime_";
+		if(timeSS>0) {
+			g="src//main//resources//pyramisAnalyticSameTimeRare//"+"sameTime_";
+		}else {
 
+			g= "src//main//resources//pyramisSimulationRare//";
+		}
 		String print= g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+it+".txt";
 
 		File file = new File(print);
+		file.getParentFile().mkdirs();
+		
 		try (PrintWriter writer = new PrintWriter(file)) {
 
 			writer.write("TIME=  "		+((EndTime-toEndTime))	+"ms \n\n");
@@ -177,22 +179,23 @@ public class PyramisSamplerRare {
 			System.out.println("errore");
 			System.out.println(e.getMessage());
 		}
-//		print="distribution_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+".txt";
-//
-//		file = new File(print);
-//		try (PrintWriter writer = new PrintWriter(file)) {
-//
-//			for(int ii=0;ii<arrSave.length;ii++) {
-//				if(arrSave[ii]>0.)
-//					writer.write(arrSave[ii]+" ");
-//			}
-//
-//		} catch (FileNotFoundException e) {
-//			System.out.println("errore");
-//			System.out.println(e.getMessage());
-//		}
+		if(timeSS==0) {
+			print=g="src//main//resources//groundTruthDistributions//distributionRare_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+".txt";
 
+			file = new File(print);
+			try (PrintWriter writer = new PrintWriter(file)) {
 
+				for(int ii=0;ii<arrSave.length;ii++) {
+					if(arrSave[ii]>0.)
+						writer.write(arrSave[ii]+" ");
+				}
+
+			} catch (FileNotFoundException e) {
+				System.out.println("errore");
+				System.out.println(e.getMessage());
+			}
+
+		}
 
 
 	}

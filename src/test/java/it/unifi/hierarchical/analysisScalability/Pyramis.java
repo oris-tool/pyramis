@@ -40,7 +40,7 @@ public class Pyramis {
 
 		Integer repetitionsOfSampling= null;
 		if(args.length>0) {
-			repetitionsOfSampling = Integer.valueOf(20);
+			repetitionsOfSampling = Integer.valueOf(100);
 		}
 		
 		test1(repetitionsOfSampling);
@@ -84,6 +84,7 @@ public class Pyramis {
 							System.out.println("Time Hierarchical SMP analysis:" + time + "ms");
 							
 							File file = new File(print);
+							file.getParentFile().mkdirs();
 							try (PrintWriter writer = new PrintWriter(file)) {
 								writer.write("TIME=  "		+time 		+"ms \n\n");
 								writer.write("p="+parallel+" d="+(depth+1)+" s="+seq+ "\n");

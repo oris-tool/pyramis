@@ -30,18 +30,14 @@ public class PyramisLongEvents {
 
 
 	public static void main(String[] args){
-		for(int i=0;i<5;i++) {
-			test1(3,20, i);
-		}
-		
+		test1(3,100, 1);
+				
 	}
 
 
 	public static void test1(int l, int y, int iter) {    
 
 
-		//cambia <4 -> <6
-		// cambia last=0 > 1
 		for(int last=0; last>-1;last--) {
 			RegionType lastB = (last==1)? RegionType.FINAL : RegionType.EXIT;
 
@@ -54,7 +50,7 @@ public class PyramisLongEvents {
 						try {
 
 
-							String print="src//main//resources//pyramisAnalytic//"+ ""+TIME_STEP+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+"_l-"+l+"-"+iter+".txt";
+							String print="src//main//resources//pyramisAnalyticLong//"+ ""+TIME_STEP+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+"_l-"+l+"-"+iter+".txt";
 
 
 							//HSMP
@@ -76,6 +72,7 @@ public class PyramisLongEvents {
 							Set<String> zeros =HSMP_JournalLongEvents.zeros;
 
 							File file = new File(print);
+							file.getParentFile().mkdirs();
 							try (PrintWriter writer = new PrintWriter(file)) {
 								writer.write("TIME=  "		+time 		+"ms \n\n");
 								writer.write("p="+parallel+" d="+(depth+1)+" s="+seq+ "\n");

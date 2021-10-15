@@ -51,7 +51,7 @@ public class PyramisSampler {
 
 	public static void sampleFromTime(long time, int parallel, int depth, int seq,boolean expolSame, RegionType lastB, int y) {
 
-		
+
 		for(int i=0;i<y;i++) {
 			sample(time, parallel,depth,seq,expolSame, lastB, i);
 		}
@@ -60,7 +60,7 @@ public class PyramisSampler {
 
 	public static void main(String[] args){
 
-		for(int last=0; last>-1;last--) {
+		for(int last=1; last>-1;last--) {
 			RegionType lastB = (last==1)? RegionType.FINAL : RegionType.EXIT;
 
 			for(int parallel=2;parallel<5; parallel++) {
@@ -146,12 +146,16 @@ public class PyramisSampler {
 		if(iteration>0) {
 			it="_"+iteration;
 		}
-		if(timeSS>0)
-			g="sameTime_";
+		if(timeSS>0) {
+			g="src//main//resources//pyramisAnalyticSameTime//"+"sameTime_";
+		}else {
 
+			g= "src//main//resources//pyramisSimulation//";
+		}
 		String print= g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+it+".txt";
 
 		File file = new File(print);
+		file.getParentFile().mkdirs();
 		try (PrintWriter writer = new PrintWriter(file)) {
 
 			writer.write("TIME=  "		+((EndTime-toEndTime))	+"ms \n\n");
@@ -175,22 +179,24 @@ public class PyramisSampler {
 			System.out.println("errore");
 			System.out.println(e.getMessage());
 		}
-//		print="distribution_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+".txt";
-//
-//		file = new File(print);
-//		try (PrintWriter writer = new PrintWriter(file)) {
-//
-//			for(int ii=0;ii<arrSave.length;ii++) {
-//				if(arrSave[ii]>0.)
-//					writer.write(arrSave[ii]+" ");
-//			}
-//
-//		} catch (FileNotFoundException e) {
-//			System.out.println("errore");
-//			System.out.println(e.getMessage());
-//		}
 
+		if(timeSS==0) {
+			print=g="src//main//resources//groundTruthDistributions//distribution_"+g+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_"+(i*RUNS_AT_A_TIME)+".txt";
 
+			file = new File(print);
+			try (PrintWriter writer = new PrintWriter(file)) {
+
+				for(int ii=0;ii<arrSave.length;ii++) {
+					if(arrSave[ii]>0.)
+						writer.write(arrSave[ii]+" ");
+				}
+
+			} catch (FileNotFoundException e) {
+				System.out.println("errore");
+				System.out.println(e.getMessage());
+			}
+
+		}
 
 
 	}

@@ -42,7 +42,7 @@ public class PyrStudyResultsVarianceCycles {
 
 		String[] pathnamesSample;
 
-		File fDirec = new File("src//main//resources//pyramisSimulation");
+		File fDirec = new File("src//main//resources//pyramisSimulationCycles");
 
 		// Populates the array with names of files and directories
 		pathnamesSample = fDirec.list();
@@ -50,11 +50,13 @@ public class PyrStudyResultsVarianceCycles {
 		for(String pathnameS: pathnamesSample) {
 			System.out.println(pathnameS);
 
+			//prefix of cycles names is 8 characters
 			int xx=8;
 
 			int p = Integer.valueOf(pathnameS.substring(2+xx, 3+xx));
 			int dep= Integer.valueOf(pathnameS.substring(6+xx, 7+xx));
 			int ss= Integer.valueOf(pathnameS.substring(10+xx, 11+xx));
+			int rp= Integer.valueOf(pathnameS.substring(15+xx, 16+xx));
 			int Final= pathnameS.contains("EXIT")? 0:1;
 
 			int l;
@@ -66,6 +68,8 @@ public class PyrStudyResultsVarianceCycles {
 				l=3;
 			}
 
+			double[] rpA= {0.5,0.75,1.,1.5};
+			double rpV= rpA[rp];
 
 
 			Map<String,String> Aliases= new HashMap<>();
@@ -75,13 +79,13 @@ public class PyrStudyResultsVarianceCycles {
 			Map<String,String>[] store=new Map[10]; 
 
 
-			for(int i=2;i<9;i++) {
+			for(int i=2;i<10;i++) {
 				
 				searchAliases= new HashMap<>();
 				store[i]=searchAliases;
 
 				System.out.println("nide");
-				HierarchicalSMP model1 = HSMP_JournalCycles.build(l,3,2,3,true, RegionType.EXIT, i);
+				HierarchicalSMP model1 = HSMP_JournalCycles.build(rpV,l,3,2,3,true, RegionType.EXIT, i);
 				State initial1 = model1.getInitialState();
 
 				searchAliases.put(initial1.getName(), "s0");
@@ -242,7 +246,7 @@ public class PyrStudyResultsVarianceCycles {
 			Map<String,Double> mapSimul = new HashMap<String,Double>();
 			Map<String,Double> mapAnalytic; 
 
-			File sample = new File("src//main//resources//pyramisSimulation//"+pathnameS);
+			File sample = new File("src//main//resources//pyramisSimulationCycles//"+pathnameS);
 
 			try (BufferedReader br = new BufferedReader(new FileReader(sample))) {
 				String line;
@@ -274,7 +278,7 @@ public class PyrStudyResultsVarianceCycles {
 
 
 
-			File f = new File("src//main//resources//pyramisAnalytic");
+			File f = new File("src//main//resources//pyramisAnalyticCycles");
 
 			// Populates the array with names of files and directories
 			pathnames = f.list();
@@ -284,8 +288,8 @@ public class PyrStudyResultsVarianceCycles {
 
 				mapAnalytic = new HashMap<String,Double>();
 				String ex= (Final>0)? "FINAL" : "EXIT";
-				boolean aa =pathname.contains("p-"+p+"_d-"+dep+"_s-"+ss+"_Final-"+Final+"_l-"+l);
-				boolean bb =pathname.contains(p+"_d-"+dep+"_s-"+ss+"_Final-"+ex+"_l-"+l);
+				boolean aa =pathname.contains("p-"+p+"_d-"+dep+"_s-"+ss+"_rp-"+rp+"_Final-"+Final+"_l-"+l);
+				boolean bb =pathname.contains(p+"_d-"+dep+"_s-"+ss+"_rp-"+rp+"_Final-"+ex+"_l-"+l);
 
 
 				if(aa || bb) {
@@ -295,7 +299,7 @@ public class PyrStudyResultsVarianceCycles {
 
 					Map<String,String> alias = store[LOOPSn];
 
-					File in = new File("src//main//resources//pyramisAnalytic//"+pathname);
+					File in = new File("src//main//resources//pyramisAnalyticCycles//"+pathname);
 
 					try (BufferedReader br = new BufferedReader(new FileReader(in))) {
 						String line;
@@ -373,7 +377,9 @@ public class PyrStudyResultsVarianceCycles {
 					scarto = Math.sqrt(scarto);
 
 
-					File file = new File("src//main//resources//pyramisRes//res_"+pathname);
+					File file = new File("src//main//resources//pyramisResCycles//res_"+pathname);
+					file.getParentFile().mkdirs();
+
 					try (PrintWriter writer = new PrintWriter(file)) {
 
 						writer.write(formatter.format(min)+", "+ formatter.format(max)+", "+formatter.format(average)+", "+formatter.format(scarto));
@@ -384,9 +390,133 @@ public class PyrStudyResultsVarianceCycles {
 						System.out.println(e.getMessage());
 					}
 
+					
+					
 				}
+				
+				
+				
 			}
+			f = new File("src//main//resources//pyramisAnalyticSameTimeCycles");
 
+			// Populates the array with names of files and directories
+			pathnames = f.list();
+
+			// For each pathname in the pathnames array
+			for (String pathname : pathnames) {
+
+				mapAnalytic = new HashMap<String,Double>();
+				String ex= (Final>0)? "FINAL" : "EXIT";
+				boolean aa =pathname.contains("p-"+p+"_d-"+dep+"_s-"+ss+"_rp-"+rp+"_Final-"+Final+"_l-"+l);
+				boolean bb =pathname.contains(p+"_d-"+dep+"_s-"+ss+"_rp-"+rp+"_Final-"+ex+"_l-"+l);
+
+
+				if(aa || bb) {
+
+					
+					int LOOPSn= aa? Integer.valueOf(pathname.substring(14, 15)): Integer.valueOf(pathname.substring(16, 17));
+
+					Map<String,String> alias = store[LOOPSn];
+
+					File in = new File("src//main//resources//pyramisAnalyticSameTimeCycles//"+pathname);
+
+					try (BufferedReader br = new BufferedReader(new FileReader(in))) {
+						String line;
+						line = br.readLine();
+						line = br.readLine();
+						while ((line = br.readLine()) != null) {
+							if(line.startsWith("p")) {
+								continue;
+							}
+							int ind= line.indexOf(".");
+							if(ind>0)
+								line=line.substring(0,ind-1)+" "+line.substring(ind-1);
+							
+							
+							String[] lines = line.split(" +");
+							
+							if(lines.length>1) {
+								add(lines[0], Double.valueOf(lines[1]),mapAnalytic, alias);
+
+							}
+
+						}
+
+
+					} catch (IOException e) {
+
+						e.printStackTrace();
+					}
+
+					Double min=10.;
+					Double max=0.;
+					Double average=0.;
+
+					int count=0;
+
+					double scarto=0.;
+
+					System.out.println(pathname);
+					System.out.println(mapAnalytic);
+					for(String st: mapSimul.keySet()) {
+						System.out.println(st);
+
+						if(mapAnalytic.containsKey(st)) {
+							Double s= mapSimul.get(st);
+							Double a= mapAnalytic.get(st);
+							Double r;
+							if(s>0.0) {
+								r= Math.abs(s-a)/s;
+								scarto+= r*r;
+								System.out.println(r+" "+s+" "+ a);
+								if(!(r>0.))
+									continue;
+								min= Math.min(min, r);
+								max=Math.max(max, r);
+								average+=r;
+								count++;
+
+							}
+						}
+
+					}
+					if(extraStates) {
+						average+=min+min+min+min;
+						scarto+=min*min+min*min+min*min+min*min;
+						count+=4;
+
+					}
+
+
+					average /=count;
+
+					scarto= scarto/ (count-1);
+					scarto-= average*average;
+
+					scarto = Math.sqrt(scarto);
+
+
+					File file = new File("src//main//resources//pyramisResSameTimeCycles//res_"+pathname);
+					
+					file.getParentFile().mkdirs();
+
+					try (PrintWriter writer = new PrintWriter(file)) {
+
+						writer.write(formatter.format(min)+", "+ formatter.format(max)+", "+formatter.format(average)+", "+formatter.format(scarto));
+
+
+					} catch (FileNotFoundException e) {
+						System.out.println("errore");
+						System.out.println(e.getMessage());
+					}
+
+					
+					
+				}
+				
+				
+				
+			}
 		}
 
 	}

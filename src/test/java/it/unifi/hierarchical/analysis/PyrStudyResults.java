@@ -129,7 +129,7 @@ public class PyrStudyResults {
 
 					writer.write(x+ formatter.format(val)+"\n");
 				}
-				average/=15;
+				average/=names.length;
 				writer.write("aver    "+ formatter.format(average)+"\n");
 
 

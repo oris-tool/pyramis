@@ -31,110 +31,114 @@ public class PyramisCycles {
 
 
 	public static void main(String[] args){
-		//Integer.valueOf(args[0])
-		
-			test1(Integer.valueOf(20));
-		
+		test1();
+
 	}
 
 
-	public static void test1(int x) {    
+	public static void test1() {    
+
+		//LOOPS determines the amount of iteration the cyle is executed for
+		//cycleType identifies if the cycle is on a single branch(1), on 2 branches(2) or all branches(3) of the failure model
+		for(int LOOPS=2;LOOPS<5;LOOPS++) {
+			for(int cycleType=3;cycleType<4;cycleType++) {
+				for(int rejPeriodI=0;rejPeriodI<4;rejPeriodI++) {
+
+					double[] rejPeriodA= {0.5,0.75,1.,1.5};
+					double rejPeriod= rejPeriodA[rejPeriodI];
+					int parallel=3;
+					int depth=2;
+					int seq=3;
+					RegionType lastB = RegionType.EXIT;
+					int last =0;
+
+					try {
 
 
-		int cycles =3;
+						String print="src//main//resources//pyramisAnalyticCycles//"+ "cycle_"+TIME_STEP+"_L"+LOOPS+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_rp-"+rejPeriodI+"_Final-"+last+"_l-"+cycleType+".txt";
 
-		for(int LOOPS=x;LOOPS<x+1;LOOPS++) {
-			int parallel=3;
-			int depth=2;
-			int seq=3;
-			RegionType lastB = RegionType.EXIT;
-			int last =0;
+						//HSMP
+						//Build the model
+						HierarchicalSMP model = HSMP_JournalCycles.build(rejPeriod,cycleType,parallel,depth,seq,expolSame, lastB,LOOPS);
 
-			try {
+						Set<String> sList = HSMP_JournalCycles.getStates();
 
-
-				String print="src//main//resources//pyramisAnalytic//"+ "cycle_"+TIME_STEP+"_L"+LOOPS+"_p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+last+"_l-"+cycles+".txt";
-
-				//HSMP
-				//Build the model
-				HierarchicalSMP model = HSMP_JournalCycles.build(cycles,parallel,depth,seq,expolSame, lastB,LOOPS);
-
-				Set<String> sList = HSMP_JournalCycles.getStates();
-
-				//Analyze
-				Date start = new Date();
-				HierarchicalSMPAnalysis analysis = new HierarchicalSMPAnalysis(model, 0);
-				Map<String, Double> ssHSMP = analysis.evaluateSteadyState(TIME_STEP, TIME_LIMIT);
+						//Analyze
+						Date start = new Date();
+						HierarchicalSMPAnalysis analysis = new HierarchicalSMPAnalysis(model, 0);
+						Map<String, Double> ssHSMP = analysis.evaluateSteadyState(TIME_STEP, TIME_LIMIT);
 
 
-				Date end = new Date();
-				long time = end.getTime() - start.getTime();
-				System.out.println(parallel+ "  "+ depth+ "  "+ seq+" "+last );
-				System.out.println("Time Hierarchical SMP analysis:" + time + "ms");
-				Set<String> zeros =HSMP_JournalCycles.zeros;
+						Date end = new Date();
+						long time = end.getTime() - start.getTime();
+						System.out.println(parallel+ "  "+ depth+ "  "+ seq+" "+last );
+						System.out.println("Time Hierarchical SMP analysis:" + time + "ms");
+						Set<String> zeros =HSMP_JournalCycles.zeros;
 
-				File file = new File(print);
-				try (PrintWriter writer = new PrintWriter(file)) {
-					writer.write("TIME=  "		+time 		+"ms \n\n");
-					writer.write("p="+parallel+" d="+(depth+1)+" s="+seq+ "\n");
-					for(String s: sList) {
-
-
-						if(zeros.contains(s)) {
-							writer.write(s+" "+0.0+"\n");
+						File file = new File(print);
+						file.getParentFile().mkdirs();
+						try (PrintWriter writer = new PrintWriter(file)) {
+							writer.write("TIME=  "		+time 		+"ms \n\n");
+							writer.write("p="+parallel+" d="+(depth+1)+" s="+seq+ "\n");
+							for(String s: sList) {
 
 
-						} else {
-							writer.write(s+" "+ssHSMP.get(s)+"\n");
+								if(zeros.contains(s)) {
+									writer.write(s+" "+0.0+"\n");
+
+
+								} else {
+									writer.write(s+" "+ssHSMP.get(s)+"\n");
+								}
+							}
+
+
+
+
+
+
+						} catch (FileNotFoundException e) {
+							System.out.println("errore");
+							System.out.println(e.getMessage());
 						}
+
+
+
+						file = new File("cdf_"+print);
+						NumericalValues cdf = HierarchicalSMPAnalysis.cdf;
+						double[] val= cdf.getValues();
+						System.out.println(cdf.getStep());
+						try (PrintWriter writer = new PrintWriter(file)) {
+
+
+							for(int i=0;i<val.length;i++) {
+
+
+								writer.write(i*cdf.getStep()+" "+val[i]+"\n");
+
+							}
+
+
+
+
+
+
+						} catch (FileNotFoundException e) {
+							System.out.println("errore");
+							System.out.println(e.getMessage());
+						}
+
+
+						PyramisSamplerCycles.sampleFromTime(rejPeriodI,LOOPS, cycleType, time, parallel,depth,seq,expolSame,lastB);
+
+
 					}
-
-
-
-
-
-
-				} catch (FileNotFoundException e) {
-					System.out.println("errore");
-					System.out.println(e.getMessage());
-				}
-
-				
-				
-				file = new File("cdf_"+print);
-				NumericalValues cdf = HierarchicalSMPAnalysis.cdf;
-				double[] val= cdf.getValues();
-				System.out.println(cdf.getStep());
-				try (PrintWriter writer = new PrintWriter(file)) {
-					
-					
-					for(int i=0;i<val.length;i++) {
-
-						
-						writer.write(i*cdf.getStep()+" "+val[i]+"\n");
-						
+					catch(Exception e){
+						System.out.println(e.toString());
 					}
-
-
-
-
-
-
-				} catch (FileNotFoundException e) {
-					System.out.println("errore");
-					System.out.println(e.getMessage());
 				}
-				
-				
-				PyramisSamplerCycles.sampleFromTime(LOOPS, cycles, time, parallel,depth,seq,expolSame,lastB, 1);
-
-
-			}
-			catch(Exception e){
-				System.out.println(e.toString());
 			}
 		}
-
 	}
 
 

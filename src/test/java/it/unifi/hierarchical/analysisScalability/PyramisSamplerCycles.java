@@ -42,11 +42,11 @@ public class PyramisSamplerCycles {
 	public static final boolean sameExp = true;
 
 
-	public static void sampleFromTime(int LOOPS, int numberLeaves, long time, int parallel, int depth, int seq,boolean expolSame, RegionType lastB, int y) {
+	public static void sampleFromTime(int rejPeriodIndex, int LOOPS, int numberLeaves, long time, int parallel, int depth, int seq,boolean expolSame, RegionType lastB) {
 
 
-		for(int i=y*0;i<=40*(y+1);i++) {
-			sample(LOOPS, numberLeaves, time, parallel,depth,seq,expolSame, lastB, i);
+		for(int i=0;i<=100;i++) {
+			sample(rejPeriodIndex, LOOPS, numberLeaves, time, parallel,depth,seq,expolSame, lastB, i);
 		}
 
 	}
@@ -54,23 +54,32 @@ public class PyramisSamplerCycles {
 
 
 	public static void main(String[] args){
-		int LOOPS=14;
+		int LOOPS=10;
 
-		for(int l=3;l<4;l++) {
-			for(int last=0; last>-1;last--) {
-				RegionType lastB = (last==1)? RegionType.FINAL : RegionType.EXIT;
+		//simulation is done over a maximum of 10 iterations of the cycle, arbitrary number no practical impact after 8
 
-				for(int parallel=3;parallel<4; parallel++) {
-					for(int depth=2;depth<3;depth++) {
-						for(int seq=3;seq<4;seq++) {
-							sample(LOOPS, l, 0,parallel,depth,seq,sameExp, lastB,0 );
+		
+		for(int rejPeriodIndex=0;rejPeriodIndex<4;rejPeriodIndex++) {
+			
+				
+			for(int l=3;l<4;l++) {
+				for(int last=0; last>-1;last--) {
+					RegionType lastB = (last==1)? RegionType.FINAL : RegionType.EXIT;
 
-						}}}}
+					for(int parallel=3;parallel<4; parallel++) {
+						for(int depth=2;depth<3;depth++) {
+							for(int seq=3;seq<4;seq++) {
+								sample(rejPeriodIndex, LOOPS, l, 0,parallel,depth,seq,sameExp, lastB,0 );
+
+							}}}}
+			}
 		}
 	}
 
-	public static void sample(int LOOPS, int numberLoopsPerLeaves,long timeSS, int parallel,int depth,int seq,boolean expolSame, RegionType lastB, int iteration){
-
+	public static void sample(int rejPeriodIndex, int LOOPS, int numberLoopsPerLeaves,long timeSS, int parallel,int depth,int seq,boolean expolSame, RegionType lastB, int iteration){
+		double[] rejPeriodArray = {0.5,0.75,1.,1.5};
+		double rejPeriod = rejPeriodArray[rejPeriodIndex];
+	
 
 		arrSave= new double[1000000];
 		indexSave=0;
@@ -89,9 +98,9 @@ public class PyramisSamplerCycles {
 
 		Map<String,Sampler> samplers = new HashMap<>();
 
-		initialize(samplers);
+		initialize(rejPeriod, samplers);
 
-		HierarchicalSMP model = HSMP_JournalCycles.build(numberLoopsPerLeaves,parallel,depth,seq,true, lastB, LOOPS);
+		HierarchicalSMP model = HSMP_JournalCycles.build(rejPeriod, numberLoopsPerLeaves,parallel,depth,seq,true, lastB, LOOPS);
 		State initial = model.getInitialState();
 
 		Set<String> sList = HSMP_JournalCycles.getStates();
@@ -120,7 +129,7 @@ public class PyramisSamplerCycles {
 			Date start = new Date();
 
 
-			samplerOut(numberLoopsPerLeaves,probabs, samplers, RUNS_AT_A_TIME,initial, lastB);
+			samplerOut(rejPeriod, numberLoopsPerLeaves,probabs, samplers, RUNS_AT_A_TIME,initial, lastB);
 
 
 
@@ -139,15 +148,22 @@ public class PyramisSamplerCycles {
 			it="_"+iteration;
 		}
 		String g="";
-		if(timeSS>0)
-			g="sameTime_";
+		if(timeSS>0) {
+			g="src//main//resources//pyramisAnalyticSameTimeCycles//"+"sameTime_";
+		}else {
 
-		String print= g+ "cycle_L"+LOOPS+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_Final-"+lastB+"_l-"+numberLoopsPerLeaves+"_"+(i*RUNS_AT_A_TIME)+it+".txt";
+			g= "src//main//resources//pyramisSimulationCycles//";
+		}
+		
+		String print= g+ "cycle_L"+LOOPS+"p-"+parallel+"_d-"+(depth+1)+"_s-"+seq+"_rp-"+rejPeriodIndex+"_Final-"+lastB+"_l-"+numberLoopsPerLeaves+"_"+(i*RUNS_AT_A_TIME)+it+".txt";
 
 		File file = new File(print);
+		file.getParentFile().mkdirs();
+		
 		try (PrintWriter writer = new PrintWriter(file)) {
 
-			writer.write("TIME=  "		+((EndTime-toEndTime))	+"ms \n\n");
+			if(timeSS==0)
+				writer.write("TIME=  "		+((EndTime-toEndTime))	+"ms \n\n");
 
 
 
@@ -168,7 +184,7 @@ public class PyramisSamplerCycles {
 			System.out.println("errore");
 			System.out.println(e.getMessage());
 		}
-		
+
 
 
 
@@ -232,7 +248,7 @@ public class PyramisSamplerCycles {
 
 
 
-	private static void initialize(Map<String,Sampler> samplers) {
+	private static void initialize(double rejPeriod, Map<String,Sampler> samplers) {
 
 		GEN exp = GEN.newExpolynomial("22.517 * Exp[-3.11427 x] * x + -22.517 * Exp[-3.11427 x] * x^2", OmegaBigDecimal.ZERO, OmegaBigDecimal.ONE);
 
@@ -240,7 +256,7 @@ public class PyramisSamplerCycles {
 
 
 		samplers.put("exp", new ExpolSampler(exp));
-		samplers.put("det", new DetSampler(0.500));
+		samplers.put("det", new DetSampler(rejPeriod));
 
 	}
 
@@ -262,13 +278,12 @@ public class PyramisSamplerCycles {
 		return changed;
 	}
 
-	public static int samplerOut(int leaves, Map<String,Double> probabs, Map<String,Sampler> samplers, int RUNS_AT_A_TIME,State initial, RegionType lastB) {
+	public static int samplerOut(double rejPeriod, int leaves, Map<String,Double> probabs, Map<String,Sampler> samplers, int RUNS_AT_A_TIME,State initial, RegionType lastB) {
 
 		int countDown = RUNS_AT_A_TIME;
 
 		int c=0;
 		while(countDown>0) {
-			System.out.println(countDown);
 
 			Map<State,Double> samp = new HashMap<State,Double>();
 			Map<Region,Double> regSamp = new HashMap<Region,Double>();
@@ -302,16 +317,16 @@ public class PyramisSamplerCycles {
 					regSamp.put(rparent, 0.0);
 				}
 
-				samp.put(s, 0.500);
+				samp.put(s, rejPeriod);
 
 
-				regSamp.put(rparent, regSamp.get(rparent)+0.500);
+				regSamp.put(rparent, regSamp.get(rparent)+rejPeriod);
 
 			}
 
 			//all simple States are assigned a sample, which is added to their region (only if the leaf is executed)
 			//in expS are contained only the initial simple State of the first branch of the switch of leaves and propagations 
-			
+
 			for(State s: expS) {
 
 
@@ -320,7 +335,7 @@ public class PyramisSamplerCycles {
 
 				double d = Math.random();
 				boolean expDiffBool = d<0.5;
-				
+
 
 				Region rparent= regMap.get(s);
 				if(!regSamp.containsKey(rparent)) {
@@ -361,7 +376,7 @@ public class PyramisSamplerCycles {
 
 
 			}
-		
+
 			// bottom up approach
 			for(int i=HSMP_JournalCycles.depthS+1;i>=0;i--) {
 				for(State s: compS) {
@@ -375,7 +390,7 @@ public class PyramisSamplerCycles {
 
 						Double min=100000.;
 						Double max=0.;
-						
+
 						if(!sCycle) {
 							for(int r=0; r< HSMP_JournalCycles.parallelS;r++) {
 								Double val= regSamp.get(((CompositeState)s).getRegions().get(r));
@@ -403,7 +418,7 @@ public class PyramisSamplerCycles {
 
 						}else if(fL.get(0).equals(s)||(leaves>=2 && sL.get(0).equals(s))||(leaves==3 && tL.get(0).equals(s))){
 
-							
+
 							LinkedList<State> l;
 							State cr=s;
 							int ind=0;
@@ -417,18 +432,18 @@ public class PyramisSamplerCycles {
 							}
 							Double val= regSamp.get(((CompositeState)s).getRegions().get(0));
 
-							
+
 							Region rparent= regMap.get(s);
 
-							while(val>0.500 && ind<l.size()-1) {
-								
-								samp.put(cr, 0.500);
+							while(val>rejPeriod && ind<l.size()-1) {
+
+								samp.put(cr, rejPeriod);
 								ind++;
 								cr=l.get(ind);
 								val = regSamp.get(((CompositeState)cr).getRegions().get(0));
-								regSamp.put(rparent, regSamp.get(rparent)+0.500);
+								regSamp.put(rparent, regSamp.get(rparent)+rejPeriod);
 							}
-							double x=val<0.500?val:0.500;
+							double x=val<rejPeriod?val:rejPeriod;
 							samp.put(cr, x);
 							regSamp.put(rparent, regSamp.get(rparent)+x);
 
@@ -443,8 +458,14 @@ public class PyramisSamplerCycles {
 			}
 			//we have S0's time
 			Double timeToEnd = samp.get(initial);
-			System.out.println(timeToEnd);
-			
+
+//			int slot= (int) Math.floor(timeToEnd/step);
+//			while(slot<cdf.length) {
+//				cdf[slot]+=1;
+//				slot++;
+//			}
+
+
 			if(indexSave<arrSave.length) {
 				arrSave[indexSave]=timeToEnd;
 				indexSave++;
@@ -476,13 +497,13 @@ public class PyramisSamplerCycles {
 		Set<String> setZero =HSMP_JournalCycles.zeros;
 		if(setZero.contains(initQ.getName())) {
 			List<State> kl = initQ.getNextStates();
-			
+
 			init=samp.get(kl.get(0)) >0. ? kl.get(0) : kl.get(1);
 		}else {
 			init=initQ;
 		}
-		
-		
+
+
 		if(init instanceof CompositeState  ) {
 			if(samp.get(init)>timeToEnd) {
 				add(init.getName(), timeToEnd, probabs);
@@ -540,7 +561,7 @@ public class PyramisSamplerCycles {
 			//init is at depth max
 		}else {
 
-			
+
 			State win =init;
 			Double remaining = timeToEnd;
 

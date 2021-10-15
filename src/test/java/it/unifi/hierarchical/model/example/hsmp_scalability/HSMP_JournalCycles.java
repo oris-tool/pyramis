@@ -74,7 +74,7 @@ public class HSMP_JournalCycles {
 
 	public static Set<State> statesP;
 
-	public static HierarchicalSMP build(int leaf, int parallel, int depth, int sequence, boolean expolSame, RegionType regT, int LOOP) {
+	public static HierarchicalSMP build(double rejPeriod, int leaf, int parallel, int depth, int sequence, boolean expolSame, RegionType regT, int LOOP) {
 		HSMP_JournalCycles.c=0;
 		HSMP_JournalCycles.map = new HashMap<State,Set<State>>();
 		HSMP_JournalCycles.compS= new HashSet<State>();
@@ -142,7 +142,7 @@ public class HSMP_JournalCycles {
 
 		for(int i=0;i<parallelS;i++) {
 
-			State initial = buildInner(leaf, rListAll.get(i), S0, 1, expolSame, regT, 0);
+			State initial = buildInner(rejPeriod, leaf, rListAll.get(i), S0, 1, expolSame, regT, 0);
 			rListAll.get(i).setInitialState(initial);
 			System.out.println(rListAll.get(i));
 		}
@@ -154,7 +154,7 @@ public class HSMP_JournalCycles {
 
 	}
 
-	private static State buildInner(int leaf, Region parentRegion, State parent, int currentDepth, boolean expolSame, RegionType regT, int inCycleStatus) {
+	private static State buildInner(double rejPeriod,int leaf, Region parentRegion, State parent, int currentDepth, boolean expolSame, RegionType regT, int inCycleStatus) {
 
 		GEN expC = GEN.newExpolynomial("22.517 * Exp[-3.11427 x] * x + -22.517 * Exp[-3.11427 x] * x^2", OmegaBigDecimal.ZERO, OmegaBigDecimal.ONE);
 
@@ -225,7 +225,7 @@ public class HSMP_JournalCycles {
 
 				for(int i=0;i<parallelS;i++) {
 
-					State initial = buildInner(leaf,rListAll.get(i), current, currentDepth+1, expolSame, regT, 0);
+					State initial = buildInner(rejPeriod, leaf,rListAll.get(i), current, currentDepth+1, expolSame, regT, 0);
 
 					rListAll.get(i).setInitialState(initial);
 				}
@@ -406,7 +406,7 @@ public class HSMP_JournalCycles {
 				
 				sA[i]=cyc;
 
-				State initial1 = buildInner(leaf,rListAll.get(0), cyc, currentDepth+1, expolSame, regT, 1);
+				State initial1 = buildInner(rejPeriod, leaf,rListAll.get(0), cyc, currentDepth+1, expolSame, regT, 1);
 
 				
 				rListAll.get(0).setInitialState(initial1);
@@ -420,7 +420,7 @@ public class HSMP_JournalCycles {
 							
 				State initial2 = new SimpleState(
 						"init_"+currentDepth+"_"+c++,
-						GEN.newDeterministic(new BigDecimal(0.5)),
+						GEN.newDeterministic(new BigDecimal(rejPeriod)),
 						Arrays.asList(endinit),
 						Arrays.asList(1.0), 
 						currentDepth+1);		
@@ -574,7 +574,7 @@ public class HSMP_JournalCycles {
 
 			for(int i=0;i<parallelS;i++) {
 
-				State initial = buildInner(leaf,rListAll.get(i), current, currentDepth+1, expolSame, regT, 2);
+				State initial = buildInner(rejPeriod,leaf,rListAll.get(i), current, currentDepth+1, expolSame, regT, 2);
 
 				rListAll.get(i).setInitialState(initial);
 			}
