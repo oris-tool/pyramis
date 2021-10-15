@@ -34,6 +34,11 @@ public class PyrStudyResults {
 
 			// Populates the array with names of files and directories
 			pathnamesSample = fDirec.list();
+			
+			if(pathnamesSample.length==0) {
+				System.out.println("Directory empty: I was expecting a file in "+"src//main//resources//pyramisSimulation"+suffix[i]);
+				return;
+			}
 
 			for(String pathnameS: pathnamesSample) {
 

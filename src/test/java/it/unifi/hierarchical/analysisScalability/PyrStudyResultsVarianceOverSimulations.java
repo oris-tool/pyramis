@@ -35,7 +35,10 @@ public class PyrStudyResultsVarianceOverSimulations {
 
 			// Populates the array with names of files and directories
 			pathnamesSample = fDirec.list();
-
+			if(pathnamesSample.length==0) {
+				System.out.println("Directory empty: I was expecting a file in "+"src//main//resources//pyramisResSameTime"+suffix[qq]);
+				return;
+			}
 
 			for(int last=1; last>-1;last--) {
 				for(int parallel=2;parallel<5; parallel++) {

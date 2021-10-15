@@ -47,6 +47,12 @@ public class PyrStudyResultsVarianceCycles {
 		// Populates the array with names of files and directories
 		pathnamesSample = fDirec.list();
 
+		if(pathnamesSample.length==0) {
+			System.out.println("Directory empty: I was expecting a file in "+"src//main//resources//pyramisSimulationCycles");
+			return;
+		}
+
+		
 		for(String pathnameS: pathnamesSample) {
 			System.out.println(pathnameS);
 

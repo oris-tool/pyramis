@@ -33,7 +33,10 @@ public class PyrStudyResults {
 		// Populates the array with names of files and directories
 		pathnamesSample = fDirec.list();
 
-
+		if(pathnamesSample.length==0) {
+			System.out.println("Directory empty: I was expecting a file in src//main//resources//pyramisCaseStudyGroundTruth ");
+			return;
+		}
 
 		File sample = new File("src//main//resources//pyramisCaseStudyGroundTruth//"+pathnamesSample[0]);
 
