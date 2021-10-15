@@ -1,129 +1,71 @@
+# Pyramis library
 
-# Pyramis library contents
+This repository provides Pyramis, a Java library for quantitative modeling and analysis of non-Markovian systems specified as an extension of UML statecharts. Specifically: 
+- Models can be defined through the formalism of Hierarchical Semi-Markov Processes with parallel regions (HSMPs), a class of statecharts capturing concurrency, hierarchy, stochastic timing, and probabilistic choices. In particular, steps modeling activities with non-Markovian duration can be either simple steps representing atomic activities or they can be composite steps obtained by composition of concurrent regions.  
+- Models can be evaluated by a compositional technique that performs separate analysis of the Semi-Markov Process (SMP) underlying each region, supporting both evaluation of steady-state behaviour of stationary models and evaluation of transient behaviour until absorption of non-stationary models. 
 
-In this repository is contained the code used for the experiments described in the paper "Compositional Analysis of Hierarchical UML Statecharts" by Laura Carnevali, Reinhard German, Francesco Santoni, and Enrico Vicario
+The approach is presented in the paper titled "Compositional Analysis of Hierarchical UML Statecharts" authored by Laura Carnevali, Reinhard German, Francesco Santoni, and Enrico Vicario, currently submitted to the IEEE Transactions on Software Engineering after a minor revision. 
 
-For the sake of reproducibility the repository contains both the source code for the analysis implementation and the source code for the execution of the individual experiments. The code is available as .java classes to be executed through the Java virtual machine. Such experiments executables are all contained in the "src/test/java/it/unifi/hierarchical/" folder and are distributed among two subfolders: */analysisScalability* and */analysis*.
-
-In the first subfolder are contained the .java files corresponding to the scalability analysis experiments; in the second subfolder are contained the .java files used in the case study experiments.
-
-
+To support reproducibility of the experimental results reported in the paper, this repository contains the code that builds and evaluates the considered models, and this document illustrates the steps needed to repeat the experiments. Given that some of them require a significant amount of time, this repository already contains all the intermediate and final results. Specifically:
+- Navigate to `src/test/java/it/unifi/hierarchical/analysisScalability`and execute the `main` method of the Java classes inside the package `it.unifi.hierarchical.analysisScalability` to reproduce the experiments of the case study on transient timed failure logic analysis of component-based systems (reported in Section 4 of the paper). 
+- Navigate to `src/test/java/it/unifi/hierarchical/analysis`and execute the `main` method of the Java classes inside the package `it.unifi.hierarchical.analysis` to reproduce the experiments of the case study on steady-state analysis of software rejuvenation in virtual servers (reported in Section 5 of the paper). 
+To execute the main method of a Java class, open the class and click on the menu `Run > Run as > Java Application`.
 
 ## Installation
-The repository requires the ![Sirio library](https://github.com/oris-tool/sirio) and can be directly built through Maven from the provided 'pom.xml'
 
-Note that Java 11 is required for Sirio to work.
+This repository provides a ready-to-use Maven project that you can easily import into an Eclipse workspace to start working with the [Pyramis library](https://github.com/oris-tool/pyramis) (the repository includes the version `2.0.0-SNAPSHOT` of the Sirio library as a Maven dependency). Just follow these steps:
 
+1. **Install Java >= 11.** For Windows, you can download a [package from Oracle](https://www.oracle.com/java/technologies/downloads/#java11); for linux, you can run `apt-get install openjdk-11-jdk`; for macOS, you can run `brew install --cask java`. 
 
+2. **Download Eclipse.** The [Eclipse IDE for Java Developers](http://www.eclipse.org/downloads/eclipse-packages/) package is sufficient.
 
-## Experiments on scalability
+3. **Clone this project.** Inside Eclipse:
+   - Select `File > Import > Maven > Check out Maven Projects from SCM` and click `Next`.
+   - If the `SCM URL` dropbox is grayed out, click on `m2e Marketplace` and install `m2e-egit`. You will have to restart Eclipse.
+   - As `SCM URL`, type: `https://github.com/oris-tool/pyramis.git` and click `Next` and then `Finish`.
+   
 
-The experiments on scalability rely on a ground truth obtained from a long running simulation. Such simulations require a long time of execution due both to reach a sufficient precision and for the high costs in sampling values for the expolinomial distributions present in the described test cases.
-Due to the high number of ground truths required, given the many combinations of properties to test, it is preferable to sample and cache values for each expolinomial distribution and reuse them every time the same distribution is exercised in each different simulation.
-In so doing we are reusing the same values by associating each different state of the models to a different sampling run.
+## Case study on transient timed failure logic analysis of component-based systems
 
-To reproduce correctly our experiments such high number of files would need to be created and used: it is either taxing on computation time (at least 3 days of execution are needed to cache the values) or space.
+This case study addresses Timed Failure Logic Analysis (TFLA) of a benchmark of component-based systems with increasing complexity. Specifically, starting from a basic pattern, a suite of synthetic models is generated by varying the behaviour length (i.e., the number of steps in sequential behaviours), the parallelism degree (i.e., the number of regions of each composite step), the hierarchy depth (i.e., the number of nested layers), the type of composite step (i.e., either type first, if the composite step terminates as soon as any of its regions terminates, or type last, if the composite step terminates when all its regions have terminated), the presence or absence of rare events, the type of duration distributions (i.e., expolynomial distributions with either small or large support), the presence or absence of cycles.
 
-While the user can absolutely re-cache the correct amount of files needed, we also propose an intermediate solution by instead offering 10 million samples of each different expolinomial distribution to be shared among the states (thus incurring in dependence). 
+### Derivation of ground truth (requires a time ranging from nearly 15 minutes for the base model to nearly 40 hours for the most complex model)
 
-### Re-cache expolinomial samples (~days)
-To re-cache the expolinomial samples (both for the support [0,1] and the support [0,10] the  **main()** in *src/test/java/it/unifi/hierarchical/analysisScalability/PyramisCreateSampFiles.java* to create 'c'*100 files each of which contains 1 million samples; 'c' is currently set to 10.
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyramisSamplerFromFiles.java` to derive a ground truth for each model of the suite except for the model variant with rare events. Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResultsRareEvents.java` to derive a ground truth for the model variant with rare events. Specifically: 
+- The files containing the probability of each step (before absorption) are placed in `src/main/resources/pyramisSimulation/`.
+- The files containing the durations of the failure process are placed in `src/main/resources/groundTruthDistributions`. Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyDrawCDF.java` to translate each of these files into a file that represents the Cumulative Distribution Function (CDF) of the failure process (used for the plots in Fig. 7) and that is placed in `src/main/resources/groundTruthCDF`.
 
-The created files are placed in the folders *src/main/resources/samplesExpolinomial* and *src/main/resources/samplesExpolinomial10* from which they are directly accessed by the sampling routines.
+### Evaluation of accuracy and complexity (requires a time ranging from nearly 3.5 minutes for the base model to nearly 45 hours for the most complex model)
 
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/Pyramis.java` to run the analysis of each model of the suite, except for the model variants with rare events, large-support duration distributions, and cycles. For each of these models, 100 simulation runs are also performed, with each run lasting at least as long as the analysis. 
 
-### Generation of the ground truth(~ several hours - 1 day)
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyramisLongEvents.java` to run the analysis of the model variants with large-support duration distributions and the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyramisCyles.java` to run the analysis of the model variants with cycles. Also in this case, for each of these models, 100 simulation runs are also performed, with each run lasting at least as long as the analysis. 
 
-Execute *src/test/java/it/unifi/hierarchical/analysisScalability/PyramisSamplerFromFiles.java"
+The files contaning the analysis computation times (reported in Table 1 and Fig. 5), the files containing the probability of each step (before absorption) produced by analysis and simulation, the files containing the CDF of the duration of the failure process produced by the analysis (used for the plots in Fig. 7) are placed in `src/main/resources/pyramisAnalytic`.
 
-The analysis is done for all combinations of the variables Behaviour length(seq values 2 to 4), parallelism degree(parallel values 2 to 4), hierarchy depth(depth values 2 to 4) and type of Regions in the HSMP (type FIRST and LAST)
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResults.java` to compare the analysis results with the ground truth for each model except the variant with cycles and execute `src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResultsVarianceCycles.java` to compare the analysis results with the ground truth for the model variant with cycles, obtaining mean value and standard deviation of relative errors of analysis over simple steps (reported in Table 2 and Fig. 6). 
 
-For the purpose of visualizing the distribution of the failure time, for each combination of variables, a file containing 1000000 samples of the times to failure of the fault tree under study is generated.
-Such files are generated in the folder *src/main/resources/groundTruthDistributions*.
-
-The ground truth files are placed in *src/main/resources/pyramisSimulation/*
-
-#### Rare events
-
-Specifically for the rare events variation the ground truth is produced by executing *src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResultsRareEvents.java*
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResultsVarianceOverSimulations.java` to compare the simulation results with the ground truth, obtaining average (over 100 simulation runs) mean value and standard deviation of relative errors of simulation over simple steps (reported in Table 3 and Fig. 6).
 
 
-#### CDF of the ground truth (~seconds)
-Execute *src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyDrawCDF.java* to create secondary files in *src\main\resources\groundTruthCDF* containing the cdf of the samplings.
+## Case study on steady-state analysis of software rejuvenation in virtual servers
 
-Such files can be used to plot the cdf of the ground truth.
+This case study addresses the evaluation of a non-Markovian variant of a server virtualized system from the literature on software rejuvenation.
 
+### Derivation of ground truth (requires nearly 36.6 hours, 55.2 hours, 73.6 hours, and 92.0 hours for a simulation time of 10, 15, 20, and 25 million hours, respectively)
 
-### Scalability Analysis  (~hours - 1 day)
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyramisSampler.java` to simulate the model for a simulation time of 10, 15, 20, and 25 million hours. The files contaning the simulation computation times (reported in Table 5) and the files containing the steady-state probability of each step (used for Table 6 and Fig. 9) are placed in `src/main/resources/pyramisCaseStudyGroundTruth/`.
 
-Execute *src/test/java/it/unifi/hierarchical/analysisScalability/Pyramis.java* it will execute the analysis of all the combinations of the variables Behaviour length(seq values 2 to 4), parallelism degree(parallel values 2 to 4), hierarchy depth(depth values 2 to 4) and type of Regions in the HSMP (respectively of type FIRST and LAST); for each combination 20 simulations requiring the same time will be executed: note that these will not use the pre-cached values.
+### Evaluation of accuracy and complexity (requires nearly 82 hours)
 
-The produced values are placed in *src/main/resources/pyramisAnalytic*.
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/Pyramis.java` to run the analysis with fixed time tick for all the steps of the model, execute the `main` method of and `src/test/java/it/unifi/hierarchical/analysis/PyramisVariableTicks.java` to run the analysis with different time tick for different steps of the model. The files contaning the analysis computation times (reported in Table 7) and the files containing the steady-state probability of each step are placed in `src/main/resources/pyramis/`.
 
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyramisSamplerRelative.java` to run, for each analysis with variable time tick, 100 simulation runs of the model, with each run lasting at least as long as the analysis. The files containing the steady-state probability of each step are placed in `src/main/resources/pyramis/`.
 
-#### Variations
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyrStudyResults.java` to compare the analysis results with the ground truth, obtaining, for each step, the relative error achieved by the analysis with respect to the ground truth (reported in Table 8 and Fig. 10).
 
-To produce the results with longer events and cycles one can execute respectively:
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyrStudyResultsVarianceOld.java` to compare the simulation results with the ground truth, obtaining, for each step, the mean value and standard deviation (over 100 runs) of relative errors achieved by the simulation with respect to the ground truth (reported in Table 9 and Fig. 10).
 
-For the version with longer events execute *src/test/java/it/unifi/hierarchical/analysisScalability/PyramisLongEvents.java*.
+## Production of plots
 
-For the version with cycles execute *src/test/java/it/unifi/hierarchical/analysisScalability/PyramisCyles.java*.
-
-Note that the folders  *pyramisAnalytic* and *pyramisSimulation* must be emptied before executing differing types.
-
-
-### Comparisons between sampling and analyses (~seconds)
-
-All comparison functions distinguish the files belonging to different properties combinations (Behavior Lenght, parallelism degree and hierarchy depth) based on the name of the files, the artifacts produced by the comparison functions are all generated to the *src/main/resources/pyramisRes*  folder.
-
-
-
-
-Execute  *src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResults.java* to obtain the min max average errors and standard deviation of values from the corresponding ground truth.
-
-
-Execute  *src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResultsVarianceOverSimulations.java* to obtain average errors on the many runs of same-time simulations: to do so execute the function after having removed the files corresponding to the analyses from src//main//resources//pyramisRes (the folder must contain only the same-time simulation results, automatically it reads all the folder files and groups them based on the name) in src//main//resources//summa produces the averages of errors over same-time simulation batches for each combination of properties
-
-#### Comparisons for Cycle variation
-For cycles execute *src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResultsVarianceCycles.java* : the execution is different as the linkage of the states names between simulation and analysis is non-trivial
-
-
-## Experiments on case study
-
-All experiments on the case study refers to the *src/test/java/it/unifi/hierarchical/analysis* folder rather than *analysisScalability/*
-
-Note that the pyramisRes, pyramisAnalytic and pyramisSimulation folders must be emptied.
-
-### Ground truth (10h)
-Execute *src/test/java/it/unifi/hierarchical/analysis/PyramisSampler.java*  to simulate the execution over 36000000 ms, repeatedly generating log files every 1M units of time of the model execution,
-
-Produces the results in *src/main/resources/pyramisCaseStudyGroundTruth/*
-### Analysis  (~1 hour)
-Execute *src/test/java/it/unifi/hierarchical/analysis/Pyramis.java* to obtain the analysis up to LOOPS (default=5) cycles with time steps specified in the array "tics".
-
-Produces the results in *src/main/resources/pyramis/*
-
-#### Variable ticks
-*PyramisVariableTicks.java* can be used to obtain the analysis with varying values of time steps at different levels in the model.
-
-
-### Same time sampling (~15 hours)
-
-Execute *src/test/java/it/unifi/hierarchical/analysis/PyramisSamplerRelative.java* to obtain the simulation with a given time limit (the same time of the analyses i.e. 190,487 and 2197 seconds) 20 times each to account for variation and obtain a mean.
-
-Produces the results in *src/main/resources/pyramis/*
-
-
-### Comparison (~seconds)
-Chosen a given ground truth remove the others from *src/main/resources/pyramisCaseStudyGroundTruth/*
-
-PyrStudyResults.java generates in src//main//resources//pyramisCaseStudyRes// the comparison files.
-
-While for the same-time sampling PyrStudyResultsVarianceOld.java and PyrStudyResultsVarianceOld2.java  must be executed.
-
-Respectively PyrStudyResultsVarianceOld give the average and variance of the states distribution values' relative errors, PyrStudyResultsVarianceOld2 gives the average and variance of the states distribution values.
-
-
-## Production of images/plots
-
-All images referring to the scalability analysis can be reproduced by executing the python scripts present in *src/main/resources/plots*
+Plots of Figs. 5, 6, 7, 9, and 10 can be obtained by executing the python scripts in `src/main/resources/plots`.
