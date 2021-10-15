@@ -68,8 +68,7 @@ public class PyramisSampler {
 
 			double TIME_LIMIT=1000000; //prints intermediate results every 1000 seconds
 
-			String print="src//main//resources//pyramisCaseStudyGrundTruth//"+"s24high_"+MILLIONS+"_"+(i*TIME_LIMIT)+".txt";
-
+			
 
 		
 
@@ -84,39 +83,45 @@ public class PyramisSampler {
 
 			toEndTime-=num;
 
-			File file = new File(print);
-			try (PrintWriter writer = new PrintWriter(file)) {
+			
 
-				writer.write("TIME=  "		+((EndTime-toEndTime)/1000)	+"sec \n\n");
+		}
+		String print="src//main//resources//pyramisCaseStudyGroundTruth//"+"s24high_"+MILLIONS+"_"+(i*1000000)+".txt";
 
+		
+		File file = new File(print);
+		file.getParentFile().mkdirs();
+		
+		try (PrintWriter writer = new PrintWriter(file)) {
+
+			writer.write("TIME=  "		+((EndTime-toEndTime)/1000)	+"sec \n\n");
+
+			
+			String[] names = new String[] {"VmRejW", "VmR", "VmFD", "VmRej", "VmF", "VmA", "VmRes", "VmmA", "VmmF", "VmmRejW", "VmmFD", "VmmR", "VmmRes", "VmSW", "VmmRej"};
+
+			for(int ii=0;ii<names.length;ii++) {
 				
-				String[] names = new String[] {"VmRejW", "VmR", "VmFD", "VmRej", "VmF", "VmA", "VmRes", "VmmA", "VmmF", "VmmRejW", "VmmFD", "VmmR", "VmmRes", "VmSW", "VmmRej"};
-
-				for(int ii=0;ii<names.length;ii++) {
-					
-					int n = names[ii].length();
-					String x = names[ii];
-					for(int r=0;r<8-n;r++) {
-						x=x+" ";
-					}
-					
-					writer.write(x+ (probabs.get(names[ii])/ (i*TIME_LIMIT) )+"\n");
+				int n = names[ii].length();
+				String x = names[ii];
+				for(int r=0;r<8-n;r++) {
+					x=x+" ";
 				}
-				writer.write("\n");
-				writer.write(num+"\n");
-				writer.write(probabs.get("2")/probabs.get("n")+"\n");
-				writer.write(probabs.get("3")/probabs.get("n")+"\n");
-				writer.write(probabs.get("4")/probabs.get("n")+"\n");
 				
-				writer.write(probabs.get("availableAt168")/probabs.get("n")+"\n");
-				
-				
-
-			} catch (FileNotFoundException e) {
-				System.out.println("errore");
-				System.out.println(e.getMessage());
+				writer.write(x+ (probabs.get(names[ii])/ (i*1000000) )+"\n");
 			}
+			writer.write("\n");
+			writer.write(num+"\n");
+			writer.write(probabs.get("2")/probabs.get("n")+"\n");
+			writer.write(probabs.get("3")/probabs.get("n")+"\n");
+			writer.write(probabs.get("4")/probabs.get("n")+"\n");
+			
+			writer.write(probabs.get("availableAt168")/probabs.get("n")+"\n");
+			
+			
 
+		} catch (FileNotFoundException e) {
+			System.out.println("errore");
+			System.out.println(e.getMessage());
 		}
 	}
 

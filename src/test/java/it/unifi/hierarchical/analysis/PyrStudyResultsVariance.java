@@ -29,7 +29,7 @@ public class PyrStudyResultsVariance {
 
 		String[] pathnamesSample;
 
-		File fDirec = new File("src//main//resources//pyramis");
+		File fDirec = new File("src//main//resources//pyramisCaseStudyGroundTruth");
 
 		// Populates the array with names of files and directories
 		pathnamesSample = fDirec.list();
@@ -62,7 +62,7 @@ public class PyrStudyResultsVariance {
 
 			String[] pathnames;
 
-			File f = new File("src//main//resources//pyramis");
+			File f = new File("src//main//resources//pyramisSameTime");
 
 			// Populates the array with names of files and directories
 			pathnames = f.list();
@@ -70,7 +70,7 @@ public class PyrStudyResultsVariance {
 			// For each pathname in the pathnames array
 			for (String pathname : pathnames) {
 
-				File in = new File("src//main//resources//pyramis//"+pathname);
+				File in = new File("src//main//resources//pyramisSameTime//"+pathname);
 
 				try (BufferedReader br = new BufferedReader(new FileReader(in))) {
 					String line;
@@ -128,7 +128,8 @@ public class PyrStudyResultsVariance {
 
 			}
 
-			File file = new File("src//main//resources//pyramisCaseStudyRes//res_"+pathnames[0].substring(0,3));
+			File file = new File("src//main//resources//pyramisResSameTime//res_"+pathnames[0].substring(0,3));
+			file.getParentFile().mkdirs();
 			try (PrintWriter writer = new PrintWriter(file)) {
 				int ccc=0;
 				for(String st: mapSimul.keySet()) {
@@ -185,7 +186,7 @@ public class PyrStudyResultsVariance {
 
 			String[] pathnames;
 
-			File f = new File("src//main//resources//pyramis");
+			File f = new File("src//main//resources//pyramisSameTime");
 
 			// Populates the array with names of files and directories
 			pathnames = f.list();
@@ -193,7 +194,7 @@ public class PyrStudyResultsVariance {
 			// For each pathname in the pathnames array
 			for (String pathname : pathnames) {
 
-				File in = new File("src//main//resources//pyramis//"+pathname);
+				File in = new File("src//main//resources//pyramisSameTime//"+pathname);
 
 				try (BufferedReader br = new BufferedReader(new FileReader(in))) {
 					String line;
@@ -251,7 +252,8 @@ public class PyrStudyResultsVariance {
 
 			}
 
-			File file = new File("src//main//resources//pyramisCaseStudyRes//prb_"+pathnames[0].substring(0,3));
+			File file = new File("src//main//resources//pyramisResSameTime//prb_"+pathnames[0].substring(0,3));
+			file.getParentFile().mkdirs();
 			try (PrintWriter writer = new PrintWriter(file)) {
 				int ccc=0;
 				for(String st: mapSimul.keySet()) {

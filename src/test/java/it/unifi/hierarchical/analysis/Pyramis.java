@@ -81,6 +81,8 @@ public class Pyramis {
 
 
 				File file = new File(print);
+				file.getParentFile().mkdirs();
+				
 				try (PrintWriter writer = new PrintWriter(file)) {
 					writer.write("TIME=  "		+time 		+"ms \n\n");
 

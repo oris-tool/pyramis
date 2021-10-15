@@ -29,19 +29,19 @@ import org.oristool.simulator.samplers.UniformSampler;
 public class PyramisSamplerRelative {
 
 
-
+	//these 3 are the times of computation for the 3 different time ticks of the analysis
+	//substitute as needed for the time of computation in your hardware
 	public static void main(String[] args){
 		int[] time = new int[] {190,487,2197};
 		for(int i=0;i<time.length;i++) {
-			sample(time[i], ""+1);
+			sample(time[i]);
 		}
 	}
 
-	public static void sample(int timeE, String x){
+	public static void sample(int timeE){
 
-		int q = Integer.valueOf(x);
 		
-		for(int I=q*20; I<(q+1)*20;I++) {
+		for(int I=0; I<100;I++) {
 
 
 
@@ -86,9 +86,11 @@ public class PyramisSamplerRelative {
 				toEndTime-=time;
 
 			}
-			String print="src//main//resources//pyramis//"+timeE+"_"+I+"_"+(i*TIME_LIMIT)+".txt";
+			String print="src//main//resources//pyramisSameTime//"+timeE+"_"+I+"_"+(i*TIME_LIMIT)+".txt";
 
 			File file = new File(print);
+			file.getParentFile().mkdirs();
+			
 			try (PrintWriter writer = new PrintWriter(file)) {
 
 				writer.write("TIME=  "		+((EndTime-toEndTime)/1000)	+"sec \n\n");

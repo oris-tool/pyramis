@@ -112,6 +112,9 @@ public class PyrStudyResults {
 
 			double average =0.;
 			File file = new File("src//main//resources//pyramisCaseStudyRes//"+pathname.substring(0, pathname.length()-4)+"_"+millions+".txt");
+			file.getParentFile().mkdirs();
+			
+			
 			try (PrintWriter writer = new PrintWriter(file)) {
 
 
@@ -140,7 +143,7 @@ public class PyrStudyResults {
 
 
 		}
-
+	
 
 	}
 

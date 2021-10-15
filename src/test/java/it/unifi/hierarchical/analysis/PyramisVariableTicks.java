@@ -35,6 +35,7 @@ public class PyramisVariableTicks {
 	
 	public static void test1() {    
 		
+		//these arrays correspond to the time tick at varying levels of the hierarchy, it is possible to modify them
 		double TIME_STEP= -1;
 		double[] timeVMA=    new double[]{0.01,0.05,0.0025};	
 		double[] timeR1= 	 new double[]{0.01,0.05,0.0025};	
@@ -46,7 +47,7 @@ public class PyramisVariableTicks {
 			try {
 
 
-				String print= i+"_a5_cycles_DoubleExp_"+timeVMA[i]+"_"+timeR1[i]+"_"+timeVMMA[i]+"_"+timeEX[i]+".txt";
+				String print="src//main//resources//pyramis//"+i+"_varyingTimeticks_"+timeVMA[i]+"_"+timeR1[i]+"_"+timeVMMA[i]+"_"+timeEX[i]+".txt";
 				
 
 
@@ -85,6 +86,8 @@ public class PyramisVariableTicks {
 
 
 				File file = new File(print);
+				file.getParentFile().mkdirs();
+				
 				try (PrintWriter writer = new PrintWriter(file)) {
 					writer.write("TIME=  "		+time 		+"ms \n\n");
 
