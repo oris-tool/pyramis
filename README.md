@@ -12,6 +12,10 @@ To support reproducibility of the experimental results reported in the paper, th
 
 To execute the main method of a Java class, open the class and click on the menu `Run > Run as > Java Application`.
 
+## Licence
+
+Pyramis is released under the [GNU Affero General Public License v3.0](https://choosealicense.com/licenses/agpl-3.0/).
+
 ## Installation
 
 This repository provides a ready-to-use Maven project that you can easily import into an Eclipse workspace to start working with the [Pyramis library](https://github.com/oris-tool/pyramis) (the version `2.0.0-SNAPSHOT` of the [Sirio library](https://github.com/oris-tool/sirio) is included as a Maven dependency). Just follow these steps:
