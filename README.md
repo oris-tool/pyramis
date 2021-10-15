@@ -65,7 +65,7 @@ Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/Pyram
 
 Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyrStudyResults.java` to compare the analysis results with the ground truth, obtaining, for each step, the relative error achieved by the analysis with respect to the ground truth (reported in Table 8 and Fig. 10).
 
-Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyrStudyResultsVarianceOld.java` to compare the simulation results with the ground truth, obtaining, for each step, the mean value and standard deviation (over 100 runs) of relative errors achieved by the simulation with respect to the ground truth (reported in Table 9 and Fig. 10).
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysis/PyrStudyResultsVariance.java` to compare the simulation results with the ground truth, obtaining, for each step, the mean value and standard deviation (over 100 runs) of relative errors achieved by the simulation with respect to the ground truth (reported in Table 9 and Fig. 10).
 
 ## Production of plots
 
