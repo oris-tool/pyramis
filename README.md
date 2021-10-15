@@ -36,7 +36,7 @@ This case study addresses Timed Failure Logic Analysis (TFLA) of a benchmark of 
 
 ### Derivation of ground truth (requires a time ranging from nearly 15 minutes for the base model to nearly 40 hours for the most complex model)
 
-Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyramisSamplerFromFiles.java` to derive a ground truth for each model of the suite except for the model variant with rare events. Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResultsRareEvents.java` to derive a ground truth for the model variant with rare events. Specifically: 
+Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyramisSampler.java` to derive a ground truth for each model of the suite except for the model variant with rare events. Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyResultsRareEvents.java` to derive a ground truth for the model variant with rare events. Specifically: 
 - The files containing the probability of each step (before absorption) are placed in `src/main/resources/pyramisSimulation/`.
 - The files containing the durations of the failure process are placed in `src/main/resources/groundTruthDistributions`. Execute the `main` method of `src/test/java/it/unifi/hierarchical/analysisScalability/PyrStudyDrawCDF.java` to translate each of these files into a file that represents the Cumulative Distribution Function (CDF) of the failure process (used for the plots in Fig. 7) and that is placed in `src/main/resources/groundTruthCDF`.
 
