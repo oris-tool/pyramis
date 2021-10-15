@@ -1,13 +1,9 @@
 package it.unifi.hierarchical.analysis;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 
-import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.domain.DBMZone;
-import org.oristool.math.expression.Exmonomial;
 import org.oristool.math.expression.Expolynomial;
-import org.oristool.math.expression.ExponentialTerm;
 import org.oristool.math.expression.Variable;
 import org.oristool.math.function.EXP;
 import org.oristool.math.function.Function;
