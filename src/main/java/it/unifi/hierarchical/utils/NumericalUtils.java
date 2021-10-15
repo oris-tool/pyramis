@@ -1,3 +1,20 @@
+/* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
+ * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package it.unifi.hierarchical.utils;
 
 import java.math.BigDecimal;
@@ -574,7 +591,7 @@ public class NumericalUtils {
 	 * @param regionTimeStep if >0.0 then all the distribution of sojourn time are rescaled to that step value
 	 * @return
 	 */
-	//FIXME aggiungere successor probabilities per N>3: ricorsivamente min a coppie può funzionare, ad ogni passo viene segnata la componente probabilistica?
+	//FIXME aggiungere successor probabilities per N>3: ricorsivamente min a coppie puï¿½ funzionare, ad ogni passo viene segnata la componente probabilistica?
 	public static List<Double> evaluateFireFirstProbabilities(List<NumericalValues> distributions, double regionTimeStep) {
 
 		if(distributions.size() == 0)
