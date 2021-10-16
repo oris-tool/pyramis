@@ -23,7 +23,6 @@ import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Map;
 
-import it.unifi.hierarchical.analysis.HierarchicalSMPAnalysisForced;
 import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.example.hsmp.HSMP_JournalCycles;
 
