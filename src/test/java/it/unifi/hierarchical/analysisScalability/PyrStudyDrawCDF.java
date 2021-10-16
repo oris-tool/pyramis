@@ -51,6 +51,18 @@ public class PyrStudyDrawCDF {
 
 		// Populates the array with names of files and directories
 		pathnamesSample = fDirec.list();
+		
+		if(pathnamesSample==null) {
+			System.out.println("No such directory : I was expecting src//main//resources//groundTruthDistributions refer to Readme.md on which steps are needed to reach here");
+			return;
+		}
+		
+
+		if(pathnamesSample.length==0) {
+			System.out.println("Directory empty: I was expecting a file in "+"src//main//resources//groundTruthDistributions");
+			return;
+		}
+		
 
 		for(String pathnameS: pathnamesSample) {
 			System.out.println(pathnameS);
