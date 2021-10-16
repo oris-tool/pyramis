@@ -51,7 +51,8 @@ public class PyrStudyResults {
 			// Populates the array with names of files and directories
 			pathnamesSample = fDirec.list();
 			if(pathnamesSample==null) {
-				System.out.println("No such directory : I was expecting src//main//resources//pyramisSimulation"+suffix[i]+" refer to Readme.md on which steps are needed to reach here");
+				System.out.println("Directory src/main/resources/pyramisSimulation"+suffix[i]+" is missing.\n"
+						+ "Follow README.md to execute each step needed to repeat the experiments.");
 				return;
 			}
 			

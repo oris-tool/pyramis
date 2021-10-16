@@ -49,7 +49,8 @@ public class PyrStudyResults {
 		pathnamesSample = fDirec.list();
 
 		if(pathnamesSample==null) {
-			System.out.println("No such directory : I was expecting src//main//resources//pyramisCaseStudyGroundTruth refer to Readme.md on which steps are needed to reach here");
+			System.out.println("Directory src/main/resources/pyramisCaseStudyGroundTruth is missing.\n"
+					+ "Follow README.md to execute each step needed to repeat the experiments.");
 			return;
 		}
 		
