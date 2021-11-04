@@ -19,6 +19,10 @@ package it.unifi.hierarchical.model;
 
 public class Region {
     
+	// FIXME: Rename FINAL to LAST and EXIT to FIRST.
+	// FIXME: LAST and FIRST should be the two types of CompositeStep not of Region.
+	// FIXME: NEVER refers to Regions of type NEVERENDING: this condition should be automatically checked
+	//		  (a region is of type ENDING if it contains a FinalLocation and of type NEVERENDING otherwise).
     public enum RegionType{
         FINAL,
         EXIT,
@@ -26,7 +30,11 @@ public class Region {
     }
     
     private State initialState;
+    
+    // FIXME: type should be removed.
     private RegionType type;
+    
+    // FIXME: timeStep should be part of the analysis configuration.
     private double timeStep;
     
     private boolean compositeCycle;
@@ -66,6 +74,11 @@ public class Region {
         return timeStep;
     }
     
+    /**
+     * FIXME: This condition should be automatically checked.
+     * 
+     * @return true if the region contains a cycle that visits a composite step.
+     */
     public boolean containsCompositeCycle() {
         return compositeCycle;
     }

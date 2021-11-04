@@ -24,6 +24,7 @@ import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 
 public class CompositeState extends State {
+	// FIXME: Rename CompositeState to CompositeStep.
 
     private List<Region> regions;
     
@@ -31,7 +32,6 @@ public class CompositeState extends State {
     private boolean exitStatesOnBorder;
     Map<State, List<State>> nextStatesConditional; 
     Map<State,List<Double>> branchingProbsConditional;
-    
     
     /**
      * Use this constructor if the composite state has final states or exit states not on border
@@ -53,7 +53,6 @@ public class CompositeState extends State {
         		throw new IllegalArgumentException("Regions of different types in state "+name);
         	}
         }
-        
         
         this.exitStatesOnBorder = false;
     }
@@ -79,10 +78,7 @@ public class CompositeState extends State {
         this.branchingProbsConditional = branchingProbsConditional;
     }
     
-    
-    
-    
-    /**
+     /**
      * Use this constructor if the composite state has final states or exit states not on border
      */
     public CompositeState(String name, List<Region> regions, List<State> nextStates, List<Double> branchingProbs, int depth) {
@@ -132,15 +128,12 @@ public class CompositeState extends State {
         this.branchingProbsConditional = branchingProbsConditional;
     }
     
-    
     //FIXME non fa copia del caso exit states on border, non � che c'� possibile errore, oppure � intenzionale e lo usa nella trasformazione
     @Override
     public State makeCopy() {
     	
     	if(exitStatesOnBorder) {
-    	
     		return new CompositeState(name, regions,nextStatesConditional, branchingProbsConditional, depth, timeStep);
-    		
     	}
     	
         return new CompositeState(name, regions, nextStates, branchingProbs, depth, timeStep);
@@ -148,13 +141,10 @@ public class CompositeState extends State {
     
     //requires to reset nextStates
     public State makeCopy(int id, List<Region> newRegs) {
-    	if(exitStatesOnBorder) {
-        	
-    		return new CompositeState(name+"_"+id, newRegs,nextStatesConditional, branchingProbsConditional, depth, timeStep);
-    		
+    	if(exitStatesOnBorder) {        	
+    		return new CompositeState(name+"_"+id, newRegs,nextStatesConditional, branchingProbsConditional, depth, timeStep);    		
     	}
     	
         return new CompositeState(name+"_"+id, newRegs, nextStates, branchingProbs, depth, timeStep);
     }
-    
 }

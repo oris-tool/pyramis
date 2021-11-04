@@ -23,6 +23,7 @@ import it.unifi.hierarchical.model.FinalState;
 import it.unifi.hierarchical.model.SimpleState;
 
 public interface StateVisitor {
+	// FIXME: Rename StateVisitor to LogicalLocationVisitor.
 
     public void visit(SimpleState state);
     public void visit(CompositeState state);

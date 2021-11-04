@@ -24,16 +24,19 @@ import org.oristool.math.function.PartitionedFunction;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 
 public class SimpleState extends State{
+	// FIXME: Rename SimpleState to SimpleStep.
+	// FIXME: SimpleStep should extend Step.
 
     private PartitionedFunction densityFunction;
     
+    // FIXME: Remove upperBound: the analysis parameters should be part of the analysis configuration, not the model
+    //        (note that if upperBound==-1., then the step is analyzed not using the analysis time limit,
+    //		  but a predefined number of time points; this is used in software rejuvenation case study of the TSE paper).
     private double upperBound=-1.;
-    
     
     public double getUpperBound() {
 		return upperBound;
 	}
-
 
 	public SimpleState(String name, PartitionedFunction densityFunction, List<State> nextStates, List<Double> branchingProbs, int depth, double timeStep, double bound) {
     	this(name, densityFunction, nextStates, branchingProbs, depth, timeStep);

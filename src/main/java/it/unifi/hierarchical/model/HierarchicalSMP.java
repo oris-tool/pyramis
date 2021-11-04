@@ -15,8 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * An HSMP model. 
+ */
 package it.unifi.hierarchical.model;
 
+// FIXME: Rename HierarchicalSMP to HSMP.
 public class HierarchicalSMP {
     
     private State initialState;

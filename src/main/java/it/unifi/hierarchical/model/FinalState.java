@@ -21,7 +21,11 @@ import java.util.UUID;
 
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 
+/**
+ * A final location of an HSMP model.
+ */
 public class FinalState extends State{
+	// FIXME: Rename FinalState to FinalLocation.
 
     public FinalState(String name, int depth) {
         super(name, depth);

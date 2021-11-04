@@ -23,17 +23,30 @@ import java.util.List;
 
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 
+/**
+ * A logical location of an HSMP model.
+ */
 public abstract class State {
-
+	// FIXME: Rename State to LogicalLocation.
+	// FIXME: Add a class Step that extends LogicalLocation.
+	
     private final static double EPSILON = 0.000001;
     
+	// FIXME: Rename nextStates to nextLocations and add it to Step.
     protected List<State> nextStates;
+
+	// FIXME: Rename branchingProbs to nextLocationDistribution. 
+	//        Should it be a map? Could the attribute nextLocations be removed in this case?
     protected List<Double> branchingProbs;
+
+	// FIXME: Maybe the attribute depth is not needed 
+    //		  (note that depth is 0 for the top level, 1 for the subsequent lower level and so on).
     protected int depth;
+    
     protected String name;
     
+    // FIXME: The concept of time step should be part of the analysis configuration (not of the model).
     protected double timeStep;
-    
     
     private boolean looping=false;
     private boolean cycle=false;
@@ -42,10 +55,21 @@ public abstract class State {
     	this(name, depth, -1.0);
     }
     
+    /**
+     * FIXME: This condition should be automatically checked (note that 
+     * in some cases the last step if a cycle may not be defined).
+     * 
+     * @return true if the step is part of a cycle and it is the last step of the cycle.
+     */
     public boolean isLooping() {
 		return looping;
 	}
     
+    /**
+     * FIXME: This condition should be automatically checked.
+     * 
+     * @return true if the step is part of a cycle
+     */
     public boolean isCycle() {
 		return cycle;
 	}
