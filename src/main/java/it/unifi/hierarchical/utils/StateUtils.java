@@ -28,6 +28,8 @@ import it.unifi.hierarchical.model.Region;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
 
+// FIXME: Could some of these methods static methods of the classes Region etc.?
+
 public class StateUtils {
 
 	public static State findEndState(Region r) {
@@ -37,8 +39,9 @@ public class StateUtils {
 		return findEndState(getReachableStates(r.getInitialState()));
 	}
 
+	// FIXME: This method should be renamed findFinalLocation.
 	/**
-	 * Assume to have a single end state
+	 * This method assumes that each region contains at most one final location.
 	 */
 	public static State findEndState(List<State> states) {
 		for (int i = 0; i < states.size(); i++) {
@@ -109,6 +112,11 @@ public class StateUtils {
 		throw new IllegalArgumentException("State not found!");
 	}
 
+	/**
+	 * 
+	 * @param state
+	 * @return true if it is a composite step of type first
+	 */
 	public static boolean isCompositeWithBorderExit(State state) {
 		if(     state instanceof CompositeState && 
 				((CompositeState)state).hasExitStatesOnBorder()) {

@@ -28,8 +28,15 @@ public class CompositeState extends State {
 
     private List<Region> regions;
     
-    //Exit states on the border
+    // FIXME: exitStatesOnBorder could be revoved (it is true if the composite step is of type first 
+    // and it has a different next step PDF depending on the region that has terminated first)
     private boolean exitStatesOnBorder;
+    
+    // FIXME: the key of the two maps nextStatesConditional and branchingProbsConditional should be Region, 
+    // modeling a different next step PDF depending on the region that has terminated first
+    // (the key could be FinalLocation to encompass multiple possible final locations per region, but this is not necessary).
+    // Note that these maps are used to select the next step only if the composite step is of type first,
+    // otherwise the attribute nextStates of the parent class is used.
     Map<State, List<State>> nextStatesConditional; 
     Map<State,List<Double>> branchingProbsConditional;
     
@@ -128,7 +135,8 @@ public class CompositeState extends State {
         this.branchingProbsConditional = branchingProbsConditional;
     }
     
-    //FIXME non fa copia del caso exit states on border, non � che c'� possibile errore, oppure � intenzionale e lo usa nella trasformazione
+    // This method makes a copy of the step using the same regions (it is used to manage 
+    // composite steps with different next step PDF depending on the region that has terminated first). 
     @Override
     public State makeCopy() {
     	
@@ -139,7 +147,9 @@ public class CompositeState extends State {
         return new CompositeState(name, regions, nextStates, branchingProbs, depth, timeStep);
     }
     
-    //requires to reset nextStates
+	// FIXME: this method was used in a preliminary solution method (to manage cycles 
+    // that involve composite steps) which could be removed now
+    // (this method makes a copy of the composite step and its regions, and thus it also changes the next step distribution)
     public State makeCopy(int id, List<Region> newRegs) {
     	if(exitStatesOnBorder) {        	
     		return new CompositeState(name+"_"+id, newRegs,nextStatesConditional, branchingProbsConditional, depth, timeStep);    		

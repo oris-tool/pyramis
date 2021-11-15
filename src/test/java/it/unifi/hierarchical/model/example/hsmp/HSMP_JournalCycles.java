@@ -41,7 +41,10 @@ import it.unifi.hierarchical.model.Region.RegionType;
 
 public class HSMP_JournalCycles {
 
-
+	/**
+	 * 
+	 * @return the HSMP of the case study on software rejuvenation
+	 */
 	public static HierarchicalSMP build() {
 
 		final double pstop=0.9997;
@@ -132,7 +135,6 @@ public class HSMP_JournalCycles {
 
 		PartitionedGEN vmmRepairing_pFunction = new PartitionedGEN(vmmRepairing_gens);
 
-
 		List<GEN> vmmRestarting_gens = new ArrayList<>();
 
 		DBMZone vmmRestarting_d_0 = new DBMZone(new Variable("x"));
@@ -146,18 +148,12 @@ public class HSMP_JournalCycles {
 
 		PartitionedGEN vmmRestarting_pFunction = new PartitionedGEN(vmmRestarting_gens);
 
-
-
-
-
 		int depth = 2;
-
-
 
 		State E11 = new ExitState("E11",2);
 		State E12 = new ExitState("E12",2);
 
-		//
+		// FIXME: Rename VmF to VM_Failing
 		State VmF = new SimpleState(
 				"VmF", 
 				new ErlangExp(new BigDecimal("0.0738004"), new BigDecimal("0.0171087")), 
@@ -165,7 +161,7 @@ public class HSMP_JournalCycles {
 				Arrays.asList(1.0), 
 				depth);
 
-		//
+		// FIXME: Rename VmRejW to VM_Rejuvenation_Waiting
 		State VmRejW = new SimpleState(
 				"VmRejW", 
 				GEN.newDeterministic(new BigDecimal("24")), 
@@ -173,8 +169,7 @@ public class HSMP_JournalCycles {
 				Arrays.asList(1.0), 
 				depth);
 
-
-		//
+		// FIXME: Rename VmA to VM_Aging
 		State VmA = new SimpleState(
 				"VmA", 
 				new ErlangExp( new BigDecimal("0.0138889"),new BigDecimal("0.0104167")), 
@@ -182,23 +177,21 @@ public class HSMP_JournalCycles {
 				Arrays.asList(1.0), 
 				depth);
 
-
+		// FIXME: Rename also the regions and the remaining steps
+		
 		Region region1 = new Region(VmA, RegionType.EXIT);
 		Region region2 = new Region(VmRejW, RegionType.EXIT);
 
-		//Level depth 1
+		// Level depth 1
 		depth = 1;
 
 		State E2 = new ExitState("E2",depth);
 		State E3 = new ExitState("E3",depth);
-
 		
 		State Enever = new ExitState("Enever",depth);
 
-
 		Map<State, List<State>> nextMap = null;
 		Map<State, List<Double>> nextBranch=null;
-
 
 		//
 		State VmmF = new SimpleState(
@@ -216,14 +209,13 @@ public class HSMP_JournalCycles {
 				Arrays.asList(1.0), 
 				depth);
 
-		//TODO
+		//
 		State VmmRejW = new SimpleState(
 				"VmmRejW", 
 				GEN.newDeterministic(new BigDecimal("96")), 
 				Arrays.asList(E3), 
 				Arrays.asList(1.0), 
 				depth);
-
 
 		State Vm = new CompositeState(
 				"Vm",  
@@ -248,15 +240,13 @@ public class HSMP_JournalCycles {
 				Arrays.asList(1.0), 
 				depth);
 
-
-		//TODO
+		//
 		State VmRej = new SimpleState(
 				"VmRej", 
 				vmRejuvenating_pFunction, 
 				Arrays.asList(Enever), 
 				Arrays.asList(1.0), 
 				depth);
-
 
 		//
 		State VmRes = new SimpleState(
@@ -265,7 +255,6 @@ public class HSMP_JournalCycles {
 				Arrays.asList(Vm), 
 				Arrays.asList(1.0), 
 				depth);
-
 
 		((CompositeState) Vm).setNextStatesConditional(Map.of(
 				E11,
@@ -279,7 +268,6 @@ public class HSMP_JournalCycles {
 				E12,
 				Arrays.asList(1.0)));
 
-
 		//Level depth 0
 		depth = 0;
 
@@ -288,18 +276,12 @@ public class HSMP_JournalCycles {
 		Region region4 = new Region(VmmA, RegionType.EXIT);
 		Region region5 = new Region(VmmRejW, RegionType.EXIT);
 
-
-
-
 		State S0 = new CompositeState(
 				"S0",  
 				Arrays.asList(region3,region4,region5), 
 				nextStates, 
 				null, 
 				depth);
-
-
-
 
 		//
 		State VmmRes = new SimpleState(
@@ -317,8 +299,6 @@ public class HSMP_JournalCycles {
 				Arrays.asList(1.0), 
 				depth);
 
-
-
 		//
 		State VmmFD = new SimpleState(
 				"VmmFD", 
@@ -327,8 +307,7 @@ public class HSMP_JournalCycles {
 				Arrays.asList(1.0), 
 				depth);
 
-
-		//TODO
+		//
 		State VmmRej = new SimpleState(
 				"VmmRej", 
 				vmmRejuvenating_pFunction,
@@ -336,16 +315,13 @@ public class HSMP_JournalCycles {
 				Arrays.asList(1.0), 
 				depth);
 
-
-		//TODO
+		//
 		State VmSW = new SimpleState(
 				"VmSW", 
 				GEN.newUniform(new OmegaBigDecimal("0.1"), new OmegaBigDecimal("0.2")), 
 				Arrays.asList(VmmRej), 
 				Arrays.asList(1.0), 
 				depth);
-
-
 
 		((CompositeState) S0).setNextStatesConditional(Map.of(
 				E2,
@@ -364,8 +340,6 @@ public class HSMP_JournalCycles {
 		VmR.setCyleLooping(true, true);
 		VmRej.setCyleLooping(true, true);
 
-
 		return new HierarchicalSMP(S0);
-
 	}
 }

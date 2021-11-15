@@ -30,9 +30,13 @@ public abstract class State {
 	// FIXME: Rename State to LogicalLocation.
 	// FIXME: Add a class Step that extends LogicalLocation.
 	
+	// FIXME: EPSILON should not be a parameter of the model 
+	// (if the sum of the probabilities of the next steps is larger than 1-EPSILON then the model is well defined). 
     private final static double EPSILON = 0.000001;
     
 	// FIXME: Rename nextStates to nextLocations and add it to Step.
+    // Note that nextStates is not used to select the next step if the step is a composite step of type first
+    // with different next step PDF depending on the region that has terminated first.
     protected List<State> nextStates;
 
 	// FIXME: Rename branchingProbs to nextLocationDistribution. 
@@ -131,7 +135,6 @@ public abstract class State {
         return name;
     }
 
-    //TODO introduce the varying value of timeStep in HashCode()
     @Override
     public int hashCode() {
         final int prime = 31;

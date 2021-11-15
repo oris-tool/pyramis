@@ -21,8 +21,8 @@ public class Region {
     
 	// FIXME: Rename FINAL to LAST and EXIT to FIRST.
 	// FIXME: LAST and FIRST should be the two types of CompositeStep not of Region.
-	// FIXME: NEVER refers to Regions of type NEVERENDING: this condition should be automatically checked
-	//		  (a region is of type ENDING if it contains a FinalLocation and of type NEVERENDING otherwise).
+	// FIXME: NEVER could be removed (a region is of type NEVER=NEVERENDING if it does not contain a FinalLocation, 
+	//        and this condition could be be automatically checked).
     public enum RegionType{
         FINAL,
         EXIT,

@@ -34,7 +34,6 @@ import org.jfree.ui.RefineryUtilities;
 
 import it.unifi.hierarchical.analysis.NumericalValues;
 
-
 public class PlotUtils extends ApplicationFrame {
 	private static final long serialVersionUID = 1109735922230651555L;
 

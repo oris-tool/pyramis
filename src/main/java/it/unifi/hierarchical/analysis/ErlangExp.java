@@ -25,8 +25,11 @@ import org.oristool.math.expression.Variable;
 import org.oristool.math.function.EXP;
 import org.oristool.math.function.Function;
 
+// FIXME: This class should be in some package related to the model, not to the analysis!
+// FIXME: Rename ErlangExp to HypoEXP or better TwoParameterHypoEXP.
+
 /**
- * Sequence of Erlang or Exponential PDFs.
+ * The hypoExponential PDF with two parameters (i.e., sequence of two Exponential PDFs, each with their own rate).
  */
 public class ErlangExp implements Function {
 
@@ -34,27 +37,25 @@ public class ErlangExp implements Function {
     private EXP second;
 
     /**
-     * Builds the function {@code e^(-lambda x)} over {@code [0, +infty)}.
+     * Builds the function {@code (lambda1 lambda2/(lambda1-lambda2)) (e^(-lambda2 x)-e^(-lambda1 x))} over {@code [0, +infty)}.
      *
      * @param x PDF variable
-     * @param lambda rate (before the negation)
+     * @param lambda1 rate of the first Exponential PDF (before the negation)
+     * @param lambda1 rate of the second Exponential PDF (before the negation)
      */
     public ErlangExp(BigDecimal lambda1, BigDecimal lambda2) {
     	first = new EXP(Variable.X, lambda1);
     	second = new EXP(Variable.X, lambda2);
     }
 
-   
     public EXP getFirst() {
     	return first;
     }
     public EXP getSecond() {
     	return second;
     }
-
-
-   
-
+    
+    // FIXME: Where is the density function built?
     @Override
     public Expolynomial getDensity() {
         return null;
@@ -64,7 +65,6 @@ public class ErlangExp implements Function {
     public DBMZone getDomain() {
         return null;
     }
-
 
 	@Override
 	public String toMathematicaString() {

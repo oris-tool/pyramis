@@ -39,9 +39,10 @@ import org.oristool.math.function.PartitionedGEN;
 import it.unifi.hierarchical.analysis.ErlangExp;
 import it.unifi.hierarchical.analysis.NumericalValues;
 
+// FIXME: May commented methods turn out to be useful or can they be eliminated?
+// FIXME: Check whether the methods evaluateEXP, evaluateGEN, evaluatePartitioneGEN, isDeterministic
+// are already present in the SIRIO library.
 public class NumericalUtils {
-
-
 
 	//	public static double[] convolveCDFs(double[] first, double[] second, double step) {
 	//		double[] firstPDF = computePDFFromCDF(first, new BigDecimal("" + step));
@@ -280,6 +281,7 @@ public class NumericalUtils {
 	//		}  
 
 
+	// FIXME: rescaleProbFromTo can be eliminated.
 	//	/**
 	//	 *Given a NumericalValues CDF with step A, returns a NumericalValues with step newStep, by skipping intermediate values
 	//	 *Values MUST be chosen so that all steps are multiple of each other!
@@ -611,7 +613,6 @@ public class NumericalUtils {
 
 		double[] aPDF;
 		double[] bPDF;
-
 
 		if(regionTimeStep>0) {
 			NumericalValues aRescaledCDF = rescaleCDF(aCDF, regionTimeStep);
