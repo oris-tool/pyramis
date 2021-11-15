@@ -28,7 +28,7 @@ import it.unifi.hierarchical.model.Region;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
 
-// FIXME: Could some of these methods static methods of the classes Region etc.?
+// FIXME: Could some of these methods be methods of the classes Region etc.?
 
 public class StateUtils {
 

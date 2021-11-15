@@ -28,7 +28,7 @@ public class CompositeState extends State {
 
     private List<Region> regions;
     
-    // FIXME: exitStatesOnBorder could be revoved (it is true if the composite step is of type first 
+    // FIXME: exitStatesOnBorder could be removed (it is true if the composite step is of type first 
     // and it has a different next step PDF depending on the region that has terminated first)
     private boolean exitStatesOnBorder;
     
