@@ -37,6 +37,12 @@ import it.unifi.hierarchical.model.SimpleState;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
 
+/**
+ * This class supports the definition of the HSMP models of the basic pattern (and its variants
+ * depending on the behaviour length, the parallelism degree, the hierarchy depth, and the composite type)
+ * used in the case study on transient timed failure logic analysis of component based systems 
+ * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts".
+ */
 public class HSMP_JournalScalability {
 
 	public static int parallelS;

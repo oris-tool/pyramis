@@ -37,6 +37,11 @@ import it.unifi.hierarchical.model.SimpleState;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
 
+/**
+ * This class supports the definition of the HSMP models with rare events
+ * used in the case study on transient timed failure logic analysis of component based systems 
+ * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts".
+ */
 public class HSMP_JournalScalabilityRare {
 
 	public static int parallelS;

@@ -33,10 +33,15 @@ import it.unifi.hierarchical.model.CompositeState;
 import it.unifi.hierarchical.model.FinalState;
 import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.Region;
+import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.SimpleState;
 import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
 
+/**
+ * This class supports the definition of the HSMP models with large support PDFs 
+ * used in the case study on transient timed failure logic analysis of component based systems 
+ * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts".
+ */
 public class HSMP_JournalLongEvents {
 
 	public static int parallelS;
@@ -51,14 +56,12 @@ public class HSMP_JournalLongEvents {
 		return statesS;
 	}
 
-
 	//per ogni stato tutti gli stati dentro le sue regioni (composite e simple)
 	public static Map<State,Set<State>> map;
 	public static Map<State,State> parentMap;
 	public static Map<State,State> doublesMap;
 	public static Map<State,State> doublesMapFrom2;
 	public static Map<State,Region> regMap;
-
 
 	public static Set<State> compS;
 
@@ -68,13 +71,9 @@ public class HSMP_JournalLongEvents {
 
 	public static Set<String> zeros;
 
-
 	public static Set<State> firstLeaf;
-
 	public static Set<State> secondLeaf;
-
 	public static Set<State> thirdLeaf;
-
 
 	public static Set<State> statesP;
 
@@ -89,11 +88,9 @@ public class HSMP_JournalLongEvents {
 		HSMP_JournalLongEvents.secondLeaf= new HashSet<State>();
 		HSMP_JournalLongEvents.thirdLeaf= new HashSet<State>();
 
-
 		HSMP_JournalLongEvents.zeros= new HashSet<String>();
 		//figlio, genitore
 		HSMP_JournalLongEvents.parentMap= new HashMap<State,State>();
-		
 
 		//old1, old2
 		HSMP_JournalLongEvents.doublesMap= new HashMap<State,State>();
@@ -102,7 +99,6 @@ public class HSMP_JournalLongEvents {
 
 		//stato, regione parte del genitore
 		HSMP_JournalLongEvents.regMap= new HashMap<State,Region>();
-
 
 		HSMP_JournalLongEvents.parallelS=parallel;
 		HSMP_JournalLongEvents.depthS=depth;
@@ -120,7 +116,6 @@ public class HSMP_JournalLongEvents {
 		
 		//System.out.println("p="+parallelS+" d="+depthS+" s="+sequenceS);
 
-
 		List<State> nextStates = null;//Required to avoid ambiguity
 
 		State S0 = new CompositeState(
@@ -134,11 +129,7 @@ public class HSMP_JournalLongEvents {
 		statesS.add(S0.getName());
 		statesP.add(S0);
 
-		
-		
-		
 		S0.setNextStates(Arrays.asList(S0), Arrays.asList(1.0));
-
 
 		for(int i=0;i<parallelS;i++) {
 
@@ -148,9 +139,6 @@ public class HSMP_JournalLongEvents {
 
 		System.out.println("c is "+ c);
 		return new HierarchicalSMP(S0);
-
-
-
 	}
 
 	private static State buildInner(int leaf, Region parentRegion, State parent, int currentDepth, boolean expolSame, RegionType regT) {
@@ -159,12 +147,9 @@ public class HSMP_JournalLongEvents {
 
 		GEN expLong = GEN.newExpolynomial("0.22517 * Exp[-0.311427 x] * x + -0.022517 * Exp[-0.311427 x] * x^2", OmegaBigDecimal.ZERO, OmegaBigDecimal.TEN); 
 
-
-
 		State current;
 
 		List<State> nextStates = null;//Required to avoid ambiguity
-
 
 		if(currentDepth!=HSMP_JournalLongEvents.depthS) {
 
@@ -269,12 +254,9 @@ public class HSMP_JournalLongEvents {
 		regMap.put(old1, parentRegion);
 		regMap.put(old2, parentRegion);
 
-
-
 		boolean first=false;
 		boolean second =false;
 		boolean third = false;
-
 
 		if(currentDepth==2 && firstLeaf.isEmpty()) {
 			first=true;
@@ -285,7 +267,6 @@ public class HSMP_JournalLongEvents {
 				secondLeaf.add(old1);
 				secondLeaf.add(old2);
 		}
-
 
 		for(int r=1;r<sequenceS;r++) {
 
@@ -318,7 +299,6 @@ public class HSMP_JournalLongEvents {
 			regMap.put(old1, parentRegion);
 			regMap.put(old2, parentRegion);
 
-
 			if(first) {
 				firstLeaf.add(old1);
 				firstLeaf.add(old2);
@@ -326,12 +306,10 @@ public class HSMP_JournalLongEvents {
 				secondLeaf.add(old1);
 				secondLeaf.add(old2);
 			}
-
 		}
 
 		expS.add(old1);
 		expDiffS.add(old2);
-
 
 		current.setNextStates(Arrays.asList(old1,old2), Arrays.asList(0.5,0.5));
 
@@ -341,9 +319,5 @@ public class HSMP_JournalLongEvents {
 		}
 		
 		return current;
-
 	}
-
-
-
 }

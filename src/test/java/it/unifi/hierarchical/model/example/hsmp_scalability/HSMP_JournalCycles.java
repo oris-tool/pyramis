@@ -39,6 +39,11 @@ import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.utils.StateUtils;
 
+/**
+ * This class supports the definition of the HSMP models with cycles 
+ * used in the case study on transient timed failure logic analysis of component based systems 
+ * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts".
+ */
 public class HSMP_JournalCycles {
 
 	public static int parallelS;

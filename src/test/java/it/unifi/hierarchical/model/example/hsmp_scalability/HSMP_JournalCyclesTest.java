@@ -34,6 +34,10 @@ import it.unifi.hierarchical.model.SimpleState;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
 
+/**
+ * This class can be eliminated (it implements some correctness check 
+ * for the HSMP models supported by the class HSMP_JournalCycles).
+ */
 public class HSMP_JournalCyclesTest {
 
 	public static int parallelS;

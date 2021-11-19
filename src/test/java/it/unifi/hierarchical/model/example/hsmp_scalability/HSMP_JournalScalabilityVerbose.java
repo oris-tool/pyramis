@@ -38,6 +38,13 @@ import it.unifi.hierarchical.model.SimpleState;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
 
+/**
+ * This class supports the comparison between HSMP analysis and regenerative transient analysis
+ * of the HSMP models of the basic pattern (and its variants 
+ * depending on the behaviour length, the parallelism degree, the hierarchy depth, and the composite type)
+ * used in the case study on transient timed failure logic analysis of component based systems 
+ * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts".
+ */
 public class HSMP_JournalScalabilityVerbose {
 
 	public static int parallelS;
@@ -50,8 +57,7 @@ public class HSMP_JournalScalabilityVerbose {
 
 	public static Set<String> getStates(){
 		return statesS;
-	}
-	
+	}	
 	
 	//per ogni stato tutti gli stati dentro le sue regioni (composite e simple)
 	public static Map<State,Set<State>> map;
@@ -72,7 +78,6 @@ public class HSMP_JournalScalabilityVerbose {
 	
 	public static Map<Integer,Map<Integer,LinkedList<String>>> internalLeaves;
 	public static Map<String,String>  couple;
-	
 	
 	public static Set<State> statesP;
 
@@ -99,9 +104,7 @@ public class HSMP_JournalScalabilityVerbose {
 			}
 			internalLeaves.put(i, x);
 		}
-		
-		
-		
+						
 		//old1, old2
 		HSMP_JournalScalabilityVerbose.doublesMap= new HashMap<State,State>();
 		//old2,old1
@@ -109,8 +112,7 @@ public class HSMP_JournalScalabilityVerbose {
 		
 		//stato, regione parte del genitore
 		HSMP_JournalScalabilityVerbose.regMap= new HashMap<State,Region>();
-		
-		
+				
 		HSMP_JournalScalabilityVerbose.parallelS=parallel;
 		HSMP_JournalScalabilityVerbose.depthS=depth;
 		HSMP_JournalScalabilityVerbose.sequenceS=sequence;
@@ -127,10 +129,7 @@ public class HSMP_JournalScalabilityVerbose {
 			rListAll.add(newR);
 		}
 		
-		
-
 		//System.out.println("p="+parallelS+" d="+depthS+" s="+sequenceS);
-
 
 		List<State> nextStates = null;//Required to avoid ambiguity
 
@@ -155,9 +154,6 @@ public class HSMP_JournalScalabilityVerbose {
 
 		System.out.println("c is "+ c);
 		return new HierarchicalSMP(S0);
-
-
-
 	}
 
 	private static State buildInner(Region parentRegion, State parent, int currentDepth, boolean expolSame, RegionType regT) {
@@ -191,8 +187,6 @@ public class HSMP_JournalScalabilityVerbose {
 
 			//System.out.println("p="+parallelS+" d="+depthS+" s="+sequenceS);
 
-
-
 			current = new CompositeState(
 					"comp_"+currentDepth+"_"+c++,  
 					rListAll, 
@@ -215,7 +209,6 @@ public class HSMP_JournalScalabilityVerbose {
 
 				rListAll.get(i).setInitialState(initial);
 			}
-
 
 		} else {
 
@@ -321,25 +314,13 @@ public class HSMP_JournalScalabilityVerbose {
 			
 			internalLeaves.get(currentDepth+1).get(sequenceS-1-r).add(old1.getName()) ;
 			internalLeaves.get(currentDepth+1).get(sequenceS-1-r).add(old2.getName()) ;
-			
-			
-			
 		}
 		
 		expS.add(old1);
 		expDiffS.add(old2);
 		
-		
-		
-		
 		current.setNextStates(Arrays.asList(old1,old2), Arrays.asList(0.5,0.5));
 
-		
-		
 		return current;
-
 	}
-
-
-
 }
