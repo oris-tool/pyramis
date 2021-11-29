@@ -37,6 +37,8 @@ import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
 
+//FIXME: Can this class be removed and its methods integrated with those of class SojournTimeEvaluatorVisitor?
+
 public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 	private Map<State, NumericalValues> sojournTimeDistributions;
@@ -48,6 +50,7 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 	private int CYCLE;
 
+	// FIXME: Rename this attribute
 	private SMPAnalyzerWithBorderExitStates cycleTransientList; 
 
 
@@ -87,10 +90,10 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 		double[] values;
 
-		double up = state.getUpperBound();
+		double up = state.getUpperBound(); // LAURA: se >0 e' uno stato esterno da trattare a precisione massima
 		if(up>0.) {
 		
-			if(state.getDepth()!=0) {
+			if(state.getDepth()!=0) {// LAURA: e' un check su come e' creato il modello
 				System.out.println("ERRORE ARBITRARY PRECISION NOT IN TOPLEVEL!! - SojournTimeEvaluatorForced");
 				return;
 			}
@@ -103,8 +106,6 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 			values = NumericalUtils.evaluateFunction(state.getDensityFunction(), new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+step));
 			values = NumericalUtils.computeCDFFromPDF(values,  new BigDecimal(""+step));
 		}
-
-
 
 		sojournTimeDistributions.put(state, new NumericalValues(values, step));
 

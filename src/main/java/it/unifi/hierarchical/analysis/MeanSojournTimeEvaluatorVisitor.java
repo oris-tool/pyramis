@@ -148,9 +148,6 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 
 	private void evaluateLowerLevelStateSojournTime(State state) {
 
-
-
-
 		//1- Get region transient probabilities. Since it is not a top level state, it must belong to a region
 		Region parentRegion = parentRegions.get(state);
 		TransientAnalyzer parentRegionAnalysis = regionTransientProbabilities.get(parentRegion);
@@ -194,9 +191,7 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 					noExitDistrib=false;
 					break;
 				}
-
 			}
-
 
 			if(variableTimeStep && previousParentRegion.getTimeStep()>greatestTimeStep) {
 				greatestTimeStep = previousParentRegion.getTimeStep();
@@ -205,7 +200,6 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 				greatestTimeStep = parentExitDistribution.getStep();
 			}
 			//here we have determined the least common multiplier step (if -all- steps are multiples of each other)
-
 
 			if(!noExitDistrib) {
 
@@ -226,12 +220,7 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 				//not necessarily scaled
 				NumericalValues absorbingProbs = absorbingProbabilities.get(previousParentRegion).get(parentState);
 
-
-
 				NumericalValues absorbingProbsRescaled = NumericalUtils.rescaleCDF(absorbingProbs, greatestTimeStep);
-
-
-
 
 				NumericalValues parentExitDistributionRescaled = NumericalUtils.rescaleCDF(parentExitDistribution, greatestTimeStep);
 
@@ -243,20 +232,13 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 
 				//3.5 add to the "exitDistributions" array
 				exitDistributions.add(parallelExitDistribution);
-
-
-
 			}
-
-
 		}
-
 
 		//4- Evaluate reaching probability of target sub-state, given that we are in the parent state
 		double reachingProbability = 1;
 
 		if(state.getDepth() > 1) {
-
 
 			Region previousParentRegion = parentRegions.get(parentStates.get(parentRegion));
 			NumericalValues absorbingProbs = absorbingProbabilities.get(previousParentRegion).get(parentState);
@@ -264,7 +246,6 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 
 			NumericalValues absorbingProbsRescaled = NumericalUtils.rescaleCDF(absorbingProbs, greatestTimeStep);
 			NumericalValues parentExitDistributionRescaled = NumericalUtils.rescaleCDF(parentExitDistribution, greatestTimeStep);
-
 
 			double[] absPDF = NumericalUtils.computePDFFromCDF(absorbingProbsRescaled.getValues(), new BigDecimal("" + greatestTimeStep));
 			double[] exitPDF = NumericalUtils.computePDFFromCDF(parentExitDistributionRescaled.getValues(), new BigDecimal("" + greatestTimeStep));
@@ -321,5 +302,4 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 
 		meanSojournTimes.put(state, mean);
 	}
-
 }

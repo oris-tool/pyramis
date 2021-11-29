@@ -38,6 +38,8 @@ import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
 
+//FIXME: Can this class be removed and its methods integrated with those of class MeanSojournTimeEvaluatorVisitor?
+
 //2.1- Navigate on the higher level searching for all possible state
 //2.2- For each one, evaluate the mean based on sojourn time distribution,
 //     if composite,

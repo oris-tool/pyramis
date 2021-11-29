@@ -29,6 +29,7 @@ import org.oristool.math.OmegaBigDecimal;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.utils.NumericalUtils;
 
+// FIXME: Can this class be removed and its methods integrated with those of class SMPAnalyzer?
 public class SMPAnalyzerForCycle implements TransientAnalyzer{
 
 	private List<State> states;
@@ -70,8 +71,6 @@ public class SMPAnalyzerForCycle implements TransientAnalyzer{
 		System.out.println("Region Never ");
 		Date start = new Date();
 
-
-
 		//Evaluate kernel
 		double[][][] kernel = new double[states.size()][states.size()][ticks];
 
@@ -107,7 +106,6 @@ public class SMPAnalyzerForCycle implements TransientAnalyzer{
 
 		for(int rr=0; rr<CYCLE;rr++) {
 			
-			
 			System.out.println("ciclo "+rr);
 			//FIXME qui mette direttamente a 1 la prob di essere al tempo zero in se stesso, mentre per immediate forse
 			//vuole 0? e 1 sui finali?
@@ -117,7 +115,6 @@ public class SMPAnalyzerForCycle implements TransientAnalyzer{
 			for (int i = 0; i < probs.length; i++) {
 				probs[i][i][0] = 1;
 			}
-
 
 			//Evaluate transient probabilities of the SMP
 			//REMARK only a single step is allowed in a tick, Multiple Det(0) are likely cause of errors
@@ -129,14 +126,12 @@ public class SMPAnalyzerForCycle implements TransientAnalyzer{
 
 					boolean immediateTransition=false;
 
-
 					double[] sojournDistrib;
 					if(sojourn == null) //absorbing state
 						sojournDistrib = new double[ticks];
 					else {
 						sojournDistrib = sojourn.getValues();
 						immediateTransition = (sojourn.getValues()[0] == 1.0); 
-
 					}
 					for(int j = 0; j < states.size(); j++) {//To
 
@@ -157,18 +152,12 @@ public class SMPAnalyzerForCycle implements TransientAnalyzer{
 									lastKernelProb=kernel[i][k][u - 1];
 								}
 
-								probs[i][j][t]+=  
-										(kernel[i][k][u] -lastKernelProb)* 
-										probs[k][j][t - u];    
-
-
+								probs[i][j][t] += (kernel[i][k][u] -lastKernelProb)*probs[k][j][t - u];    
 							}
 						}
 					}
 				}
 			}
-
-
 
 			double[] sojournDistrib = probs[indexChange][endIndex];
 
@@ -177,25 +166,18 @@ public class SMPAnalyzerForCycle implements TransientAnalyzer{
 					kernel[indexChange][kk][t] = nonZeroIndex.get(kk) * sojournDistrib[t];
 				}
 			}
-			
 			probsL.add(probs);
-
-
 		}
-
 
 		Date end = new Date();
 		timeElapsed += end.getTime() - start.getTime();
 		System.out.println("(ms): " + timeElapsed );
-
 	}
 
 	@Override
 	public List<State> getStates() {
 		return states;
 	}
-
-
 
 	@Override
 	public double getTimeLimit() {
@@ -208,13 +190,11 @@ public class SMPAnalyzerForCycle implements TransientAnalyzer{
 	}
 
 
-
 	@Override
 	public NumericalValues getProbsFromTo(State from, State to) {
 		System.out.println("error should not be here SMPAnalyzerForCycle called with getProbsFromTo");
 		return null;
 	}
-
 
 	public NumericalValues getProbsFromTo(State from, State to, int i) {
 
@@ -224,6 +204,4 @@ public class SMPAnalyzerForCycle implements TransientAnalyzer{
 		double[] result = probsL.get(i)[fromStateIndex][toStateIndex];
 		return new NumericalValues(result, timeStep);
 	}
-
-
 }

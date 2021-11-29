@@ -326,6 +326,7 @@ public class NumericalUtils {
 	//	}  
 	//
 
+	// FIXME: Rename this method to computeTickNumber
 	public static int computeStepNumber(OmegaBigDecimal timeLimit, BigDecimal timeStep) {
 		return timeLimit.divide(timeStep, MathContext.DECIMAL128).intValue() + 1;
 	}

@@ -34,6 +34,8 @@ import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
 
+//FIXME: Can this class be removed and its methods integrated with those of class SMPAnalyzer?
+
 /**
  * Extend the SMPAnalyzer so as to handle the case of composite states with exits on the border
  */

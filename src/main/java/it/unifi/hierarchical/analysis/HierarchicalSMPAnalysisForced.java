@@ -38,6 +38,8 @@ import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
 
+//FIXME: Can this class be removed and its methods integrated with those of class HierarchicalSMPAnalysis?
+
 
 /**
  * Notes: 
@@ -71,7 +73,6 @@ public class HierarchicalSMPAnalysisForced {
 		this.model = model;
 		this.CYCLE_UNROLLING=CYCLE;
 	}
-
 
 	/**
 	 * @param timeStep  discretization step for the numerical passes, -1.0 is used to operate on different timeStep per state and regions 
@@ -120,7 +121,6 @@ public class HierarchicalSMPAnalysisForced {
 		return result;
 	}
 
-
 	private boolean checkInitialsNoBorder(Set<State> offenderSet) {
 
 		BorderExitInitialVisitor visitor = new BorderExitInitialVisitor();
@@ -143,7 +143,6 @@ public class HierarchicalSMPAnalysisForced {
 		
 	}
 
-
 	private void evaluateMeanSojournTimes(double timeStep, double timeLimit) {
 
 		boolean variableTimeStep= (timeStep<0.0);
@@ -154,11 +153,7 @@ public class HierarchicalSMPAnalysisForced {
 		this.meanSojournTimes = visitor.getMeanSojournTimes();
 		this.meanSojournVmAvailableAtCycle = visitor.getMeanSojournVmAvailableAtCycle();
 		this.meanSojournInnerAtCycle = visitor.getMeanSojournInnerAtCycle();
-
-
-
 	}
-
 
 	private void solveEmbeddedDTMC(double timeStep){
 		//3.1- Build DTMC
@@ -298,5 +293,4 @@ public class HierarchicalSMPAnalysisForced {
 
 		return ss;
 	}
-
 }

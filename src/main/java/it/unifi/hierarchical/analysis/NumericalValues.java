@@ -19,6 +19,9 @@ package it.unifi.hierarchical.analysis;
 
 import java.util.Arrays;
 
+/**
+ * Array of probabilities and the time step used to evaluate them.
+ */
 public class NumericalValues {
 
     private double[] values;

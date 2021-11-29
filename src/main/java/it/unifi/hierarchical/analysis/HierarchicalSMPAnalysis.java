@@ -43,7 +43,6 @@ import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
 
-
 /**
  * Notes: 
  * - we assume the embedded DTMC to be irreducible 
@@ -74,11 +73,11 @@ public class HierarchicalSMPAnalysis {
 		this(model,0);
 	}
 
+	// LAURA: se CYCLE==0 allora chiama analyzer normale, altrimenti chiama analyzer for cycle
 	public HierarchicalSMPAnalysis(HierarchicalSMP model, int CYCLE) {
 		this.model = model;
 		this.CYCLE_UNROLLING=CYCLE;
 	}
-
 
 	/**
 	 * @param timeStep  discretization step for the numerical passes, -1.0 is used to operate on different timeStep per state and regions 
@@ -89,6 +88,7 @@ public class HierarchicalSMPAnalysis {
 	public Map<String, Double> evaluateSteadyState(double timeStep, double timeLimit) {
 
 		//0 - checking model does not contains exits on borders of initial states
+		// LAURA: si assume che il primo stato non sia un composite first con diversa next step pdf per ogni regione
 		boolean noExitInitials = true;
 		Set<State> offendingStateSet=new HashSet<>();
 		noExitInitials=checkInitialsNoBorder(offendingStateSet);
@@ -103,14 +103,18 @@ public class HierarchicalSMPAnalysis {
 			return null;
 		}
 
-
 		//0.1 - unrolling all cycles forcibly: use a fixed number of unrollings, 
 		//TODO add treatment to specify a confidence and identify correct number of unrolls
+		//     (LAURA: siamo noi a dire quanti unroll deve fare)
 		//TODO add correct treatment if cycles are present in multiple levels
 		//TODO add correct treatment if multiple cycles connect the same nodes 
+		//     (LAURA: "otto volante")
 		//TODO add correct treatment for cycles in regions containing nodes not in the cycle
+		//     (LAURA: qui si sta dicendo che se è un cerchio dal quale posso uscrire, allora non è trattato, forse)
 		//qui tratto solo il caso di cicli che occupano completamente una neverending reg
 		// e composite che contengono solo stati simple
+		// (LAURA: deve esserci un unico ciclo, e la regione deve essere never-ending, 
+		// si assume che i composite del ciclo siano tutti di tipo simple)
 		if(CYCLE_UNROLLING!=0)
 			identifyAndUnrollCycles();
 		
@@ -144,11 +148,11 @@ public class HierarchicalSMPAnalysis {
 		time = d4.getTime() - d3.getTime();
 		System.out.println(time+ "  solveDTMCXXX");
 		
-		
 		//		System.out.println("Evaluate Steady State");
 		//4- steady state (Use solution of 2 and 3 to evaluate steady)
 		Map<String, Double> result = evalueteSS();    
 
+		// LAURA: questo serve per rimappare le prob degli alias sugli step originali
 		if(compositeCycles) {
 			for(State s : aliasStates.keySet()) {
 				Double res =0.;
@@ -186,13 +190,14 @@ public class HierarchicalSMPAnalysis {
 				for(State s: toDuplicateMap.get(r)) {
 					linkStates(s, false);
 				}
-
-
 			}
 		}
 	}
 
 
+	// LAURA: questo copia gli archi (sulla base della mappa)
+	// inner vale true se siamo dentro il ciclo, false altrimenti
+	// si assume che il primo stato del ciclo sia un simple step
 	//FIXME !isCycle considers only simples at the start
 	private void linkStates(State s, boolean inner) {
 
@@ -216,7 +221,6 @@ public class HierarchicalSMPAnalysis {
 			}//else if composite / compositeOnBorder
 			return;
 		}
-
 
 		boolean loop = s.isLooping();
 
@@ -260,7 +264,6 @@ public class HierarchicalSMPAnalysis {
 					linkStates(li, true);
 				}
 			}
-
 
 			for(int i=0; i<CYCLE_UNROLLING;i++) {
 				CompositeState curr= (CompositeState) aliasStates.get(s).get(i);
@@ -332,8 +335,6 @@ public class HierarchicalSMPAnalysis {
 
 	}
 
-
-
 	private void createCopyRegion(State s) {
 
 		Set<State> visited = new HashSet<>();
@@ -368,7 +369,9 @@ public class HierarchicalSMPAnalysis {
 		}
 	}
 
-
+    // LAURA: crea una copia dello step che viene passato
+	// (se è un composite copia anche le regioni ecc.),
+	// non si occupa degli archi
 	private void createStateCopy(State s) {
 
 		aliasStates.put(s, new LinkedList<State>());
@@ -416,7 +419,6 @@ public class HierarchicalSMPAnalysis {
 
 		BorderExitInitialVisitor visitor = new BorderExitInitialVisitor();
 
-
 		model.getInitialState().accept(visitor);
 		offenderSet.addAll(visitor.getOffenderSet());
 
@@ -424,30 +426,22 @@ public class HierarchicalSMPAnalysis {
 		return visitor.isModelCorrect();
 	}
 
-
 	private void evaluateSojournTimeDistributions(double timeStep, double timeLimit) {
+
 		SojournTimeEvaluatorVisitor visitor = new SojournTimeEvaluatorVisitor(timeStep, timeLimit);
 		model.getInitialState().accept(visitor);
 		this.sojournTimeDistributions = visitor.getSojournTimeDistributions();
 		this.regionSojournTimeDistributions = visitor.getRegionSojournTimeDistributions();
-		this.regionTransientProbabilities = visitor.getRegionTransientProbabilities();
-		
+		this.regionTransientProbabilities = visitor.getRegionTransientProbabilities();		
 		HierarchicalSMPAnalysis.cdf=sojournTimeDistributions.get(model.getInitialState());
 	}
-
 
 	private void evaluateMeanSojournTimes(double timeStep, double timeLimit) {
 
 		boolean variableTimeStep= (timeStep<0.0);
-
-
 		MeanSojournTimeEvaluatorVisitor visitor = new MeanSojournTimeEvaluatorVisitor(model.getInitialState(), sojournTimeDistributions, regionSojournTimeDistributions, regionTransientProbabilities, variableTimeStep, timeLimit);
 		model.getInitialState().accept(visitor);
 		this.meanSojournTimes = visitor.getMeanSojournTimes();
-
-
-
-
 	}
 
 
@@ -555,6 +549,7 @@ public class HierarchicalSMPAnalysis {
 	}
 
 
+	// FIXME: Rename this method to evaluateSS
 	private Map<String, Double> evalueteSS() {        
 		//4.1- At higher level use the standard solution method for SS of an SMP
 		Map<String, Double> ss = new HashMap<>();

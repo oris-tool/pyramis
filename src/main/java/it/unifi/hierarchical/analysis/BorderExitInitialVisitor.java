@@ -30,6 +30,9 @@ import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.StateUtils;
 
+// LAURA: è i lvisitor che controlla se il primo stato è un border exit
+// per ogni regione, guarda se ogni stato è un border exit e ti produce una lista di errori
+// se il primo stato della regione è un border exit
 public class BorderExitInitialVisitor implements StateVisitor{
 
 	private Set<State> evaluated;
@@ -65,14 +68,12 @@ public class BorderExitInitialVisitor implements StateVisitor{
 
 		System.out.println(state.getDepth()+" "+state.getName());
 		
-		
 		evaluated.add(state);
 
 		List<Region> regions = state.getRegions();
 		for (Region region : regions) {
 
 			System.out.println("region ");
-			
 			
 			if(StateUtils.isCompositeWithBorderExit( region.getInitialState())) {
 				offenderSet.add(region.getInitialState());

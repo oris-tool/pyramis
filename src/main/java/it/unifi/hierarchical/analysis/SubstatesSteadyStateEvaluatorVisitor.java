@@ -22,20 +22,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Stack;
 
 import it.unifi.hierarchical.model.CompositeState;
 import it.unifi.hierarchical.model.ExitState;
 import it.unifi.hierarchical.model.FinalState;
 import it.unifi.hierarchical.model.Region;
+import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.SimpleState;
 import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.StateUtils;
 
-import java.util.Set;
-import java.util.Stack;
-
+// LAURA: Calcola lo steady-state degli step che non sono al top-level
 public class SubstatesSteadyStateEvaluatorVisitor implements StateVisitor{
 
 	//allowed difference between steady state of parents and sum of steady state of childrens

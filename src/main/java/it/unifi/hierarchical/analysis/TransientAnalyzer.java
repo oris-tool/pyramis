@@ -21,6 +21,9 @@ import java.util.List;
 
 import it.unifi.hierarchical.model.State;
 
+/**
+ * Common interface of methods for transient analysis of the semi-Markov process underlying a {@link Region}. 
+ */
 public interface TransientAnalyzer {
 
     public double getTimeLimit();
@@ -29,6 +32,6 @@ public interface TransientAnalyzer {
 
     public List<State> getStates();
 
-    public NumericalValues getProbsFromTo(State from, State to);
-    
+    // FIXME: Rename getProbsFromTo to getTransientProbability()
+    public NumericalValues getProbsFromTo(State from, State to); 
 }

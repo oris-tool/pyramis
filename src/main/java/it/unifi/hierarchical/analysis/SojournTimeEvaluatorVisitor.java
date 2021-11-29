@@ -31,12 +31,15 @@ import it.unifi.hierarchical.model.CompositeState;
 import it.unifi.hierarchical.model.ExitState;
 import it.unifi.hierarchical.model.FinalState;
 import it.unifi.hierarchical.model.Region;
+import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.SimpleState;
 import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
+
+// LAURA: questo e il gemello si differenziano in quanto qui abbiamo unrolling e non ci preoccupiamo quindi dei cicli
+// E se invece non facciamo l'unrolling allora siamo costretti a trattare i cicli con la classe forced.
 
 public class SojournTimeEvaluatorVisitor implements StateVisitor{
 
@@ -127,6 +130,7 @@ public class SojournTimeEvaluatorVisitor implements StateVisitor{
 					mapSojournTimeDistributions.put(region, regionSojournTimeDistribution);
 		}
 
+		// LAURA: qui tenere conto del refactoring su composite step e region
 		//Evaluate composite state distribution
 		RegionType type=null;
 		for(Region r: regions) {
@@ -140,7 +144,7 @@ public class SojournTimeEvaluatorVisitor implements StateVisitor{
 		//non c'� mai il caso never
 		switch (type) {
 		case EXIT:
-			if(timeStep<0.0) {
+			if(timeStep<0.0) { // LAURA: se timeStep<0 allora il timeStep è variabile e va preso quello giusto dello statp
 				sojournTimeDistribution = NumericalUtils.minCDFvar(mapSojournTimeDistributions.values(), state.getTimeStep());
 			}else {
 				sojournTimeDistribution = NumericalUtils.minCDF(mapSojournTimeDistributions.values());
@@ -182,6 +186,7 @@ public class SojournTimeEvaluatorVisitor implements StateVisitor{
 		}
 	}
 
+	// LAURA: calcola la CDF
 	private NumericalValues evaluateRegionSojournTime(Region region) {
 		
 		RegionType type= region.getType();
@@ -200,26 +205,11 @@ public class SojournTimeEvaluatorVisitor implements StateVisitor{
 		}
 		
 		if(type==RegionType.NEVER) {
-			
-			//FIXME devo considerare lo specifico transiente unlooped basato su tempo altrui
-			// il transiente per essere unlooped !!richiede!! di conoscere la distribuzione 
-			//delle altre regioni vicine (Fexit)
-			//posso forzabrutare un certo numero di loop...
-			
 			regionSojournTimeDistributions.put(region, null);
-
-			
 			TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(region.getInitialState(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, variableSteps);
-
-			//FIXME TRANSIENTE RICHIEDE UNLOOPING, CONOSCENZA REGIONI VICINE / FORZA BRUTA UN CERTO NUM
 			regionTransientProbabilities.put(region, analyzer);
-			
-			
 			return null;
 		}
-		
-		
-
 		
 		State endState = StateUtils.findEndState(smpStates);
 
@@ -235,12 +225,12 @@ public class SojournTimeEvaluatorVisitor implements StateVisitor{
 		timeX = d2.getTime() - d1.getTime();
 		System.out.println(timeX+ "  sojournPPP");
 		
-		
 		//REMARK ottiene prob di passare da init a end in un certo tempo, richiede che i due siano stati presenti in analyzer, quindi non borderExit
+	    // LAURA: initialState è lo stato iniziale della regione, che non può masi essere un borderexit
+		// endState è la finalLocation
+		// se uno step è borderExit, dentro analyzer ci sono i suoi stati regione
 		NumericalValues sojournTimeDistribution = analyzer.getProbsFromTo(initialState, endState);
 		
-		
-		//FIXME TRANSIENTE RICHIEDE UNLOOPING, CONOSCENZA REGIONI VICINE / FORZA BRUTA UN CERTO NUM
 		regionSojournTimeDistributions.put(region, sojournTimeDistribution);
 		regionTransientProbabilities.put(region, analyzer);
 		return sojournTimeDistribution;

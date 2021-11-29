@@ -33,7 +33,6 @@ import org.oristool.math.function.StateDensityFunction;
 import org.oristool.models.stpn.trees.StochasticStateFeature;
 
 import it.unifi.hierarchical.analysis.NumericalValues;
-import it.unifi.hierarchical.utils.NumericalUtils;
 
 public class NumericalUtilsTest {
 
@@ -57,7 +56,6 @@ public class NumericalUtilsTest {
         GEN b = GEN.newUniform(new OmegaBigDecimal("1"), new OmegaBigDecimal("2"));
         
         compareShiftAndProject(step, timeLimit, a, b);
-        
     }
     
     @Test    
@@ -74,6 +72,7 @@ public class NumericalUtilsTest {
         int ticks = NumericalUtils.computeStepNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + step));
         double[] sirioResult = new double[ticks];
         double[] numericalResult = new double[ticks];
+        
         //Sirio analytical evaluation
         StochasticStateFeature feature = new StochasticStateFeature(BigDecimal.ZERO, 0);
         StateDensityFunction density = feature.getStateDensity();
@@ -89,7 +88,6 @@ public class NumericalUtilsTest {
         sirioResult = NumericalUtils.computeCDFFromPDF(sirioResult, new BigDecimal("" + step));
         
         //Numerical evaluation        
-        
         NumericalValues aNumerical = 
                 new NumericalValues(
                         NumericalUtils.computeCDFFromPDF(
@@ -129,6 +127,4 @@ public class NumericalUtilsTest {
         }
         assertEquals(0.5, mean, 0.001);
     }
-
-    
 }
