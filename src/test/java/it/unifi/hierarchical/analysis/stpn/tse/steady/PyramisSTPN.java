@@ -36,7 +36,7 @@ import org.oristool.petrinet.Marking;
 import org.oristool.petrinet.PetriNet;
 
 import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.models.tse.trans.TFLVerbose;
+import it.unifi.hierarchical.model.tse.trans.TFLVerbose;
 
 /**
  * This class supports the analysis of the STPN model corresponding to the HSMP model

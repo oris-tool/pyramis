@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package it.unifi.hierarchical.models.tse.steady;
+package it.unifi.hierarchical.model.tse.steady;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

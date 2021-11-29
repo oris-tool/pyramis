@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package it.unifi.hierarchical.models.stpn.tse;
+package it.unifi.hierarchical.model.stpn.tse;
 
 import java.math.BigDecimal;
 

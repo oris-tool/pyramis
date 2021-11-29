@@ -28,7 +28,7 @@ import it.unifi.hierarchical.analysis.HierarchicalSMPAnalysis;
 import it.unifi.hierarchical.analysis.NumericalValues;
 import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.models.tse.trans.TFLRare;
+import it.unifi.hierarchical.model.tse.trans.TFLRare;
 
 /**
  * This class supports the analysis of the HSMP models with rare events

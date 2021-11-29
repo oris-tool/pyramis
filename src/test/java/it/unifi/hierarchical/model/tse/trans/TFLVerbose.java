@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package it.unifi.hierarchical.models.tse.trans;
+package it.unifi.hierarchical.model.tse.trans;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

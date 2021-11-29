@@ -39,8 +39,8 @@ import it.unifi.hierarchical.model.FinalState;
 import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.Region;
 import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.tse.trans.TFL;
 import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.models.tse.trans.TFL;
 
 /**
  * This class supports the derkivation of a ground truth (through stochastic simulation) 

@@ -34,7 +34,7 @@ import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.Region;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.models.tse.trans.TFLCycles;
+import it.unifi.hierarchical.model.tse.trans.TFLCycles;
 import it.unifi.hierarchical.utils.StateUtils;
 
 /**

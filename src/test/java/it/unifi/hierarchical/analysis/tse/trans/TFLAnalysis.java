@@ -28,7 +28,7 @@ import it.unifi.hierarchical.analysis.HierarchicalSMPAnalysis;
 import it.unifi.hierarchical.analysis.NumericalValues;
 import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.models.tse.trans.TFL;
+import it.unifi.hierarchical.model.tse.trans.TFL;
 
 /**
  * This class supports the analysis of the HSMP models of the basic pattern (and its variants

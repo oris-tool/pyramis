@@ -25,7 +25,7 @@ import java.util.Map;
 
 import it.unifi.hierarchical.analysis.HierarchicalSMPAnalysisForced;
 import it.unifi.hierarchical.model.HierarchicalSMP;
-import it.unifi.hierarchical.models.tse.steady.SWRej;
+import it.unifi.hierarchical.model.tse.steady.SWRej;
 
 /**
  * This class supports the analysis of the HSMP model

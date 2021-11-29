@@ -27,7 +27,7 @@ import java.util.Set;
 import it.unifi.hierarchical.analysis.HierarchicalSMPAnalysis;
 import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.models.tse.trans.TFLLargeSupport;
+import it.unifi.hierarchical.model.tse.trans.TFLLargeSupport;
 
 /**
  * This class supports the analsyis of the HSMP models with large support PDFs 

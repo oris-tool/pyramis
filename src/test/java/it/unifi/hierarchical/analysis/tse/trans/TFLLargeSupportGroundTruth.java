@@ -40,7 +40,7 @@ import it.unifi.hierarchical.model.HierarchicalSMP;
 import it.unifi.hierarchical.model.Region;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.models.tse.trans.TFLLargeSupport;
+import it.unifi.hierarchical.model.tse.trans.TFLLargeSupport;
 
 /**
  * This class supports the derivation of a ground truth (through stochastic simulation)
