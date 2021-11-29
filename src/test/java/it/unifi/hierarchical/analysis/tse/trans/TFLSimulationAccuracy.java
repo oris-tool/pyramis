@@ -30,7 +30,7 @@ import java.util.LinkedList;
 /**
  * This class supports the comparison of the simulation results with the ground truth for all the HSMP models 
  * used in the case study on transient timed failure logic analysis of component based systems 
- * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts" (see Figure 4).
+ * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts" (see Figures 4 and 6 and Table 6).
  */
 public class TFLSimulationAccuracy {
 

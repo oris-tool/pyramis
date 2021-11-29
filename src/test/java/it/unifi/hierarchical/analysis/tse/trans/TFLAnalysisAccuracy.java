@@ -34,7 +34,7 @@ import java.util.Map;
  * depending on the behaviour length, the parallelism degree, the hierarchy depth, and the composite type)
  * and for the HSMP models with large support PDFs and with rate events
  * used in the case study on transient timed failure logic analysis of component based systems 
- * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts" (see Figure 4).
+ * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts" (see Figures 4 and 6 and Table 2).
  */
 public class TFLAnalysisAccuracy {
 

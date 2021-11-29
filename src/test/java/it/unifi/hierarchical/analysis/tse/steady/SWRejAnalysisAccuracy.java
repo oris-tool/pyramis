@@ -29,7 +29,7 @@ import java.text.NumberFormat;
 /**
  * This class supports the comparison of the analysis results with the ground truth
  * for the HSMP model used in the case study on steady-state analysis of software rejuvenation in virtual servers 
- * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts" (see Figure 8).
+ * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts" (see Figures 8 and 10, and Table 9).
  */
 public class SWRejAnalysisAccuracy {
 
