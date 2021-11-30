@@ -38,13 +38,12 @@ import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
 
-//FIXME: Can this class be removed and its methods integrated with those of class HierarchicalSMPAnalysis?
+//FIXME: This class be removed and its methods integrated with those of class HierarchicalSMPAnalysis.
 
 
 /**
  * Notes: 
  * - we assume the embedded DTMC to be irreducible 
- * @author marco e francesco
  *
  */
 public class HierarchicalSMPAnalysisForced {

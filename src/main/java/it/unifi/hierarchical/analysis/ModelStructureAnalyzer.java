@@ -29,10 +29,17 @@ import it.unifi.hierarchical.model.Region;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.utils.StateUtils;
 
+/**
+ * Analysis of the hierarchical structure of an HSMP in order to 
+ * derive the parent step of each region and the parent regions of each step.
+ */
 public class ModelStructureAnalyzer{
-
-    private Map<State, Region> parentRegions; // Region parent of a state
-    private Map<Region, CompositeState> parentStates; //Composite state parent of the region
+	
+	// Parent region of each step
+    private Map<State, Region> parentRegions; 
+    
+    // Parent composite step of each region
+    private Map<Region, CompositeState> parentStates; 
     
     public ModelStructureAnalyzer(State initialState) {
         parentRegions =  new HashMap<>();
@@ -59,20 +66,19 @@ public class ModelStructureAnalyzer{
     				for (State s : successors) {
         				if(visited.contains(s) || toBeVisited.contains(s))
                             continue;
-        				parentRegions.put(s, parentRegions.get(c));//Same of predecessor
+        				parentRegions.put(s, parentRegions.get(c)); //Same of predecessor
                         toBeVisited.add(s);
         			} 
     			}
-    		}else {
+    		} else {
     			List<State> successors = c.getNextStates();
     			for (State s : successors) {
     				if(visited.contains(s) || toBeVisited.contains(s))
                         continue;
-    				parentRegions.put(s, parentRegions.get(c));//Same of predecessor
+    				parentRegions.put(s, parentRegions.get(c)); //Same of predecessor
                     toBeVisited.add(s);
     			}    
     		}
-            
         }
     }
 
@@ -83,5 +89,4 @@ public class ModelStructureAnalyzer{
     public Map<Region, CompositeState> getParentStates() {
         return parentStates;
     }
-    
 }

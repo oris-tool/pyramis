@@ -36,7 +36,7 @@ import it.unifi.hierarchical.utils.StateUtils;
 import java.util.Set;
 import java.util.Stack;
 
-//FIXME: Can this class be removed and its methods integrated with those of class SubstatesSteadyStateEvaluatorVisitor?
+//FIXME: This class can be removed and its methods integrated with those of class SubstatesSteadyStateEvaluatorVisitor.
 
 public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 

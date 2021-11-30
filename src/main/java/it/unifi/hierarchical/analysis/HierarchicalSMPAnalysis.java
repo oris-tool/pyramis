@@ -46,7 +46,6 @@ import it.unifi.hierarchical.utils.StateUtils;
 /**
  * Notes: 
  * - we assume the embedded DTMC to be irreducible 
- * @author marco e francesco
  *
  */
 public class HierarchicalSMPAnalysis {
@@ -549,7 +548,7 @@ public class HierarchicalSMPAnalysis {
 	}
 
 
-	// FIXME: Rename this method to evaluateSS
+	// FIXME: Rename this method to evaluateSteadyState
 	private Map<String, Double> evalueteSS() {        
 		//4.1- At higher level use the standard solution method for SS of an SMP
 		Map<String, Double> ss = new HashMap<>();

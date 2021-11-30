@@ -69,7 +69,7 @@ public class NumericalUtilsTest {
     }
     
     private void compareShiftAndProject(double step, double timeLimit, GEN a, GEN b) {
-        int ticks = NumericalUtils.computeStepNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + step));
+        int ticks = NumericalUtils.computeTickNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + step));
         double[] sirioResult = new double[ticks];
         double[] numericalResult = new double[ticks];
         

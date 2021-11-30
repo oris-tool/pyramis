@@ -77,7 +77,7 @@ public class Region {
     /**
      * FIXME: This condition should be automatically checked.
      * 
-     * @return true if the region contains a cycle that visits a composite step.
+     * @return true if the region contains a cycle that visits a non-top-level composite step.
      */
     public boolean containsCompositeCycle() {
         return compositeCycle;

@@ -25,8 +25,8 @@ import it.unifi.hierarchical.model.CompositeState;
 import it.unifi.hierarchical.model.ExitState;
 import it.unifi.hierarchical.model.FinalState;
 import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.State;
 
 // FIXME: Could some of these methods be methods of the classes Region etc.?
 
@@ -36,14 +36,13 @@ public class StateUtils {
 		if(r.getType()==RegionType.NEVER) {
 			throw new IllegalStateException("Searching End in NeverEnding");
 		}
-		return findEndState(getReachableStates(r.getInitialState()));
+		return findFinalLocation(getReachableStates(r.getInitialState()));
 	}
 
-	// FIXME: This method should be renamed findFinalLocation.
 	/**
 	 * This method assumes that each region contains at most one final location.
 	 */
-	public static State findEndState(List<State> states) {
+	public static State findFinalLocation(List<State> states) {
 		for (int i = 0; i < states.size(); i++) {
 			State state = states.get(i);
 			if (state instanceof ExitState || state instanceof FinalState)
@@ -76,8 +75,6 @@ public class StateUtils {
 				}
 			}
 				
-			
-				
 			states.add(current);
 
 			if(StateUtils.isCompositeWithBorderExit(current)) {
@@ -89,7 +86,6 @@ public class StateUtils {
 						if (!states.contains(successor) && !toBeVisited.contains(successor))
 							toBeVisited.add(successor);
 					}
-
 				}
 			}else {
 				for (State successor : current.getNextStates()) {
@@ -97,12 +93,10 @@ public class StateUtils {
 						toBeVisited.add(successor);
 				}
 			}
-
 		}
 
 		return states;
 	}
-
 
 	public static State searchStateByName(List<State> states, String name) {
 		for (State state : states) {
@@ -113,16 +107,14 @@ public class StateUtils {
 	}
 
 	/**
-	 * 
-	 * @param state
+	 * @param state a logical location
 	 * @return true if it is a composite step of type first
 	 */
 	public static boolean isCompositeWithBorderExit(State state) {
-		if(     state instanceof CompositeState && 
+		if(state instanceof CompositeState && 
 				((CompositeState)state).hasExitStatesOnBorder()) {
 			return true;
 		}
 		return false;
 	}
-
 }

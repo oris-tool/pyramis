@@ -230,7 +230,7 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 
 
-		State endState = StateUtils.findEndState(smpStates);
+		State endState = StateUtils.findFinalLocation(smpStates);
 
 		//		System.out.println("SojournTimeDistributions -> Analyzer");
 

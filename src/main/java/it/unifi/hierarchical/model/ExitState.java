@@ -22,7 +22,6 @@ import java.util.UUID;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 
 // FIXME: Remove this class (it is equivalent to FinalState).
-
 public class ExitState extends State{
 
     public ExitState(String name, int depth) {

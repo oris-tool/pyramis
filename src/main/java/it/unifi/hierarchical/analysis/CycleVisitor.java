@@ -34,17 +34,23 @@ import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.StateUtils;
 
+/**
+ * Visitor of logical locations, supporting the identification of cycles visiting non-top-level composite steps.
+ */
 public class CycleVisitor implements StateVisitor{
 
 	private Set<State> evaluated;
 	private boolean compositeCycles;
+	
+	// Set of regions containing a cycle visiting a non-top-level composite step
 	private Set<Region> regionSet;
+	
+	// For each region that contains a cycle visiting a non-top-level composute step,
+	// the map yields the set of logical locations of the region
 	private Map<Region,Set<State>> map;
 
 	public CycleVisitor(){
-		
-		System.out.println("cycle visitor initiated");
-		
+		System.out.println("Cycle visitor started");
 		this.regionSet = new HashSet<>();
 		this.map= new HashMap<>();
 		this.compositeCycles=false;
@@ -64,7 +70,6 @@ public class CycleVisitor implements StateVisitor{
 		}
 	}
 
-	
 	//FIXME aggiungo tutti gli stati direttamente, 
 	//ma in realt� il ciclo non coinvolge generalmente tutto
 	@Override
@@ -98,7 +103,7 @@ public class CycleVisitor implements StateVisitor{
 						}
 						//STANDARD CASE
 					}else {
-						//Add missing children to the dtmc
+						//Add missing children to the DTMC
 						for(State successor:current.getNextStates()) {
 							if(visited.contains(successor) || toBeVisited.contains(successor))
 								continue;
@@ -112,7 +117,7 @@ public class CycleVisitor implements StateVisitor{
 			region.getInitialState().accept(this);
 		}
 
-		//Visit successors not yet visited
+		// Visit successors not yet visited
 		if(StateUtils.isCompositeWithBorderExit(state)) {
 
 			CompositeState cState = state;
@@ -122,20 +127,17 @@ public class CycleVisitor implements StateVisitor{
 					if(evaluated.contains(successor))
 						continue;
 					successor.accept(this);
-
 				}    
 			}
-		}else {
+		} else {
 			List<State> successors = state.getNextStates();
 			for (State successor : successors) {
 				if(evaluated.contains(successor))
 					continue;
 				successor.accept(this);
-
 			}    
 		}
 	}
-
 
 	@Override
 	public void visit(FinalState state) {
@@ -158,7 +160,4 @@ public class CycleVisitor implements StateVisitor{
 	public Map<Region, Set<State>> getMap() {
 		return map;
 	}
-
-
-
 }

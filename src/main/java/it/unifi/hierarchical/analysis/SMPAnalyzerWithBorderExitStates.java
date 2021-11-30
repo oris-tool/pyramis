@@ -34,8 +34,7 @@ import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
 
-//FIXME: Can this class be removed and its methods integrated with those of class SMPAnalyzer?
-
+//FIXME: This class be removed and its methods integrated with those of class SMPAnalyzer.
 /**
  * Extend the SMPAnalyzer so as to handle the case of composite states with exits on the border
  */
@@ -123,9 +122,7 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		}
 	}
 
-
 	private NumericalValues computeRegionStateDistribution(RegionState state) {
-
 
 		List<NumericalValues> vl= new LinkedList<>();
 		NumericalValues fired = regionSojournTimeDistributions.get(state.getRegion());
@@ -142,7 +139,6 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		return fired;
 	}
 
-
 	//the first state From is always the initial state of the region (so it is not ExitOnBorder)
 	@Override
 	public NumericalValues getProbsFromTo(State from, State to) {
@@ -153,7 +149,7 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		}
 
 		//Aggregation required
-		int steps = NumericalUtils.computeStepNumber(new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+timeStep));
+		int steps = NumericalUtils.computeTickNumber(new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+timeStep));
 		List<RegionState> mappedState = compositeStateToRegionStates.get(to);
 		double[] result = new double[steps];
 		for (RegionState rState : mappedState) {
@@ -177,7 +173,7 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 			}else {
 
 				//Aggregation required
-				int steps = NumericalUtils.computeStepNumber(new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+timeStep));
+				int steps = NumericalUtils.computeTickNumber(new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+timeStep));
 				List<RegionState> mappedState = compositeStateToRegionStates.get(to);
 				double[] result = new double[steps];
 				for (RegionState rState : mappedState) {
@@ -189,12 +185,8 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 				list.add(new NumericalValues(result, timeStep));
 			}
 		}
-		
-		
 		return list;
 	}
-
-
 
 	@Override
 	public double getTimeLimit() {
@@ -210,7 +202,6 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 	public List<State> getStates() {
 		return states;
 	}
-
 
 	//FIXME trattare il caso in cui si ha una neverending in parallelo a regioni con exitOnBorder
 	/**
@@ -304,7 +295,6 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		return StateUtils.isCompositeWithBorderExit(state);
 	}
 
-
 	private class RegionState extends State{
 
 		private Region region;
@@ -364,5 +354,4 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 			return new RegionState(region, state);
 		} 
 	}
-
 }

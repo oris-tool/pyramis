@@ -68,7 +68,6 @@ public class ErlangExp implements Function {
 
 	@Override
 	public String toMathematicaString() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

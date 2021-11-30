@@ -50,13 +50,13 @@ public class SMPAnalyzer implements TransientAnalyzer{
 		this(states, sojournTimeDistributions, timeLimit, timeStep, null);
 	}
 
-	// FIXME: It may be better to have the analysis in a static method rather than in the constructor
+	// FIXME: It may be better to run the analysis in a static method rather than in the constructor
 	public SMPAnalyzer(List<State> states, Map<State, NumericalValues> sojournTimeDistributions, double timeLimit, double timeStep, State absorbingState) {
 		this.states = states;
 		this.timeLimit = timeLimit;
 		this.timeStep = timeStep;
 		this.absorbingState = absorbingState;
-		int ticks = NumericalUtils.computeStepNumber(new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+timeStep));
+		int ticks = NumericalUtils.computeTickNumber(new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+timeStep));
 
 		System.out.println("RandomStateInRegion "+states.get(0).getName());
 		System.out.println(states.size()+" "+ ticks);
@@ -105,8 +105,9 @@ public class SMPAnalyzer implements TransientAnalyzer{
 			probs[i][i][0] = 1;
 		}
 
-		//Evaluate transient probabilities of the SMP
-		//REMARK only a single step is allowed in a tick, Multiple Det(0) are likely cause of errors
+		// Evaluate transient probabilities of the SMP
+		// REMARK: only a single step is allowed to be executed during a time tick, 
+		// i.e., a sequence of immediate executed steps may cause errors
 		for(int t = 1; t < ticks; t++) {
 			for(int i = 0; i < states.size(); i++) {//From
 				State from = states.get(i);
@@ -139,7 +140,6 @@ public class SMPAnalyzer implements TransientAnalyzer{
 							}else {
 								lastKernelProb=kernel[i][k][u - 1];
 							}
-							
 							probs[i][j][t]+= (kernel[i][k][u] -lastKernelProb)*probs[k][j][t - u];    
 						}
 					}
@@ -153,7 +153,7 @@ public class SMPAnalyzer implements TransientAnalyzer{
 
 		Date end = new Date();
 		timeElapsed += end.getTime() - start.getTime();
-		System.out.println("(ms): " + timeElapsed );
+		System.out.println("(ms): " + timeElapsed);
 	}
 
 	@Override

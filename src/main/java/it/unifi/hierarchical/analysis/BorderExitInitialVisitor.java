@@ -30,9 +30,12 @@ import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.StateUtils;
 
-// LAURA: è i lvisitor che controlla se il primo stato è un border exit
-// per ogni regione, guarda se ogni stato è un border exit e ti produce una lista di errori
-// se il primo stato della regione è un border exit
+// FIXME: Rename this class to RegionVisitor
+
+/**
+ * Visitor of logical locations, supporting the identification of regions whose initial step
+ * is a composite step of type first with ending regions having different next step PDF.
+ */
 public class BorderExitInitialVisitor implements StateVisitor{
 
 	private Set<State> evaluated;
@@ -83,7 +86,7 @@ public class BorderExitInitialVisitor implements StateVisitor{
 			region.getInitialState().accept(this);
 		}
 
-		//Visit successors not yet visited
+		// Visit successors not yet visited
 		if(StateUtils.isCompositeWithBorderExit(state)) {
 
 			CompositeState cState = state;
@@ -93,20 +96,17 @@ public class BorderExitInitialVisitor implements StateVisitor{
 					if(evaluated.contains(successor))
 						continue;
 					successor.accept(this);
-					
 				}    
 			}
-		}else {
+		} else {
 			List<State> successors = state.getNextStates();
 			for (State successor : successors) {
 				if(evaluated.contains(successor))
 					continue;
-				successor.accept(this);
-								
+				successor.accept(this);					
 			}    
 		}
 	}
-
 
 	@Override
 	public void visit(FinalState state) {
@@ -129,5 +129,4 @@ public class BorderExitInitialVisitor implements StateVisitor{
 	public Set<State> getOffenderSet() {
 		return offenderSet;
 	}
-
 }

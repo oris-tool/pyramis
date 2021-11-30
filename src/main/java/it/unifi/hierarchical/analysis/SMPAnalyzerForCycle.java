@@ -29,7 +29,7 @@ import org.oristool.math.OmegaBigDecimal;
 import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.utils.NumericalUtils;
 
-// FIXME: Can this class be removed and its methods integrated with those of class SMPAnalyzer?
+// FIXME: This class should be removed and its methods integrated with those of class SMPAnalyzer.
 public class SMPAnalyzerForCycle implements TransientAnalyzer{
 
 	private List<State> states;
@@ -66,7 +66,7 @@ public class SMPAnalyzerForCycle implements TransientAnalyzer{
 			System.out.println("null initial Cycle c'� un problema");
 		}
 
-		int ticks = NumericalUtils.computeStepNumber(new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+timeStep));
+		int ticks = NumericalUtils.computeTickNumber(new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+timeStep));
 
 		System.out.println("Region Never ");
 		Date start = new Date();

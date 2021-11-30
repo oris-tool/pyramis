@@ -260,7 +260,7 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 		}
 
 		//5- Evaluate the exit distribution as the minimum and save it for lower regions
-		double[] finalExitDistribution = new double[NumericalUtils.computeStepNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + greatestTimeStep))];
+		double[] finalExitDistribution = new double[NumericalUtils.computeTickNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + greatestTimeStep))];
 		if(exitDistributions.size() == 0) {
 			Arrays.fill(finalExitDistribution, 0.0);    
 			finalExitDistribution[finalExitDistribution.length-1]=1.0;
