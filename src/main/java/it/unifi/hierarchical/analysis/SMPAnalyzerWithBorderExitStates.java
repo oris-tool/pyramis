@@ -63,9 +63,6 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		this(initialState, sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, timeStep, absorbingState, variable, 0);
 	}
 
-	// analyzer da dove � chiamato? Da Sojourn per valutare il tempo di soggiorno in una regione: prob from to
-	// Si riferisce solo ad una regione di volta in volta vero? SI
-	// Quindi la riconversione � fatta regione per regione immediatamente
 	/**
 	 * 
 	 * @param initialState
@@ -117,7 +114,6 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		if(CYCLE == 0) {
 			this.analyzer = new SMPAnalyzer(stateWithExitConditioning, augmentedSojournTimeDistributions, timeLimit, timeStep, this.absorbingState);
 		}else {
-			//TODO FIXME qui considero solo caso del journal dove il ciclo inizia al secondo stato e non vi sono uscite
 			this.analyzerForCycle = new SMPAnalyzerForCycle(stateWithExitConditioning, augmentedSojournTimeDistributions, timeLimit, timeStep, CYCLE);
 		}
 	}
@@ -133,7 +129,6 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 
 		fired = variableTime ? NumericalUtils.rescaleCDF(fired, timeStep) : fired;
 
-		//condiziona basato su altre
 		fired = NumericalUtils.conditionDistributionToFire(fired,vl,timeLimit,timeStep,variableTime);
 
 		return fired;
@@ -203,7 +198,6 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		return states;
 	}
 
-	//FIXME trattare il caso in cui si ha una neverending in parallelo a regioni con exitOnBorder
 	/**
 	 * For each composite state that has exits on border, create a dummy state for each region.
 	 * For each state that has a composite state having exits on border, change the branching probs considering probability that a region is faster
@@ -241,7 +235,6 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		List<Double> branchingProbs = new ArrayList<>();
 		List<State> nextStates = new ArrayList<>();
 
-		//fo un self loop, ogni uscita � riportata sullo stesso
 		if(oldstate.equals(absorbingState)) {
 			branchingProbs.add(1.0);
 			nextStates.add(newState);

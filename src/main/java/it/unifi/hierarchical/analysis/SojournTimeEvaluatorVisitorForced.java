@@ -90,10 +90,10 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 		double[] values;
 
-		double up = state.getUpperBound(); // LAURA: se >0 e' uno stato esterno da trattare a precisione massima
+		double up = state.getUpperBound();
 		if(up>0.) {
 		
-			if(state.getDepth()!=0) {// LAURA: e' un check su come e' creato il modello
+			if(state.getDepth()!=0) {
 				System.out.println("ERRORE ARBITRARY PRECISION NOT IN TOPLEVEL!! - SojournTimeEvaluatorForced");
 				return;
 			}
@@ -150,7 +150,6 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 		}
 
 		NumericalValues sojournTimeDistribution = null;
-		//non c'� mai il caso never
 		switch (type) {
 		case EXIT:
 			if(timeStep<0.0) {
@@ -236,11 +235,8 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 		TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(region.getInitialState(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, variableSteps);
 
-		//REMARK ottiene prob di passare da init a end in un certo tempo, richiede che i due siano stati presenti in analyzer, quindi non borderExit
 		NumericalValues sojournTimeDistribution = analyzer.getProbsFromTo(initialState, endState);
 
-
-		//FIXME TRANSIENTE RICHIEDE UNLOOPING, CONOSCENZA REGIONI VICINE / FORZA BRUTA UN CERTO NUM
 		regionSojournTimeDistributions.put(region, sojournTimeDistribution);
 		regionTransientProbabilities.put(region, analyzer);
 		return sojournTimeDistribution;

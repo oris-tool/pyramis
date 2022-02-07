@@ -207,8 +207,6 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 				if(absorbingProbabilities.get(previousParentRegion) == null)
 					absorbingProbabilities.put(previousParentRegion, new HashMap<>());
 
-				//REMARK qui viene chiamato analyzer
-
 				if(absorbingProbabilities.get(previousParentRegion).get(parentState) == null) {
 
 					//CREATE ABSORBING PROBABILITIES: CHANGE THE MODEL FOR ABSORPTION!!				

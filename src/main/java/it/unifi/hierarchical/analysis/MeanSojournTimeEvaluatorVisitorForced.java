@@ -177,9 +177,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 		meanSojournTimes.put(state, mean);
 	}
 
-
-	//INFO: I calcoli si basano sul fatto che il ciclo � tale da non permettere mai l'uscita!!
-	// Reaching prob nella never � sempre 1!!
 	private void evaluateLowerLevelStateSojournTime(State state) {
 
 
@@ -194,26 +191,9 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 			insideVm = (parentRegions.get(parentStates.get(parentRegion)).getType()==RegionType.NEVER);
 		}
 
-		//FIXME al momento per costruzione se depth > 1 insideVm == true
 		if(insideVm){
 			meanSojournInnerAtCycle.put(state, new LinkedList<Double>());
 		}
-
-
-
-
-		//			prima non mi preoccupavo di nulla potevo direttamente 
-		//			usare lo studio transiente della regione ai differenti tempi (sommavano a 1 con sufficienti cicli extra)
-		//			
-		//			adesso devo "ricostruire" la prob della regione!!
-		//			
-		//			e devo mantenere info dei CYCLE differenti per poter calcolare sugli stati lower!!
-		//			
-		//			
-		//			trattamento diverso anche per gli stati interni, magari usare direttamente il nome?
-		//					check state.getName() ??
-
-
 
 		double greatestTimeStep=state.getTimeStep();
 		TransientAnalyzer parentRegionAnalysis=null;
@@ -265,7 +245,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 				return;
 			}
 
-			// i tempi di arrivo in Vm sono i tempi di conclusione di ogni ciclo + il tempo di soggiorno di VmRes
 			arrivalsInVm = cycleTransientList.getProbsFromToList(parentRegion.getInitialState(), endState);
 			arrivalsInVm.add(0, sojournTimeDistributions.get(res));
 			arrivalsInVm.remove(arrivalsInVm.size()-1);
@@ -281,7 +260,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 		}
 
-		//FIXME SE CASO NEVER + FINAL QUI IL FINAL NON VIENE CONSIDERATO (PER ORA CONSIDERA SOLO NEVER + EXIT* )
 		//2- Get exit distributions of parallel regions at same level of the direct parent composite state
 		List<NumericalValues> exitDistributions = new ArrayList<>();
 		State parentState = parentStates.get(parentRegion);
@@ -304,7 +282,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 		double reachingProbability = 1;
 
-		// PER I FIGLI TROVA LA DISTRIBUZIONE PER ENTRARE NEL PADRE E SHIFTA LE PARALLELE DEL PADRE ALL INGRESSO
 		//3- Get exit distribution of parallel regions at higher level. Note that distribution must have
 		//the same time origin and thus need to be shifted
 		if(state.getDepth() > 1) {
@@ -345,9 +322,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 				//3.5 add to the "exitDistribCycle" array
 				exitDistribCycle.add(parallelExitDistribution);
 
-
-
-				// calcola separatamente alle exit modificate, la probabilit� che non falliscano prima
 				//4- Evaluate reaching probability of target sub-state, given that we are in the parent state
 
 
@@ -362,8 +336,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 					}
 				}
 
-
-				//TODO raggruppa questi per regione...
 				//5- Evaluate the exit distribution as the minimum and save it for lower regions
 				double[] finalExitDistribution = new double[NumericalUtils.computeTickNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + greatestTimeStep))];
 				if(exitDistribCycle.size() == 0) {
@@ -413,8 +385,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 		}
 
-
-		//TODO raggruppa questi per regione...
 		//5- Evaluate the exit distribution as the minimum and save it for lower regions
 		double[] finalExitDistribution = new double[NumericalUtils.computeTickNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + greatestTimeStep))];
 		if(exitDistributions.size() == 0) {
@@ -446,7 +416,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements StateVisitor{
 			}
 		}
 
-		//FIXME viene fatto pi� volte...
 		shiftedExitDistributions.put(parentRegion, new NumericalValues(finalExitDistribution, greatestTimeStep));
 
 		if(vm) {

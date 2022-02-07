@@ -70,8 +70,6 @@ public class CycleVisitor implements StateVisitor{
 		}
 	}
 
-	//FIXME aggiungo tutti gli stati direttamente, 
-	//ma in realt� il ciclo non coinvolge generalmente tutto
 	@Override
 	public void visit(CompositeState state) {
 

@@ -35,7 +35,6 @@ import it.unifi.hierarchical.model.State;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 import it.unifi.hierarchical.utils.StateUtils;
 
-// LAURA: Calcola lo steady-state degli step che non sono al top-level
 public class SubstatesSteadyStateEvaluatorVisitor implements StateVisitor{
 
 	//allowed difference between steady state of parents and sum of steady state of childrens

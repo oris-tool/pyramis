@@ -45,7 +45,6 @@ public class SMPAnalyzer implements TransientAnalyzer{
 	private static long timeElapsed=0;
 
 	// FIXME: Can this constructor be eliminated?
-	//absorbing state NON serve a niente, in quanto quando viene passato si � avuta una chiamata a SMPAWithBorderExit che ha reso lo stato assorbente un selflooping
 	public SMPAnalyzer(List<State> states, Map<State, NumericalValues> sojournTimeDistributions, double timeLimit, double timeStep) {
 		this(states, sojournTimeDistributions, timeLimit, timeStep, null);
 	}
@@ -95,10 +94,7 @@ public class SMPAnalyzer implements TransientAnalyzer{
 		Date d3 = new Date();
 		time = d3.getTime() - d2.getTime();
 		System.out.println(time+ "  kernelQQQ");
-	
-		//FIXME qui mette direttamente a 1 la prob di essere al tempo zero in se stesso, mentre per immediate forse
-		//vuole 0? e 1 sui finali?
-		
+
 		//Init transient probs array
 		probs = new double[states.size()][states.size()][ticks];
 		for (int i = 0; i < probs.length; i++) {

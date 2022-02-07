@@ -72,7 +72,6 @@ public class HierarchicalSMPAnalysis {
 		this(model,0);
 	}
 
-	// LAURA: se CYCLE==0 allora chiama analyzer normale, altrimenti chiama analyzer for cycle
 	public HierarchicalSMPAnalysis(HierarchicalSMP model, int CYCLE) {
 		this.model = model;
 		this.CYCLE_UNROLLING=CYCLE;
@@ -86,8 +85,6 @@ public class HierarchicalSMPAnalysis {
 	 */
 	public Map<String, Double> evaluateSteadyState(double timeStep, double timeLimit) {
 
-		//0 - checking model does not contains exits on borders of initial states
-		// LAURA: si assume che il primo stato non sia un composite first con diversa next step pdf per ogni regione
 		boolean noExitInitials = true;
 		Set<State> offendingStateSet=new HashSet<>();
 		noExitInitials=checkInitialsNoBorder(offendingStateSet);
@@ -102,18 +99,6 @@ public class HierarchicalSMPAnalysis {
 			return null;
 		}
 
-		//0.1 - unrolling all cycles forcibly: use a fixed number of unrollings, 
-		//TODO add treatment to specify a confidence and identify correct number of unrolls
-		//     (LAURA: siamo noi a dire quanti unroll deve fare)
-		//TODO add correct treatment if cycles are present in multiple levels
-		//TODO add correct treatment if multiple cycles connect the same nodes 
-		//     (LAURA: "otto volante")
-		//TODO add correct treatment for cycles in regions containing nodes not in the cycle
-		//     (LAURA: qui si sta dicendo che se è un cerchio dal quale posso uscrire, allora non è trattato, forse)
-		//qui tratto solo il caso di cicli che occupano completamente una neverending reg
-		// e composite che contengono solo stati simple
-		// (LAURA: deve esserci un unico ciclo, e la regione deve essere never-ending, 
-		// si assume che i composite del ciclo siano tutti di tipo simple)
 		if(CYCLE_UNROLLING!=0)
 			identifyAndUnrollCycles();
 		
@@ -151,7 +136,6 @@ public class HierarchicalSMPAnalysis {
 		//4- steady state (Use solution of 2 and 3 to evaluate steady)
 		Map<String, Double> result = evalueteSS();    
 
-		// LAURA: questo serve per rimappare le prob degli alias sugli step originali
 		if(compositeCycles) {
 			for(State s : aliasStates.keySet()) {
 				Double res =0.;
@@ -193,10 +177,6 @@ public class HierarchicalSMPAnalysis {
 		}
 	}
 
-
-	// LAURA: questo copia gli archi (sulla base della mappa)
-	// inner vale true se siamo dentro il ciclo, false altrimenti
-	// si assume che il primo stato del ciclo sia un simple step
 	//FIXME !isCycle considers only simples at the start
 	private void linkStates(State s, boolean inner) {
 
@@ -275,7 +255,6 @@ public class HierarchicalSMPAnalysis {
 					region.setInitialState(aliasStates.get(init).get(i));					
 				}
 
-				//linka il composite e poi linka gli stati interni
 				int pp;
 				if(!inner)
 					pp= loop?i+1:i;
@@ -368,9 +347,6 @@ public class HierarchicalSMPAnalysis {
 		}
 	}
 
-    // LAURA: crea una copia dello step che viene passato
-	// (se è un composite copia anche le regioni ecc.),
-	// non si occupa degli archi
 	private void createStateCopy(State s) {
 
 		aliasStates.put(s, new LinkedList<State>());
