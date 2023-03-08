@@ -19,7 +19,7 @@ package it.unifi.hierarchical.model.tse.steady;
 
 import it.unifi.hierarchical.analysis.ErlangExp;
 import it.unifi.hierarchical.model.*;
-import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.Region;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.domain.DBMZone;
 import org.oristool.math.expression.Expolynomial;
@@ -39,6 +39,7 @@ import java.util.Map;
  * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts" (see Figure 8).
  */
 public class SWRej {
+	/*
 
 	public static HSMP build() {
 
@@ -333,4 +334,6 @@ public class SWRej {
 
 		return new HSMP(S0);
 	}
+
+	 */
 }

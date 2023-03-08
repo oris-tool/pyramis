@@ -17,9 +17,9 @@
 
 package it.unifi.hierarchical.analysis.tse.trans;
 
-import it.unifi.hierarchical.analysis.HierarchicalSMPAnalysis;
+//import it.unifi.hierarchical.analysis.HierarchicalSMPAnalysis;
 import it.unifi.hierarchical.model.HSMP;
-import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.Region;
 import it.unifi.hierarchical.model.tse.trans.TFLLargeSupport;
 
 import java.io.File;
@@ -36,7 +36,7 @@ import java.util.Set;
  * For each model, 100 simulation runs are also performed, with each run lasting at least as long as the analysis.
  */
 public class TFLLargeSupportAnalysis {
-
+/*
 	// Chosen according to the model, based on the maximum time elapsed in a region or a state
 	private static final double TIME_STEP = 0.0025;
 	private static final boolean expolSame = true;
@@ -106,4 +106,6 @@ public class TFLLargeSupportAnalysis {
 			}
 		}
 	}
+
+ */
 }

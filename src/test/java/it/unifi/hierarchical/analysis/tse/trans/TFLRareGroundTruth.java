@@ -18,7 +18,7 @@
 package it.unifi.hierarchical.analysis.tse.trans;
 
 import it.unifi.hierarchical.model.*;
-import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.Region;
 import it.unifi.hierarchical.model.tse.trans.TFL;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.function.Function;
@@ -39,7 +39,7 @@ import java.util.*;
  * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts".
  */
 public class TFLRareGroundTruth {
-
+/*
 	public static double[]	arrSave;
 	public static int indexSave;
 	public static final boolean sameExp = true;
@@ -478,4 +478,6 @@ public class TFLRareGroundTruth {
 			}
 		}
 	}
+
+ */
 }

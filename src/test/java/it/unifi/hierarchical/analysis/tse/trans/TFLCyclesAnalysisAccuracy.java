@@ -20,7 +20,6 @@ package it.unifi.hierarchical.analysis.tse.trans;
 import it.unifi.hierarchical.model.CompositeStep;
 import it.unifi.hierarchical.model.HSMP;
 import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.Step;
 import it.unifi.hierarchical.model.tse.trans.TFLCycles;
 import it.unifi.hierarchical.utils.StateUtils;
@@ -39,7 +38,7 @@ import java.util.Map;
  * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts" (see Figure 4).
  */
 public class TFLCyclesAnalysisAccuracy {
-
+/*
 	public TFLCyclesAnalysisAccuracy() {
 	}
 
@@ -496,4 +495,6 @@ public class TFLCyclesAnalysisAccuracy {
 			System.out.println(s+" ->"+alias);
 		}
 	}
+
+ */
 }

@@ -34,6 +34,7 @@ import java.util.Map;
  * The analysis uses the same number times tick for all the steps of the model.
  */
 public class SWRejAnalysisFixedTicks {
+	/*
 
 	private static int LOOPS= 5; 
 
@@ -117,4 +118,6 @@ public class SWRejAnalysisFixedTicks {
 			}
 		}
 	}
+
+	 */
 }

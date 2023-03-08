@@ -19,7 +19,7 @@ package it.unifi.hierarchical.model.tse.steady;
 
 import it.unifi.hierarchical.analysis.ErlangExp;
 import it.unifi.hierarchical.model.*;
-import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.Region;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.domain.DBMZone;
 import org.oristool.math.expression.Expolynomial;
@@ -41,6 +41,7 @@ import java.util.Map;
  * but a different number of the time ticks is used for different steps during the analysis).
  */
 public class SWRejVariableTicks {
+	/*
 
 	public static HSMP build(double timeVMA, double timeR1, double timeVMMA, double timeEXX, double timeRegions) {
 
@@ -353,4 +354,6 @@ public class SWRejVariableTicks {
 
 		return new HSMP(S0);
 	}
+
+	 */
 }

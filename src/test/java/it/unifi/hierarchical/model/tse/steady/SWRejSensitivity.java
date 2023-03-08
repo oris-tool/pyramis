@@ -18,7 +18,7 @@
 package it.unifi.hierarchical.model.tse.steady;
 
 import it.unifi.hierarchical.model.*;
-import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.Region;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.domain.DBMZone;
 import org.oristool.math.expression.Expolynomial;
@@ -40,6 +40,7 @@ import java.util.Map;
  * where a different rejuvenation period is considered with respect to the base HSMP of Figure 8.
  */
 public class SWRejSensitivity {
+	/*
 
 	public static HSMP build(double timeVMA, double timeR1, double timeVMMA, double timeEX, double timeRegions, int i24, int i96, double prob) {
 
@@ -344,4 +345,6 @@ public class SWRejSensitivity {
 
 		return new HSMP(S0);
 	}
+
+	 */
 }

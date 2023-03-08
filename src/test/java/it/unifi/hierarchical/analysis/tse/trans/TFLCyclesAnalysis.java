@@ -35,7 +35,7 @@ import java.util.Set;
  * For each model, 100 simulation runs are also performed, with each run lasting at least as long as the analysis.
  */
 public class TFLCyclesAnalysis {
-
+/*
 	// Chosen according to the model, based on the maximum time elapsed in a region or a state
 	private static final double TIME_LIMIT = 10;
 	private static final double TIME_STEP = 0.0025;
@@ -123,4 +123,6 @@ public class TFLCyclesAnalysis {
 			}
 		}
 	}
+
+ */
 }

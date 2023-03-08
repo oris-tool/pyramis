@@ -17,7 +17,7 @@
 
 package it.unifi.hierarchical.analysis.stpn.tse.steady;
 
-import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.Region;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.domain.DBMZone;
 import org.oristool.math.expression.Expolynomial;
@@ -42,7 +42,7 @@ import java.util.*;
  * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts" (see Figure 8).
  */
 public class CreateSTPN {
-
+/*
 	public static int parallelS;
 	public static int depthS;
 	public static int sequenceS;
@@ -236,4 +236,6 @@ public class CreateSTPN {
 
 		return t;
 	}
+
+ */
 }

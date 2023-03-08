@@ -17,7 +17,7 @@
 
 package it.unifi.hierarchical.analysis.stpn.tse.steady;
 
-import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.Region;
 import it.unifi.hierarchical.model.tse.trans.TFLVerbose;
 import org.oristool.models.stpn.RewardRate;
 import org.oristool.models.stpn.TransientSolution;
@@ -40,6 +40,7 @@ import java.util.concurrent.Callable;
  * In particular, eahc marking of the STPN is associated with a location of the HSMP.
  */
 public class PyramisSTPN implements Callable<Long> {
+	/*
 
 	//Need to be chosen according to the model, based on which is the maximum time elapsed in a region or a state
 	private static final boolean expolSame = true;
@@ -67,8 +68,8 @@ public class PyramisSTPN implements Callable<Long> {
 		depth=d;
 		last=las;
 	}
-
-	public Long call() {    
+*/
+	public Long call() { return (long) 0.0;   /*
 
 		RegionType lastB = (last==1)? RegionType.FINAL : RegionType.EXIT;
 
@@ -107,6 +108,7 @@ public class PyramisSTPN implements Callable<Long> {
 						link.put(nName, s);
 					}
 				}
+
 			}
 
 			CreateSTPN.build(net, m, parallel,depth,seq,expolSame,lastB, internalLeaves);
@@ -198,5 +200,6 @@ public class PyramisSTPN implements Callable<Long> {
 			}
 		}
 		return (long) 1;
+		*/
 	}
 }

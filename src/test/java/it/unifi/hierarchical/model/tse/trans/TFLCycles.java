@@ -18,7 +18,7 @@
 package it.unifi.hierarchical.model.tse.trans;
 
 import it.unifi.hierarchical.model.*;
-import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.Region;
 import it.unifi.hierarchical.utils.StateUtils;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.function.GEN;
@@ -32,7 +32,7 @@ import java.util.*;
  * of the paper titled "Compositional Analysis of Hierarchical UML Statecharts".
  */
 public class TFLCycles {
-
+/*
 	public static int parallelS;
 	public static int depthS;
 	public static int sequenceS;
@@ -534,4 +534,6 @@ public class TFLCycles {
 		return current;
 
 	}
+
+ */
 }
