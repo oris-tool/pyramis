@@ -17,8 +17,6 @@
 
 package it.unifi.hierarchical.model;
 
-import it.unifi.hierarchical.model.visitor.StateVisitor;
-
 import java.util.*;
 
 /**

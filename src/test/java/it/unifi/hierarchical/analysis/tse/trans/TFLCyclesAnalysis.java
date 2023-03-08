@@ -17,10 +17,8 @@
 
 package it.unifi.hierarchical.analysis.tse.trans;
 
-import it.unifi.hierarchical.analysis.HierarchicalSMPAnalysis;
 import it.unifi.hierarchical.analysis.NumericalValues;
 import it.unifi.hierarchical.model.HSMP;
-import it.unifi.hierarchical.model.Region.RegionType;
 import it.unifi.hierarchical.model.tse.trans.TFLCycles;
 
 import java.io.File;
