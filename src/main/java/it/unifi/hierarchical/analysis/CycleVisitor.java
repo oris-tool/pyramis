@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,134 +17,110 @@
 
 package it.unifi.hierarchical.analysis;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.Map.Entry;
-
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.ExitState;
-import it.unifi.hierarchical.model.FinalState;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.SimpleState;
-import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.visitor.StateVisitor;
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.model.visitor.LogicalLocationVisitor;
 import it.unifi.hierarchical.utils.StateUtils;
+
+import java.util.*;
 
 /**
  * Visitor of logical locations, supporting the identification of cycles visiting non-top-level composite steps.
  */
-public class CycleVisitor implements StateVisitor{
+// Serve in quanto si memorizza solo lo step iniziale di una regione: serve per capire se si ha un ciclo che comprende
+// stati compositi che non siano di top-level
+public class CycleVisitor implements LogicalLocationVisitor {
 
-	private Set<State> evaluated;
+	private final Set<LogicalLocation> evaluated;
 	private boolean compositeCycles;
-	
-	// Set of regions containing a cycle visiting a non-top-level composite step
-	private Set<Region> regionSet;
-	
-	// For each region that contains a cycle visiting a non-top-level composute step,
-	// the map yields the set of logical locations of the region
-	private Map<Region,Set<State>> map;
 
-	public CycleVisitor(){
-		System.out.println("Cycle visitor started");
+	// Set of regions containing a cycle visiting a non-top-level composite step
+	private final Set<Region> regionSet;
+
+	// For each region that contains a cycle visiting a non-top-level composite step,
+	// the map yields the set of logical locations of the region
+	private final Map<Region,Set<LogicalLocation>> map;
+
+	public CycleVisitor() {
 		this.regionSet = new HashSet<>();
-		this.map= new HashMap<>();
-		this.compositeCycles=false;
-		this.evaluated=new HashSet<>();
+		this.map = new HashMap<>();
+		this.compositeCycles = false;
+		this.evaluated = new HashSet<>();
 	}
 
 	@Override
-	public void visit(SimpleState state) {
+	public void visit(SimpleStep simpleStep) {
+		evaluated.add(simpleStep);
 
-		evaluated.add(state);
 		//Visit successors not yet visited
-		List<State> successors = state.getNextStates();
-		for (State successor : successors) {
-			if(evaluated.contains(successor))
+		List<LogicalLocation> successors = simpleStep.getNextLocations();
+
+		for (LogicalLocation successor : successors) {
+			if (evaluated.contains(successor))
 				continue;
+
+			successor.accept(this);
+		}
+	}
+
+	//FIXME aggiungo tutti gli stati direttamente,
+	//ma in realt� il ciclo non coinvolge generalmente tutto
+	@Override
+	public void visit(CompositeStep compositeStep) {
+		evaluated.add(compositeStep);
+
+		List<Region> regions = compositeStep.getRegions();
+		for (Region region : regions) {
+			if (region.containsCompositeCycle()) {
+				compositeCycles = true;
+				regionSet.add(region);
+
+				Set<LogicalLocation> visited = new HashSet<>();
+				Stack<LogicalLocation> toBeVisited = new Stack<>();
+				toBeVisited.add(region.getInitialStep());
+
+				while (!toBeVisited.isEmpty()) {
+					LogicalLocation current = toBeVisited.pop();
+					visited.add(current);
+
+					if (StateUtils.isCompositeWithBorderExit(current)) {
+						CompositeStep cState = (CompositeStep)current;
+
+						for (LogicalLocation successor : cState.getNextLocations()) {
+							if (visited.contains(successor) || toBeVisited.contains(successor))
+								continue;
+
+							toBeVisited.push(successor);
+						}
+						//STANDARD CASE
+					} else {
+						//Add missing children to the DTMC
+						for (LogicalLocation successor : current.getNextLocations()) {
+							if (visited.contains(successor) || toBeVisited.contains(successor))
+								continue;
+
+							toBeVisited.push(successor);
+						}
+					}
+				}
+
+				map.put(region, visited);
+			}
+
+			region.getInitialStep().accept(this);
+		}
+
+		// Visit successors not yet visited
+		for (LogicalLocation successor : compositeStep.getNextLocations()) {
+			if (evaluated.contains(successor))
+				continue;
+
 			successor.accept(this);
 		}
 	}
 
 	@Override
-	public void visit(CompositeState state) {
-
-		evaluated.add(state);
-
-		List<Region> regions = state.getRegions();
-		for (Region region : regions) {
-
-			if(region.containsCompositeCycle()) {
-				compositeCycles=true;
-				regionSet.add(region);
-			
-				Set<State> visited = new HashSet<>();
-				Stack<State> toBeVisited = new Stack<>();
-				toBeVisited.add(region.getInitialState());
-				while(!toBeVisited.isEmpty()) {
-					State current = toBeVisited.pop();
-					visited.add(current);
-
-					if(StateUtils.isCompositeWithBorderExit(current)) {
-						CompositeState cState = (CompositeState)current;
-						
-						for(Entry<State, List<State>> e:cState.getNextStatesConditional().entrySet()) {
-							for (State successor : e.getValue()) {
-								if(visited.contains(successor) || toBeVisited.contains(successor))
-									continue;
-								toBeVisited.push(successor);    
-							}
-						}
-						//STANDARD CASE
-					}else {
-						//Add missing children to the DTMC
-						for(State successor:current.getNextStates()) {
-							if(visited.contains(successor) || toBeVisited.contains(successor))
-								continue;
-							toBeVisited.push(successor);
-						}
-					}
-				}
-				
-			map.put(region, visited);
-			}
-			region.getInitialState().accept(this);
-		}
-
-		// Visit successors not yet visited
-		if(StateUtils.isCompositeWithBorderExit(state)) {
-
-			CompositeState cState = state;
-			for(State exitState : cState.getNextStatesConditional().keySet()) {
-				List<State> successors = cState.getNextStatesConditional().get(exitState);
-				for (State successor : successors) {
-					if(evaluated.contains(successor))
-						continue;
-					successor.accept(this);
-				}    
-			}
-		} else {
-			List<State> successors = state.getNextStates();
-			for (State successor : successors) {
-				if(evaluated.contains(successor))
-					continue;
-				successor.accept(this);
-			}    
-		}
-	}
-
-	@Override
-	public void visit(FinalState state) {
-		evaluated.add(state);
-	}
-
-	@Override
-	public void visit(ExitState state) {
-		evaluated.add(state);
+	public void visit(FinalLocation finalLocation) {
+		evaluated.add(finalLocation);
 	}
 
 	public boolean containsCompositeCycles() {
@@ -155,7 +131,7 @@ public class CycleVisitor implements StateVisitor{
 		return regionSet;
 	}
 
-	public Map<Region, Set<State>> getMap() {
+	public Map<Region, Set<LogicalLocation>> getMap() {
 		return map;
 	}
 }

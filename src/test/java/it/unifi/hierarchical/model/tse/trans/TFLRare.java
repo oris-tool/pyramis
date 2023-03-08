@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,25 +17,13 @@
 
 package it.unifi.hierarchical.model.tse.trans;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.model.Region.RegionType;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.function.GEN;
 
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.FinalState;
-import it.unifi.hierarchical.model.HierarchicalSMP;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.SimpleState;
-import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * This class supports the definition of the HSMP models with rare events
@@ -57,48 +45,48 @@ public class TFLRare {
 	}
 	
 	// for each step, all the (simple and composite) steps contained within its regions
-	public static Map<State,Set<State>> map;
-	public static Map<State,State> parentMap;
-	public static Map<State,State> doublesMap;
-	public static Map<State,State> doublesMapFrom2;
-	public static Map<State,Region> regMap;
+	public static Map<Step,Set<Step>> map;
+	public static Map<Step, Step> parentMap;
+	public static Map<Step, Step> doublesMap;
+	public static Map<Step, Step> doublesMapFrom2;
+	public static Map<Step,Region> regMap;
 	
-	public static Map<State,State>  toCopy;
+	public static Map<Step, Step>  toCopy;
 	
-	public static Set<State> compS;
+	public static Set<Step> compS;
 	
 	// only the first step of the sequence is contained
-	public static Set<State> expDiffS;
-	public static Set<State> expS;
+	public static Set<Step> expDiffS;
+	public static Set<Step> expS;
 	
-	public static Set<State> statesP;
+	public static Set<Step> statesP;
 
-	public static HierarchicalSMP build(int parallel, int depth, int sequence, boolean expolSame, RegionType regT) {
+	public static HSMP build(int parallel, int depth, int sequence, boolean expolSame, RegionType regT) {
 		TFLRare.c=0;
-		TFLRare.map = new HashMap<State,Set<State>>();
-		TFLRare.compS= new HashSet<State>();
-		TFLRare.expS= new HashSet<State>();
-		TFLRare.expDiffS= new HashSet<State>();
+		TFLRare.map = new HashMap<Step,Set<Step>>();
+		TFLRare.compS= new HashSet<Step>();
+		TFLRare.expS= new HashSet<Step>();
+		TFLRare.expDiffS= new HashSet<Step>();
 		
 		// child, parent
-		TFLRare.parentMap= new HashMap<State,State>();
-		TFLRare.toCopy= new HashMap<State,State>();
+		TFLRare.parentMap= new HashMap<Step, Step>();
+		TFLRare.toCopy= new HashMap<Step, Step>();
 		
 		// old1, old2
-		TFLRare.doublesMap= new HashMap<State,State>();
+		TFLRare.doublesMap= new HashMap<Step, Step>();
 
 		// old2,old1
-		TFLRare.doublesMapFrom2= new HashMap<State,State>();
+		TFLRare.doublesMapFrom2= new HashMap<Step, Step>();
 		
 		// step, region contained in the parent step
-		TFLRare.regMap= new HashMap<State,Region>();
+		TFLRare.regMap= new HashMap<Step,Region>();
 		
 		TFLRare.parallelS=parallel;
 		TFLRare.depthS=depth;
 		TFLRare.sequenceS=sequence;
 
 		TFLRare.statesS= new HashSet<String>();
-		TFLRare.statesP= new HashSet<State>();
+		TFLRare.statesP= new HashSet<Step>();
 
 		List<Region> rListAll = new LinkedList<Region>();
 		for(int i=0;i<parallelS;i++) {
@@ -108,15 +96,15 @@ public class TFLRare {
 		}
 		//System.out.println("p="+parallelS+" d="+depthS+" s="+sequenceS);
 
-		List<State> nextStates = null;//Required to avoid ambiguity
+		List<Step> nextStates = null;//Required to avoid ambiguity
 
-		State S0 = new CompositeState(
+		Step S0 = new CompositeStep(
 				"S0",  
 				rListAll, 
 				nextStates, 
 				null, 
 				0);
-		map.put(S0, new HashSet<State>());
+		map.put(S0, new HashSet<Step>());
 		compS.add(S0);
 		statesS.add(S0.getName());
 		statesP.add(S0);
@@ -125,14 +113,14 @@ public class TFLRare {
 
 		for(int i=0;i<parallelS;i++) {
 
-			State initial = buildInner(rListAll.get(i), S0, 1, expolSame, regT);
+			Step initial = buildInner(rListAll.get(i), S0, 1, expolSame, regT);
 			rListAll.get(i).setInitialState(initial);
 		}
 		System.out.println("c is "+ c);
-		return new HierarchicalSMP(S0);
+		return new HSMP(S0);
 	}
 
-	private static State buildInner(Region parentRegion, State parent, int currentDepth, boolean expolSame, RegionType regT) {
+	private static Step buildInner(Region parentRegion, Step parent, int currentDepth, boolean expolSame, RegionType regT) {
 
 		GEN exp = GEN.newExpolynomial("22.517 * Exp[-3.11427 x] * x + -22.517 * Exp[-3.11427 x] * x^2", OmegaBigDecimal.ZERO, OmegaBigDecimal.ONE);
 //exp= GEN.newDeterministic(BigDecimal.valueOf(0.5));
@@ -145,8 +133,8 @@ public class TFLRare {
 			expDiff = GEN.newExpolynomial("0.22517 * Exp[-0.311427 x] * x + -0.022517 * Exp[-0.311427 x] * x^2", OmegaBigDecimal.ZERO, OmegaBigDecimal.TEN); 
 		}
 
-		State current;
-		List<State> nextStates = null;//Required to avoid ambiguity
+		Step current;
+		List<Step> nextStates = null;//Required to avoid ambiguity
 
 		if(currentDepth!=TFLRare.depthS) {
 			
@@ -159,7 +147,7 @@ public class TFLRare {
 
 			//System.out.println("p="+parallelS+" d="+depthS+" s="+sequenceS);
 
-			current = new CompositeState(
+			current = new CompositeStep(
 					"comp_"+currentDepth+"_"+c++,  
 					rListAll, 
 					nextStates, 
@@ -170,21 +158,21 @@ public class TFLRare {
 			parentMap.put(current, parent);
 			regMap.put(current, parentRegion);
 			
-			map.put(current, new HashSet<State>());
+			map.put(current, new HashSet<Step>());
 			map.get(parent).add(current);
 			statesS.add(current.getName());
 			statesP.add(current);
 			
 			for(int i=0;i<parallelS;i++) {
 
-				State initial = buildInner(rListAll.get(i), current, currentDepth+1, expolSame, regT);
+				Step initial = buildInner(rListAll.get(i), current, currentDepth+1, expolSame, regT);
 
 				rListAll.get(i).setInitialState(initial);
 			}
 
 		} else {
 
-			current = new SimpleState(
+			current = new SimpleStep(
 					"zero_"+currentDepth+"_"+c++,
 					GEN.newDeterministic(new BigDecimal(0)),
 					nextStates,
@@ -198,24 +186,24 @@ public class TFLRare {
 			statesS.add(current.getName());
 		}
 
-		State E = new FinalState("e_"+c++, currentDepth);
+		Step E = new FinalLocation("e_"+c++, currentDepth);
 
-		State stateD112 = new SimpleState(
+		Step stateD112 = new SimpleStep(
 				"d1_"+currentDepth+"_"+c++,
 				exp,
 				Arrays.asList(E), 
 				Arrays.asList(1.0), 
 				currentDepth); 
 		
-		State stateD122 = new SimpleState(
+		Step stateD122 = new SimpleStep(
 				"d2_"+currentDepth+"_"+c++,
 				expDiff,
 				Arrays.asList(E), 
 				Arrays.asList(1.0), 
 				currentDepth); 
 
-		State old1= stateD112;
-		State old2= stateD122;
+		Step old1= stateD112;
+		Step old2= stateD122;
 		map.get(parent).add(old1);
 		map.get(parent).add(old2);
 		statesS.add(old1.getName());
@@ -232,14 +220,14 @@ public class TFLRare {
 		
 		for(int r=1;r<sequenceS;r++) {
 
-			State stateD111 = new SimpleState(
+			Step stateD111 = new SimpleStep(
 					"d1--_"+currentDepth+"_"+c++,
 					exp,
 					Arrays.asList(old1), 
 					Arrays.asList(1.0), 
 					currentDepth); 
 
-			State stateD121 = new SimpleState(
+			Step stateD121 = new SimpleStep(
 					"d2--_"+currentDepth+"_"+c++,
 					expDiff,
 					Arrays.asList(old2), 

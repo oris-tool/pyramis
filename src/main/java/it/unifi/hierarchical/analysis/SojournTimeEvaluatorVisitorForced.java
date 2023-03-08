@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,41 +17,30 @@
 
 package it.unifi.hierarchical.analysis;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.oristool.math.OmegaBigDecimal;
-
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.ExitState;
-import it.unifi.hierarchical.model.FinalState;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.SimpleState;
-import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.model.visitor.StateVisitor;
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.model.visitor.LogicalLocationVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
+import org.oristool.math.OmegaBigDecimal;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 //FIXME: Can this class be removed and its methods integrated with those of class SojournTimeEvaluatorVisitor?
 
-public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
+public class SojournTimeEvaluatorVisitorForced implements LogicalLocationVisitor {
 
-	private Map<State, NumericalValues> sojournTimeDistributions;
-	private Map<Region, NumericalValues> regionSojournTimeDistributions;
-	private Map<Region, TransientAnalyzer> regionTransientProbabilities;
-	private Set<State> evaluated;
-	private double timeStep;
-	private double timeLimit;
+	private final Map<LogicalLocation, NumericalValues> sojournTimeDistributions;
+	private final Map<Region, NumericalValues> regionSojournTimeDistributions;
+	private final Map<Region, TransientAnalyzer> regionTransientProbabilities;
+	private final Set<LogicalLocation> evaluated;
+	private final double timeStep;
+	private final double timeLimit;
 
-	private int CYCLE;
+	private final int CYCLE;
 
 	// FIXME: Rename this attribute
-	private SMPAnalyzerWithBorderExitStates cycleTransientList; 
+	private SMPAnalyzerWithBorderExitStates cycleTransientList;
 
 
 	public SMPAnalyzerWithBorderExitStates getCycleTransientList() {
@@ -59,7 +48,7 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 	}
 
 	/**
-	 * 
+	 *
 	 * @param timeStep if <0 then calculations must account for variable steps
 	 * @param timeLimit limit of the interval of interest
 	 */
@@ -74,15 +63,15 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 	}
 
 	@Override
-	public void visit(SimpleState state) {
+	public void visit(SimpleStep simpleStep) {
 
-		evaluated.add(state);
+		evaluated.add(simpleStep);
 		//Evaluate its sojourn time distribution
 
 		double step;
 
 		if(timeStep<0.0) {
-			step= state.getTimeStep();
+			step= simpleStep.getTimeStep();
 		}else {
 			step= timeStep;
 		}
@@ -90,28 +79,28 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 		double[] values;
 
-		double up = state.getUpperBound();
+		double up = simpleStep.getUpperBound(); // LAURA: se >0 e' uno stato esterno da trattare a precisione massima
 		if(up>0.) {
-		
-			if(state.getDepth()!=0) {
+
+			if(simpleStep.getDepth()!=0) {// LAURA: e' un check su come e' creato il modello
 				System.out.println("ERRORE ARBITRARY PRECISION NOT IN TOPLEVEL!! - SojournTimeEvaluatorForced");
 				return;
 			}
-			
+
 			step = up/50000;
-			values = NumericalUtils.evaluateFunction(state.getDensityFunction(), new OmegaBigDecimal(""+up), new BigDecimal(""+step));
+			values = NumericalUtils.evaluateFunction(simpleStep.getDensityFunction(), new OmegaBigDecimal(""+up), new BigDecimal(""+step));
 			values = NumericalUtils.computeCDFFromPDF(values,  new BigDecimal(""+step));
-	
+
 		}else {
-			values = NumericalUtils.evaluateFunction(state.getDensityFunction(), new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+step));
+			values = NumericalUtils.evaluateFunction(simpleStep.getDensityFunction(), new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+step));
 			values = NumericalUtils.computeCDFFromPDF(values,  new BigDecimal(""+step));
 		}
 
-		sojournTimeDistributions.put(state, new NumericalValues(values, step));
+		sojournTimeDistributions.put(simpleStep, new NumericalValues(values, step));
 
 		//Visit successors not yet visited
-		List<State> successors = state.getNextStates();
-		for (State successor : successors) {
+		List<LogicalLocation> successors = simpleStep.getNextLocations();
+		for (LogicalLocation successor : successors) {
 			if(evaluated.contains(successor))
 				continue;
 			successor.accept(this);
@@ -120,14 +109,14 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 	@SuppressWarnings("incomplete-switch")
 	@Override
-	public void visit(CompositeState state) {
+	public void visit(CompositeStep compositeStep) {
 
-		evaluated.add(state);
+		evaluated.add(compositeStep);
 		//Evaluate children sojourn time distribution
 		//In case of Never simply study ignoring parent's peculiarity
-		List<Region> regions = state.getRegions();
+		List<Region> regions = compositeStep.getRegions();
 		for (Region region : regions) {
-			region.getInitialState().accept(this);
+			region.getInitialStep().accept(this);
 		}
 
 		//Evaluate regions distribution
@@ -135,71 +124,65 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 
 		//if Region is Never put a null in mapSojournTimeDistribution
 		for (Region region : regions) {
+			//System.out.println(region.getInitialStep().getName());
 			NumericalValues regionSojournTimeDistribution = evaluateRegionSojournTime(region);
 			if(regionSojournTimeDistribution!= null)
 				mapSojournTimeDistributions.put(region, regionSojournTimeDistribution);
 		}
 
-		//Evaluate composite state distribution
-		RegionType type=null;
-		for(Region r: regions) {
-			if (r.getType()!=RegionType.NEVER) {
-				type=r.getType();
-				break;
-			}
-		}
+		CompositeStepType regionsType = compositeStep.getType();
 
 		NumericalValues sojournTimeDistribution = null;
-		switch (type) {
-		case EXIT:
-			if(timeStep<0.0) {
-				sojournTimeDistribution = NumericalUtils.minCDFvar(mapSojournTimeDistributions.values(), state.getTimeStep());
-			}else {
-				sojournTimeDistribution = NumericalUtils.minCDF(mapSojournTimeDistributions.values());
-			}
-			break;
-		case FINAL:
-			if(timeStep<0.0) {
-				sojournTimeDistribution = NumericalUtils.maxCDFvar(mapSojournTimeDistributions.values(), state.getTimeStep());
-			}else {
-				sojournTimeDistribution = NumericalUtils.maxCDF(mapSojournTimeDistributions.values());
-			}
-			break;
+		//non c'� mai il caso never
+		switch (regionsType) {
+			case FIRST:
+				if(timeStep<0.0) {
+					sojournTimeDistribution = NumericalUtils.minCDFvar(mapSojournTimeDistributions.values(), compositeStep.getTimeStep());
+				}else {
+					sojournTimeDistribution = NumericalUtils.minCDF(mapSojournTimeDistributions.values());
+				}
+				break;
+			case LAST:
+				if(timeStep<0.0) {
+					sojournTimeDistribution = NumericalUtils.maxCDFvar(mapSojournTimeDistributions.values(), compositeStep.getTimeStep());
+				}else {
+					sojournTimeDistribution = NumericalUtils.maxCDF(mapSojournTimeDistributions.values());
+				}
+				break;
 		}
 
 		//		System.out.println("composite");
 		//		System.out.println(Arrays.toString(sojournTimeDistribution.getValues()));
-		//		
+		//
 
-		sojournTimeDistributions.put(state, sojournTimeDistribution);
+		sojournTimeDistributions.put(compositeStep, sojournTimeDistribution);
 		//Visit successors not yet visited
-		if(StateUtils.isCompositeWithBorderExit(state)) {
+		if(StateUtils.isCompositeWithBorderExit(compositeStep)) {
 
-			CompositeState cState = state;
-			for(State exitState : cState.getNextStatesConditional().keySet()) {
-				List<State> successors = cState.getNextStatesConditional().get(exitState);
-				for (State successor : successors) {
+			for (LogicalLocation exitState : compositeStep.getExitSteps().keySet()) {
+				List<LogicalLocation> successors = compositeStep.getNextLocations(exitState);
+				for (LogicalLocation successor : successors) {
 					if(evaluated.contains(successor))
 						continue;
 					successor.accept(this);
-				}    
+				}
 			}
 		}else {
-			List<State> successors = state.getNextStates();
-			for (State successor : successors) {
+			List<LogicalLocation> successors = compositeStep.getNextLocations();
+			for (LogicalLocation successor : successors) {
 				if(evaluated.contains(successor))
 					continue;
 				successor.accept(this);
-			}    
+			}
 		}
 	}
 
 	private NumericalValues evaluateRegionSojournTime(Region region) {
-
+		System.out.println("Evaluate Region Sojourn Time");
 		RegionType type= region.getType();
 
-		State initialState = region.getInitialState();
-		List<State> smpStates = StateUtils.getReachableStates(region.getInitialState());
+		LogicalLocation initialState = region.getInitialStep();
+		List<LogicalLocation> smpStates = StateUtils.getReachableStates(region.getInitialStep());
 
 		boolean variableSteps;
 		double time;
@@ -211,53 +194,35 @@ public class SojournTimeEvaluatorVisitorForced implements StateVisitor{
 			variableSteps=false;
 		}
 
-		if(type==RegionType.NEVER) {
-
+		if(type==RegionType.NEVERENDING) {
 			regionSojournTimeDistributions.put(region, null);
-
-			cycleTransientList= new SMPAnalyzerWithBorderExitStates(region.getInitialState(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, null, variableSteps, CYCLE);
-
-
+			cycleTransientList= new SMPAnalyzerWithBorderExitStates(region.getInitialStep(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, null, variableSteps, CYCLE);
 			regionTransientProbabilities.put(region, null);
-
-
-
-
 			return null;
 		}
 
+		LogicalLocation endState = StateUtils.findFinalLocation(smpStates);
+
+		System.out.println("SojournTimeDistributions -> Analyzer");
+		TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(region.getInitialStep(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, variableSteps);
+
+		//REMARK ottiene prob di passare da init a end in un certo tempo, richiede che i due siano stati presenti in analyzer, quindi non borderExit
+		NumericalValues sojournTimeDistribution = analyzer.getTransientProbability(initialState, endState);
 
 
-
-		State endState = StateUtils.findFinalLocation(smpStates);
-
-		//		System.out.println("SojournTimeDistributions -> Analyzer");
-
-		TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(region.getInitialState(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, variableSteps);
-
-		NumericalValues sojournTimeDistribution = analyzer.getProbsFromTo(initialState, endState);
-
+		//FIXME TRANSIENTE RICHIEDE UNLOOPING, CONOSCENZA REGIONI VICINE / FORZA BRUTA UN CERTO NUM
 		regionSojournTimeDistributions.put(region, sojournTimeDistribution);
 		regionTransientProbabilities.put(region, analyzer);
 		return sojournTimeDistribution;
 	}
 
 	@Override
-	public void visit(FinalState state) {
-
-
-		evaluated.add(state);
-		sojournTimeDistributions.put(state, null);
+	public void visit(FinalLocation finalLocation) {
+		evaluated.add(finalLocation);
+		sojournTimeDistributions.put(finalLocation, null);
 	}
 
-	@Override
-	public void visit(ExitState state) {
-
-		evaluated.add(state);
-		sojournTimeDistributions.put(state, null);
-	}
-
-	public Map<State, NumericalValues> getSojournTimeDistributions() {
+	public Map<LogicalLocation, NumericalValues> getSojournTimeDistributions() {
 		return sojournTimeDistributions;
 	}
 

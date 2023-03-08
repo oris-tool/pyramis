@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,12 +17,13 @@
 
 package it.unifi.hierarchical.model;
 
-import java.util.UUID;
-
+import it.unifi.hierarchical.model.visitor.LogicalLocationVisitor;
 import it.unifi.hierarchical.model.visitor.StateVisitor;
 
+import java.util.UUID;
+
 // FIXME: Remove this class (it is equivalent to FinalState).
-public class ExitState extends State{
+public class ExitState extends Step {
 
     public ExitState(String name, int depth) {
         super(name, depth);
@@ -36,18 +37,19 @@ public class ExitState extends State{
     public String toString() {
         return "ExitState [depth=" + depth + ", name=" + name + "]";
     }
+
     
     @Override
-    public void accept(StateVisitor visitor) {
-        visitor.visit(this);
-    }
-    
-    @Override
-    public State makeCopy() {
+    public Step makeCopy() {
         return new ExitState(name, depth);
     }
-    
-    public State makeCopy(int id) {
+
+    @Override
+    public void accept(LogicalLocationVisitor visitor) {
+
+    }
+
+    public Step makeCopy(int id) {
         return new ExitState(name+"_"+id, depth);
     }
 }

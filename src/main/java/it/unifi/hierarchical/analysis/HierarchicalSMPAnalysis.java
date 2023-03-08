@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,82 +17,66 @@
 
 package it.unifi.hierarchical.analysis;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Stack;
-
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.utils.NumericalUtils;
+import it.unifi.hierarchical.utils.StateUtils;
 import org.oristool.models.gspn.chains.DTMC;
 import org.oristool.models.gspn.chains.DTMCStationary;
 
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.ExitState;
-import it.unifi.hierarchical.model.FinalState;
-import it.unifi.hierarchical.model.HierarchicalSMP;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.SimpleState;
-import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.utils.NumericalUtils;
-import it.unifi.hierarchical.utils.StateUtils;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
- * Notes: 
- * - we assume the embedded DTMC to be irreducible 
+ * Notes:
+ * - we assume the embedded DTMC to be irreducible
  *
  */
+
 public class HierarchicalSMPAnalysis {
 
 	private static final double DTMC_STRUCTURE_ALLOWED_EPSILON = 0.00000001;
-	
+
 	public static NumericalValues cdf;
 
 	private int CYCLE_UNROLLING;
 
-	private HierarchicalSMP model;
-	private Map<State, NumericalValues> sojournTimeDistributions;
+	private HSMP model;
+	private Map<Step, NumericalValues> sojournTimeDistributions;
 	private Map<Region, NumericalValues> regionSojournTimeDistributions;
 	private Map<Region, TransientAnalyzer> regionTransientProbabilities;
-	private Map<State, Double> meanSojournTimes;
-	private Map<State, Double> emcSolution;
+	private Map<Step, Double> meanSojournTimes;
+	private Map<Step, Double> emcSolution;
 
 	//for cycle unrolling
-	private Map<State, List<State>> aliasStates;
+	private Map<Step, List<Step>> aliasStates;
 	private Map<Region, List<Region>> aliasRegion;
-	private boolean compositeCycles=false;	
+	private boolean compositeCycles=false;
 
-	public HierarchicalSMPAnalysis(HierarchicalSMP model) {
+	public HierarchicalSMPAnalysis(HSMP model) {
 		this(model,0);
 	}
 
-	public HierarchicalSMPAnalysis(HierarchicalSMP model, int CYCLE) {
+	public HierarchicalSMPAnalysis(HSMP model, int CYCLE) {
 		this.model = model;
 		this.CYCLE_UNROLLING=CYCLE;
 	}
 
 	/**
-	 * @param timeStep  discretization step for the numerical passes, -1.0 is used to operate on different timeStep per state and regions 
-	 * @param timeLimit longest meaningful interval of time, in a state or region, 
-	 * over which the calculation must be executed, in case of unbounded distributions a truncation point must be 
+	 * @param timeStep  discretization step for the numerical passes, -1.0 is used to operate on different timeStep per state and regions
+	 * @param timeLimit longest meaningful interval of time, in a state or region,
+	 * over which the calculation must be executed, in case of unbounded distributions a truncation point must be
 	 * identified in an educated way
 	 */
 	public Map<String, Double> evaluateSteadyState(double timeStep, double timeLimit) {
 
 		boolean noExitInitials = true;
-		Set<State> offendingStateSet=new HashSet<>();
+		Set<Step> offendingStateSet=new HashSet<>();
 		noExitInitials=checkInitialsNoBorder(offendingStateSet);
 		if(!noExitInitials) {
 			System.out.println("Initial state/s composite with border exit found, for the moment not implemented, "
 					+ "shortcut through introducing a fake initial state with duration 0");
 
-			for(State s: offendingStateSet) {
+			for(Step s: offendingStateSet) {
 				System.out.println(s.getName());
 			}
 
@@ -101,45 +85,45 @@ public class HierarchicalSMPAnalysis {
 
 		if(CYCLE_UNROLLING!=0)
 			identifyAndUnrollCycles();
-		
+
 		long time;
 		Date d1 = new Date();
-	
+
 		//		System.out.println("Evaluate Sojourn Time Distributions");
 		//1- Sojourn times distribution
 		evaluateSojournTimeDistributions(timeStep, timeLimit);
 
 		Date d2 = new Date();
-		
+
 		time = d2.getTime() - d1.getTime();
 		System.out.println(time+ "  sojournXXX");
-		
+
 		//		System.out.println("Evaluate Mean Sojourn Times");
-		//2- Mean sojourn times 
+		//2- Mean sojourn times
 		evaluateMeanSojournTimes(timeStep, timeLimit);
 
 		Date d3 = new Date();
-		
+
 		time = d3.getTime() - d2.getTime();
 		System.out.println(time+ "  meanXXX");
-		
+
 		//		System.out.println("Solve Embedded");
 		//3- Solve EMC
 		solveEmbeddedDTMC(timeStep);
 
 		Date d4 = new Date();
-		
+
 		time = d4.getTime() - d3.getTime();
 		System.out.println(time+ "  solveDTMCXXX");
-		
+
 		//		System.out.println("Evaluate Steady State");
 		//4- steady state (Use solution of 2 and 3 to evaluate steady)
-		Map<String, Double> result = evalueteSS();    
+		Map<String, Double> result = evalueteSS();
 
 		if(compositeCycles) {
-			for(State s : aliasStates.keySet()) {
+			for(Step s : aliasStates.keySet()) {
 				Double res =0.;
-				for(State t: aliasStates.get(s)) {
+				for(Step t: aliasStates.get(s)) {
 					res+=result.get(t.getName());
 				}
 				result.put(s.getName(), res);
@@ -151,7 +135,7 @@ public class HierarchicalSMPAnalysis {
 
 
 	private void identifyAndUnrollCycles() {
-		Map<Region, Set<State>> toDuplicateMap = new HashMap<>();
+		Map<Region, Set<Step>> toDuplicateMap = new HashMap<>();
 
 		CycleVisitor visitor = new CycleVisitor();
 
@@ -164,13 +148,13 @@ public class HierarchicalSMPAnalysis {
 			aliasRegion = new HashMap<>();
 
 			for(Region r: toDuplicateMap.keySet()) {
-				for(State s: toDuplicateMap.get(r)) {
+				for(Step s: toDuplicateMap.get(r)) {
 					if(s.isCycle()) {
 						createStateCopy(s);
 					}
 
 				}
-				for(State s: toDuplicateMap.get(r)) {
+				for(Step s: toDuplicateMap.get(r)) {
 					linkStates(s, false);
 				}
 			}
@@ -178,17 +162,17 @@ public class HierarchicalSMPAnalysis {
 	}
 
 	//FIXME !isCycle considers only simples at the start
-	private void linkStates(State s, boolean inner) {
+	private void linkStates(Step s, boolean inner) {
 
 		System.out.println("linko "+s.getName()+" "+inner);
 
 		if(!inner && !s.isCycle()) {
-			if(s instanceof SimpleState) {
-				List<State> nextStates = s.getNextStates();
+			if(s instanceof SimpleStep) {
+				List<Step> nextStates = s.getNextStates();
 				List<Double> branchP = s.getBranchingProbs();
 
-				List<State> newNext = new LinkedList<>();
-				for(State st : nextStates) {
+				List<Step> newNext = new LinkedList<>();
+				for(Step st : nextStates) {
 					if(st.isCycle()) {
 						newNext.add(aliasStates.get(st).get(0));
 					}else {
@@ -203,7 +187,7 @@ public class HierarchicalSMPAnalysis {
 
 		boolean loop = s.isLooping();
 
-		if(s instanceof SimpleState) {
+		if(s instanceof SimpleStep) {
 			for(int i=0; i<CYCLE_UNROLLING;i++) {
 				int pp;
 
@@ -212,10 +196,10 @@ public class HierarchicalSMPAnalysis {
 				else
 					pp= i;
 
-				SimpleState curr= (SimpleState) aliasStates.get(s).get(i);
+				SimpleStep curr= (SimpleStep) aliasStates.get(s).get(i);
 
-				List<State> nextStates = curr.getNextStates();
-				List<State> newStates = new LinkedList<>();
+				List<Step> nextStates = curr.getNextStates();
+				List<Step> newStates = new LinkedList<>();
 				List<Double> branchP = curr.getBranchingProbs();
 
 				if(pp==CYCLE_UNROLLING) {
@@ -225,8 +209,8 @@ public class HierarchicalSMPAnalysis {
 
 					for(int j=0; j<nextStates.size();j++) {
 
-						List<State> rr = aliasStates.get(nextStates.get(j));
-						State nn = rr.get(pp);
+						List<Step> rr = aliasStates.get(nextStates.get(j));
+						Step nn = rr.get(pp);
 
 						newStates.add(nn);
 
@@ -234,25 +218,25 @@ public class HierarchicalSMPAnalysis {
 				}
 				curr.setNextStates(newStates, branchP);
 			}
-		}else if(s instanceof CompositeState) {
+		}else if(s instanceof CompositeStep) {
 
-			for (Region region : ((CompositeState) s).getRegions()) {
-				State init=region.getInitialState();
-				List<State> reach = StateUtils.getReachableStates(init);
-				for(State li: reach) {
+			for (Region region : ((CompositeStep) s).getRegions()) {
+				Step init=region.getInitialState();
+				List<Step> reach = StateUtils.getReachableStates(init);
+				for(Step li: reach) {
 					linkStates(li, true);
 				}
 			}
 
 			for(int i=0; i<CYCLE_UNROLLING;i++) {
-				CompositeState curr= (CompositeState) aliasStates.get(s).get(i);
+				CompositeStep curr= (CompositeStep) aliasStates.get(s).get(i);
 
-				State init;
+				Step init;
 
 				//reset (correct region's) initial state
 				for (Region region : curr.getRegions()) {
 					init=region.getInitialState();
-					region.setInitialState(aliasStates.get(init).get(i));					
+					region.setInitialState(aliasStates.get(init).get(i));
 				}
 
 				int pp;
@@ -262,8 +246,8 @@ public class HierarchicalSMPAnalysis {
 					pp= i;
 
 				if(!StateUtils.isCompositeWithBorderExit(s)) {
-					List<State> nextStates = curr.getNextStates();
-					List<State> newStates = new LinkedList<>();
+					List<Step> nextStates = curr.getNextStates();
+					List<Step> newStates = new LinkedList<>();
 					List<Double> branchP = curr.getBranchingProbs();
 
 					if(pp==CYCLE_UNROLLING) {
@@ -281,31 +265,31 @@ public class HierarchicalSMPAnalysis {
 
 				}else {
 
-					Map<State, List<State>> nextStatesMap = curr.getNextStatesConditional();
-					Map<State, List<State>> nextStatesLinked = new HashMap<>();
-					
-					Map<State, List<Double>> nextBranchMap = curr.getBranchingProbsConditional();
-					Map<State, List<Double>> nextBranchLinked = new HashMap<>();
+					Map<Step, List<Step>> nextStatesMap = curr.getNextStatesConditional();
+					Map<Step, List<Step>> nextStatesLinked = new HashMap<>();
 
-					for(State in: nextStatesMap.keySet()) {
-						State news= aliasStates.get(in).get(i);
-						nextStatesLinked.put(news, new LinkedList<State>());
-						for(State out: nextStatesMap.get(in)) {
+					Map<Step, List<Double>> nextBranchMap = curr.getBranchingProbsConditional();
+					Map<Step, List<Double>> nextBranchLinked = new HashMap<>();
+
+					for(Step in: nextStatesMap.keySet()) {
+						Step news= aliasStates.get(in).get(i);
+						nextStatesLinked.put(news, new LinkedList<Step>());
+						for(Step out: nextStatesMap.get(in)) {
 							nextStatesLinked.get(news).add(aliasStates.get(out).get(pp));
 						}
 					}
-					
-					for(State in: nextBranchMap.keySet()) {
-						State news= aliasStates.get(in).get(i);
+
+					for(Step in: nextBranchMap.keySet()) {
+						Step news= aliasStates.get(in).get(i);
 						nextBranchLinked.put(news, new LinkedList<Double>());
 						for(Double out: nextBranchMap.get(in)) {
 							nextBranchLinked.get(news).add(out);
 						}
 					}
-					
+
 					curr.setNextStatesConditional(nextStatesLinked);
 					curr.setBranchingProbsConditional(nextBranchLinked);
-					
+
 				}
 			}
 
@@ -313,28 +297,28 @@ public class HierarchicalSMPAnalysis {
 
 	}
 
-	private void createCopyRegion(State s) {
+	private void createCopyRegion(Step s) {
 
-		Set<State> visited = new HashSet<>();
-		Stack<State> toBeVisited = new Stack<>();
+		Set<Step> visited = new HashSet<>();
+		Stack<Step> toBeVisited = new Stack<>();
 		toBeVisited.add(s);
 		while(!toBeVisited.isEmpty()) {
-			State current = toBeVisited.pop();
+			Step current = toBeVisited.pop();
 			visited.add(current);
 
 			if(StateUtils.isCompositeWithBorderExit(current)) {
-				CompositeState cState = (CompositeState)current;
+				CompositeStep cState = (CompositeStep)current;
 
-				for(Entry<State, List<State>> e:cState.getNextStatesConditional().entrySet()) {
-					for (State successor : e.getValue()) {
+				for(Entry<Step, List<Step>> e:cState.getNextStatesConditional().entrySet()) {
+					for (Step successor : e.getValue()) {
 						if(visited.contains(successor) || toBeVisited.contains(successor))
 							continue;
-						toBeVisited.push(successor);    
+						toBeVisited.push(successor);
 					}
 				}
 				//STANDARD CASE
 			}else {
-				for(State successor:current.getNextStates()) {
+				for(Step successor:current.getNextStates()) {
 					if(visited.contains(successor) || toBeVisited.contains(successor))
 						continue;
 					toBeVisited.push(successor);
@@ -342,22 +326,22 @@ public class HierarchicalSMPAnalysis {
 			}
 		}
 
-		for(State v: visited) {
+		for(Step v: visited) {
 			createStateCopy(v);
 		}
 	}
 
-	private void createStateCopy(State s) {
+	private void createStateCopy(Step s) {
 
-		aliasStates.put(s, new LinkedList<State>());
+		aliasStates.put(s, new LinkedList<Step>());
 
-		if(s instanceof SimpleState) {
+		if(s instanceof SimpleStep) {
 			for(int i=0; i<CYCLE_UNROLLING;i++) {
-				aliasStates.get(s).add(((SimpleState) s).makeCopy(i));
+				aliasStates.get(s).add(((SimpleStep) s).makeCopy(i));
 			}
-		}else if(s instanceof CompositeState) {
+		}else if(s instanceof CompositeStep) {
 
-			CompositeState sC = (CompositeState) s;
+			CompositeStep sC = (CompositeStep) s;
 
 			for(Region r: sC.getRegions()) {
 				aliasRegion.put(r, new LinkedList<>());
@@ -372,7 +356,7 @@ public class HierarchicalSMPAnalysis {
 					aliasRegion.get(r).add(copy);
 				}
 
-				aliasStates.get(s).add(((CompositeState) s).makeCopy(i, listR));
+				aliasStates.get(s).add(((CompositeStep) s).makeCopy(i, listR));
 
 			}
 
@@ -380,24 +364,24 @@ public class HierarchicalSMPAnalysis {
 		}else if(s instanceof ExitState) {
 			for(int i=0; i<CYCLE_UNROLLING;i++) {
 				aliasStates.get(s).add(((ExitState) s).makeCopy(i));
-			}	
-		}else if(s instanceof FinalState) {
+			}
+		}else if(s instanceof FinalLocation) {
 			for(int i=0; i<CYCLE_UNROLLING;i++) {
-				aliasStates.get(s).add(((FinalState) s).makeCopy(i));
-			}	
+				aliasStates.get(s).add(((FinalLocation) s).makeCopy(i));
+			}
 		}
 
 	}
 
 
-	private boolean checkInitialsNoBorder(Set<State> offenderSet) {
+	private boolean checkInitialsNoBorder(Set<Step> offenderSet) {
 
-		BorderExitInitialVisitor visitor = new BorderExitInitialVisitor();
+		RegionVisitor visitor = new RegionVisitor();
 
 		model.getInitialState().accept(visitor);
 		offenderSet.addAll(visitor.getOffenderSet());
 
-		//the only border state accepted in the initial position is the initialState of the toplevel 
+		//the only border state accepted in the initial position is the initialState of the toplevel
 		return visitor.isModelCorrect();
 	}
 
@@ -407,7 +391,7 @@ public class HierarchicalSMPAnalysis {
 		model.getInitialState().accept(visitor);
 		this.sojournTimeDistributions = visitor.getSojournTimeDistributions();
 		this.regionSojournTimeDistributions = visitor.getRegionSojournTimeDistributions();
-		this.regionTransientProbabilities = visitor.getRegionTransientProbabilities();		
+		this.regionTransientProbabilities = visitor.getRegionTransientProbabilities();
 		HierarchicalSMPAnalysis.cdf=sojournTimeDistributions.get(model.getInitialState());
 	}
 
@@ -422,37 +406,37 @@ public class HierarchicalSMPAnalysis {
 
 	private void solveEmbeddedDTMC(double timeStep){
 		//3.1- Build DTMC
-		DTMC<State> dtmc = buildEDTMC(timeStep);
+		DTMC<Step> dtmc = buildEDTMC(timeStep);
 		//3.2- Evaluate steady state considering only branching probabilities and neglecting sojourn times
 		this.emcSolution = evaluateDTMCSteadyState(dtmc);
 	}
 
-	private DTMC<State> buildEDTMC(double timeStep) {
-		DTMC<State> dtmc = DTMC.create();
+	private DTMC<Step> buildEDTMC(double timeStep) {
+		DTMC<Step> dtmc = DTMC.create();
 
 		//Initial state
 		dtmc.initialStates().add(model.getInitialState());
 		dtmc.initialProbs().add(1.0);
 
 		//transition probabilities
-		Set<State> visited = new HashSet<>();
-		Stack<State> toBeVisited = new Stack<>();
+		Set<Step> visited = new HashSet<>();
+		Stack<Step> toBeVisited = new Stack<>();
 		toBeVisited.add(model.getInitialState());
 		dtmc.probsGraph().addNode(model.getInitialState());
 		while(!toBeVisited.isEmpty()) {
-			State current = toBeVisited.pop();
+			Step current = toBeVisited.pop();
 			visited.add(current);
 
 			//CASE OF COMPOSITE STATE WITH EXIT STATES ON THE BORDER
 			if(StateUtils.isCompositeWithBorderExit(current)) {
-				CompositeState cState = (CompositeState)current;
+				CompositeStep cState = (CompositeStep)current;
 				//Add missing children to the dtmc
-				for(Entry<State, List<State>> e:cState.getNextStatesConditional().entrySet()) {
-					for (State successor : e.getValue()) {
+				for(Entry<Step, List<Step>> e:cState.getNextStatesConditional().entrySet()) {
+					for (Step successor : e.getValue()) {
 						if(visited.contains(successor) || toBeVisited.contains(successor))
 							continue;
 						dtmc.probsGraph().addNode(successor);
-						toBeVisited.push(successor);    
+						toBeVisited.push(successor);
 					}
 				}
 				//Evaluate successors probabilities
@@ -470,18 +454,18 @@ public class HierarchicalSMPAnalysis {
 				}
 				List<Double> fireFirstProb = NumericalUtils.evaluateFireFirstProbabilities(distributions, time);
 
-				Map<State, Double> fireFirstProbMap = new HashMap<>();
+				Map<Step, Double> fireFirstProbMap = new HashMap<>();
 
 				int count=0;
 				for (Region region : cState.getRegions()) {
 					if(region.getType()!=RegionType.NEVER) {
-						State endState = StateUtils.findEndState(region);
+						Step endState = StateUtils.findEndState(region);
 						fireFirstProbMap.put(endState, fireFirstProb.get(count));
 						count++;
 					}
 				}
 				//Add edges
-				for(State exitState: cState.getNextStatesConditional().keySet()) {
+				for(Step exitState: cState.getNextStatesConditional().keySet()) {
 					for(int b = 0; b < cState.getBranchingProbsConditional().get(exitState).size(); b++) {
 						double prob = cState.getBranchingProbsConditional().get(exitState).get(b) * fireFirstProbMap.get(exitState);
 						addEdgeValue(dtmc, current, cState.getNextStatesConditional().get(exitState).get(b), prob);
@@ -490,7 +474,7 @@ public class HierarchicalSMPAnalysis {
 				//STANDARD CASE
 			}else {
 				//Add missing children to the dtmc
-				for(State successor:current.getNextStates()) {
+				for(Step successor:current.getNextStates()) {
 					if(visited.contains(successor) || toBeVisited.contains(successor))
 						continue;
 					dtmc.probsGraph().addNode(successor);
@@ -499,7 +483,7 @@ public class HierarchicalSMPAnalysis {
 				//Add edges
 				for(int i = 0; i <current.getBranchingProbs().size(); i++) {
 					addEdgeValue(dtmc, current, current.getNextStates().get(i), current.getBranchingProbs().get(i));
-				}                
+				}
 			}
 		}
 		return dtmc;
@@ -509,7 +493,7 @@ public class HierarchicalSMPAnalysis {
 	 * If it not exists, create an edge in the DTMC between from and to with specified value.
 	 * If the edge already exists sums values
 	 */
-	private static void addEdgeValue(DTMC<State> dtmc, State from, State to, double prob) {
+	private static void addEdgeValue(DTMC<Step> dtmc, Step from, Step to, double prob) {
 		Optional<Double> old = dtmc.probsGraph().edgeValue(from, to);
 		double newProb = prob;
 		if(old.isPresent()) {
@@ -518,22 +502,22 @@ public class HierarchicalSMPAnalysis {
 		dtmc.probsGraph().putEdgeValue(from, to, newProb);
 	}
 
-	private static Map<State, Double> evaluateDTMCSteadyState(DTMC<State> dtmc) {
-		DTMCStationary<State> DTMCss = DTMCStationary.<State>builder().epsilon(DTMC_STRUCTURE_ALLOWED_EPSILON).build();
+	private static Map<Step, Double> evaluateDTMCSteadyState(DTMC<Step> dtmc) {
+		DTMCStationary<Step> DTMCss = DTMCStationary.<Step>builder().epsilon(DTMC_STRUCTURE_ALLOWED_EPSILON).build();
 		return DTMCss.apply(dtmc.probsGraph());
 	}
 
 
 	// FIXME: Rename this method to evaluateSteadyState
-	private Map<String, Double> evalueteSS() {        
+	private Map<String, Double> evalueteSS() {
 		//4.1- At higher level use the standard solution method for SS of an SMP
 		Map<String, Double> ss = new HashMap<>();
 		double denominator = 0.0;
-		for (State higherLevelState : emcSolution.keySet()) {
+		for (Step higherLevelState : emcSolution.keySet()) {
 			denominator += meanSojournTimes.get(higherLevelState) * emcSolution.get(higherLevelState);
 		}
 
-		for (State higherLevelState : emcSolution.keySet()) {
+		for (Step higherLevelState : emcSolution.keySet()) {
 
 
 			double numerator = meanSojournTimes.get(higherLevelState)* emcSolution.get(higherLevelState);
@@ -544,12 +528,12 @@ public class HierarchicalSMPAnalysis {
 		//4.2- At lower level recursively go down:
 		//The SS of a sub-state in a region can be obtained by multiplying the steady-state probability of the surrounding composite state with the
 		//fraction of mean sojourn time in the sub-state and the surrounding composite state
-		for (State higherLevelState : emcSolution.keySet()) {
+		for (Step higherLevelState : emcSolution.keySet()) {
 			//			System.out.println("higher "+higherLevelState.getName());
 
 
 
-			SubstatesSteadyStateEvaluatorVisitor visitor = 
+			SubstatesSteadyStateEvaluatorVisitor visitor =
 					new SubstatesSteadyStateEvaluatorVisitor(
 							higherLevelState,
 							ss.get(higherLevelState.getName()),

@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,30 +17,20 @@
 
 package it.unifi.hierarchical.analysis.tse.trans;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.tse.trans.TFLLargeSupport;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.function.Function;
 import org.oristool.math.function.GEN;
 import org.oristool.simulator.samplers.MetropolisHastings;
 import org.oristool.simulator.samplers.Sampler;
 
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.ExitState;
-import it.unifi.hierarchical.model.FinalState;
-import it.unifi.hierarchical.model.HierarchicalSMP;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.model.tse.trans.TFLLargeSupport;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * This class supports the derivation of a ground truth (through stochastic simulation)
@@ -99,8 +89,8 @@ public class TFLLargeSupportGroundTruth {
 		Map<String,Sampler> samplers = new HashMap<>();
 		initialize(samplers);
 
-		HierarchicalSMP model = TFLLargeSupport.build(numberLongLeaves,parallel,depth,seq,true, lastB);
-		State initial = model.getInitialState();
+		HSMP model = TFLLargeSupport.build(numberLongLeaves,parallel,depth,seq,true, lastB);
+		Step initial = model.getInitialState();
 
 		// all the steps (i.e., not the final locations)
 		Set<String> sList = TFLLargeSupport.getStates();
@@ -238,7 +228,7 @@ public class TFLLargeSupportGroundTruth {
 		return changed;
 	}
 
-	public static int samplerOut(int leaves, Map<String,Double> probabs, Map<String,Sampler> samplers, int RUNS_AT_A_TIME,State initial, RegionType lastB) {
+	public static int samplerOut(int leaves, Map<String,Double> probabs, Map<String,Sampler> samplers, int RUNS_AT_A_TIME, Step initial, RegionType lastB) {
 
 		int countDown = RUNS_AT_A_TIME;
 
@@ -246,27 +236,27 @@ public class TFLLargeSupportGroundTruth {
 		while(countDown>0) {
 			System.out.println(countDown);
 
-			Map<State,Double> samp = new HashMap<State,Double>();
+			Map<Step,Double> samp = new HashMap<Step,Double>();
 			Map<Region,Double> regSamp = new HashMap<Region,Double>();
 
-			Set<State> compS = TFLLargeSupport.compS;
+			Set<Step> compS = TFLLargeSupport.compS;
 
-			Set<State> expS = TFLLargeSupport.expS;
-			Set<State> fL = TFLLargeSupport.firstLeaf;
-			Set<State> sL = TFLLargeSupport.secondLeaf;
-			Set<State> tL= TFLLargeSupport.thirdLeaf;
-			Map<State,Region> regMap = TFLLargeSupport.regMap;
+			Set<Step> expS = TFLLargeSupport.expS;
+			Set<Step> fL = TFLLargeSupport.firstLeaf;
+			Set<Step> sL = TFLLargeSupport.secondLeaf;
+			Set<Step> tL= TFLLargeSupport.thirdLeaf;
+			Map<Step,Region> regMap = TFLLargeSupport.regMap;
 
 
 			double d = Math.random();
 			boolean expDiffBool = d<0.5;
 			// initialize samp with the composite steps (it includes S0 which must be ignored, anyway it is associated with zero)
-			for(State s: compS) {
+			for(Step s: compS) {
 				samp.put(s, 0.0);
 			}
 
 			// accumulate values sampled for the leaves at any level
-			for(State s: expS) {
+			for(Step s: expS) {
 
 				Sampler sampler;
 				if(fL.contains(s) || (leaves>=2 && sL.contains(s)) || (leaves==3 && tL.contains(s))) {
@@ -280,8 +270,8 @@ public class TFLLargeSupportGroundTruth {
 					regSamp.put(rparent, 0.0);
 				}
 
-				State doub = TFLLargeSupport.doublesMap.get(s);
-				State win;
+				Step doub = TFLLargeSupport.doublesMap.get(s);
+				Step win;
 				double v;
 				if(!expDiffBool) {
 					v = sampler.getSample().doubleValue();
@@ -315,12 +305,12 @@ public class TFLLargeSupportGroundTruth {
 
 			// accumulate values in bottom-up order
 			for(int i=TFLLargeSupport.depthS;i>=0;i--) {
-				for(State s: compS) {
+				for(Step s: compS) {
 					if(s.getDepth()==i-1) {
 						Double min=100000.;
 						Double max=0.;
 						for(int r=0; r< TFLLargeSupport.parallelS;r++) {
-							Double val= regSamp.get(((CompositeState)s).getRegions().get(r));
+							Double val= regSamp.get(((CompositeStep)s).getRegions().get(r));
 							if(val<min) min=val;
 							if(val>max) max=val;
 						}						
@@ -351,7 +341,7 @@ public class TFLLargeSupportGroundTruth {
 			}
 			add(initial.getName(), timeToEnd, probabs);
 
-			for(Region r: ((CompositeState)initial).getRegions()) {
+			for(Region r: ((CompositeStep)initial).getRegions()) {
 				topDown(r.getInitialState(),r, timeToEnd, samp, probabs);
 			}
 			countDown--;
@@ -359,12 +349,12 @@ public class TFLLargeSupportGroundTruth {
 		return c;
 	}
 
-	private static void topDown(State initQ, Region r, Double timeToEnd, Map<State,Double> samp,Map<String,Double> probabs ) {
+	private static void topDown(Step initQ, Region r, Double timeToEnd, Map<Step,Double> samp, Map<String,Double> probabs ) {
 
-		State init;
+		Step init;
 		Set<String> setZero =TFLLargeSupport.zeros;
 		if(setZero.contains(initQ.getName())) {
-			List<State> kl = initQ.getNextStates();
+			List<Step> kl = initQ.getNextStates();
 
 			init=samp.get(kl.get(0)) >0. ? kl.get(0) : kl.get(1);
 		}else {
@@ -372,25 +362,25 @@ public class TFLLargeSupportGroundTruth {
 		}
 
 		// If the depth is larger than zero, the first step is a composite step
-		if(init instanceof CompositeState  ) {
+		if(init instanceof CompositeStep) {
 			if(samp.get(init)>timeToEnd) {
 				add(init.getName(), timeToEnd, probabs);
-				for(Region r1: ((CompositeState)init).getRegions()) {
+				for(Region r1: ((CompositeStep)init).getRegions()) {
 					topDown(r1.getInitialState(), r1, timeToEnd, samp, probabs);
 				}
 
 			}else {
 				add(init.getName(), samp.get(init), probabs);
-				for(Region r1: ((CompositeState)init).getRegions()) {
+				for(Region r1: ((CompositeStep)init).getRegions()) {
 					topDown(r1.getInitialState(),r1, samp.get(init), samp, probabs);
 				}
-				State win = null;
+				Step win = null;
 				double remaining= timeToEnd-samp.get(init);
 				if(!(remaining>0.0)) {
 					return;
 				}
 
-				List<State> list= init.getNextStates();
+				List<Step> list= init.getNextStates();
 
 				win = samp.get(list.get(0)) >0. ? list.get(0) : list.get(1);
 
@@ -402,7 +392,7 @@ public class TFLLargeSupportGroundTruth {
 					}
 					add(win.getName(), samp.get(win), probabs);
 					remaining=remaining-samp.get(win);
-					if(win.getNextStates().get(0) instanceof FinalState ||  win.getNextStates().get(0) instanceof ExitState) {
+					if(win.getNextStates().get(0) instanceof FinalLocation ||  win.getNextStates().get(0) instanceof ExitState) {
 						break;
 					}
 					win=win.getNextStates().get(0);
@@ -410,7 +400,7 @@ public class TFLLargeSupportGroundTruth {
 			}
 			// Init is at maximum depth
 		} else {
-			State win =init;
+			Step win =init;
 			Double remaining = timeToEnd;
 
 			while(remaining>0) {
@@ -421,7 +411,7 @@ public class TFLLargeSupportGroundTruth {
 				}
 				add(win.getName(), samp.get(win), probabs);
 				remaining=remaining-samp.get(win);
-				if(win.getNextStates().get(0) instanceof FinalState ||  win.getNextStates().get(0) instanceof ExitState) {
+				if(win.getNextStates().get(0) instanceof FinalLocation ||  win.getNextStates().get(0) instanceof ExitState) {
 					break;
 				}
 				win=win.getNextStates().get(0);

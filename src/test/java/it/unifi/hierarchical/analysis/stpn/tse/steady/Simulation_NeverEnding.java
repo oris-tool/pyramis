@@ -1,16 +1,6 @@
 package it.unifi.hierarchical.analysis.stpn.tse.steady;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import it.unifi.hierarchical.model.stpn.tse.SWRej_STPN;
 import org.oristool.analyzer.log.AnalysisLogger;
 import org.oristool.petrinet.Marking;
 import org.oristool.petrinet.MarkingCondition;
@@ -21,7 +11,11 @@ import org.oristool.simulator.rewards.NumericRewardResult;
 import org.oristool.simulator.stpn.STPNSimulatorComponentsFactory;
 import org.oristool.simulator.stpn.TransientMarkingConditionProbability;
 
-import it.unifi.hierarchical.model.stpn.tse.SWRej_STPN;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * This class supports the stochastic simulation of the STPN model of the never-ending region R1 of the HSMP model

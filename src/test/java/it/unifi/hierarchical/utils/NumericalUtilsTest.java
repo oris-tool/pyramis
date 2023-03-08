@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,13 +17,7 @@
 
 package it.unifi.hierarchical.utils;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashSet;
-
+import it.unifi.hierarchical.analysis.NumericalValues;
 import org.junit.Test;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.expression.Variable;
@@ -32,7 +26,12 @@ import org.oristool.math.function.PartitionedGEN;
 import org.oristool.math.function.StateDensityFunction;
 import org.oristool.models.stpn.trees.StochasticStateFeature;
 
-import it.unifi.hierarchical.analysis.NumericalValues;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashSet;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class NumericalUtilsTest {
 

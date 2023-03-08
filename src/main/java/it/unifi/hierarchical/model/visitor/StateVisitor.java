@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,16 +17,16 @@
 
 package it.unifi.hierarchical.model.visitor;
 
-import it.unifi.hierarchical.model.CompositeState;
+import it.unifi.hierarchical.model.CompositeStep;
 import it.unifi.hierarchical.model.ExitState;
-import it.unifi.hierarchical.model.FinalState;
-import it.unifi.hierarchical.model.SimpleState;
+import it.unifi.hierarchical.model.FinalLocation;
+import it.unifi.hierarchical.model.SimpleStep;
 
 public interface StateVisitor {
 	// FIXME: Rename StateVisitor to LogicalLocationVisitor.
 
-    public void visit(SimpleState state);
-    public void visit(CompositeState state);
-    public void visit(FinalState state);
+    public void visit(SimpleStep state);
+    public void visit(CompositeStep state);
+    public void visit(FinalLocation state);
     public void visit(ExitState state);
 }

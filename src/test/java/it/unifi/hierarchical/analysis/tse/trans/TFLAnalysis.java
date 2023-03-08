@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,18 +17,18 @@
 
 package it.unifi.hierarchical.analysis.tse.trans;
 
+import it.unifi.hierarchical.analysis.HierarchicalSMPAnalysis;
+import it.unifi.hierarchical.analysis.NumericalValues;
+import it.unifi.hierarchical.model.HSMP;
+import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.tse.trans.TFL;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
-
-import it.unifi.hierarchical.analysis.HierarchicalSMPAnalysis;
-import it.unifi.hierarchical.analysis.NumericalValues;
-import it.unifi.hierarchical.model.HierarchicalSMP;
-import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.model.tse.trans.TFL;
 
 /**
  * This class supports the analysis of the HSMP models of the basic pattern (and its variants
@@ -67,7 +67,7 @@ public class TFLAnalysis {
 
 							//HSMP
 							//Build the model
-							HierarchicalSMP model = TFL.build(parallel,depth,seq,true, lastB);
+							HSMP model = TFL.build(parallel,depth,seq,true, lastB);
 
 							Set<String> sList = TFL.getStates();
 

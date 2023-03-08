@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,51 +17,38 @@
 
 package it.unifi.hierarchical.analysis;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.ExitState;
-import it.unifi.hierarchical.model.FinalState;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.SimpleState;
-import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.model.visitor.StateVisitor;
-import it.unifi.hierarchical.utils.StateUtils;
-
-import java.util.Set;
-import java.util.Stack;
-
 //FIXME: This class can be removed and its methods integrated with those of class SubstatesSteadyStateEvaluatorVisitor.
 
-public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.model.visitor.LogicalLocationVisitor;
+import it.unifi.hierarchical.utils.StateUtils;
+
+import java.util.*;
+
+public class SubstatesSteadyStateEvaluatorVisitorForced implements LogicalLocationVisitor {
 
 	//allowed difference between steady state of parents and sum of steady state of childrens
 	private static final double SS_ALLOWED_EPSILON = 0.00000001;
 
-	private double parentLevelSSProb;
-	private double parentLevelMeanSojourn;
-	private Map<State, Double> meanSojournTimes;
-	private Map<String, Double> subStateSSProbs;
+	private final double parentLevelSSProb;
+	private final double parentLevelMeanSojourn;
+	private final Map<LogicalLocation, Double> meanSojournTimes;
+	private final Map<String, Double> subStateSSProbs;
 
-	private List<Double> meanSojournVmAvailableAtCycle;
-	private Map<State, List<Double>> meanSojournInnerAtCycle;
+	private final List<Double> meanSojournVmAvailableAtCycle;
+	private final Map<LogicalLocation, List<Double>> meanSojournInnerAtCycle;
 
-	private State currentParent;
+	private final LogicalLocation currentParent;
 
 	/**
-	 * Visitor called on a Parent to calculate the steady states of the childrens: 
+	 * Visitor called on a Parent to calculate the steady states of the childrens:
 	 * as such it is always called only on Composites
-	 * 
+	 *
 	 * after the calculation of steady state of the childrens, their remaining time is associated with the ending state
-	 *  
+	 *
 	 */
-	public SubstatesSteadyStateEvaluatorVisitorForced(State currentParent, double parentLevelSSProb, double parentLevelMeanSojourn, Map<State, Double> meanSojournTimes, List<Double> meanSojournVmAvailableAtCycle,
-			Map<State, List<Double>> meanSojournInnerAtCycle){
+	public SubstatesSteadyStateEvaluatorVisitorForced(LogicalLocation currentParent, double parentLevelSSProb, double parentLevelMeanSojourn, Map<LogicalLocation, Double> meanSojournTimes, List<Double> meanSojournVmAvailableAtCycle,
+													  Map<LogicalLocation, List<Double>> meanSojournInnerAtCycle){
 		this.currentParent = currentParent;
 		this.parentLevelSSProb = parentLevelSSProb;
 		this.parentLevelMeanSojourn = parentLevelMeanSojourn;
@@ -73,39 +60,41 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 	}
 
 	@Override
-	public void visit(SimpleState state) { }
+	public void visit(SimpleStep simpleStep) { }
 
 	@Override
-	public void visit(CompositeState state) {
-		System.out.println("ss "+ state.getName());
+	public void visit(CompositeStep compositeStep) {
+		//System.out.println("ss "+ compositeStep.getName());
 
-		double parentPrecision = state.getTimeStep();
+		double parentPrecision = compositeStep.getTimeStep();
 
 		//Recursively use the visitor
-		List<Region> regions = state.getRegions();
+		List<Region> regions = compositeStep.getRegions();
 		for (Region region : regions) {
 
 
 			double regionPrecision = region.getTimeStep();
 
-			State regionEnd=null;
+			LogicalLocation regionEnd=null;
 			Double childrenSS=0.0;
 
-			// if the region is of type exit, theres no time spent on the exit state, 
+
+			//FIXME NON FATTO CON DIFFERENTI PRECISIONI PER NEVER / FIGLI NEVER
+			// if the region is of type exit, theres no time spent on the exit state,
 			//so we can smooth the steady state based on the one calculated on the parent
 			//if the region is of type final, no normalization can be applied
-			if(regionPrecision != parentPrecision && region.getType()==RegionType.EXIT) {
+			if(regionPrecision != parentPrecision && compositeStep.getType().equals(CompositeStepType.FIRST)) {
 
 				Map<String, Double> subStateSSProbsTemporary = new HashMap<>();
 
 
-				Set<State> visited = new HashSet<>();
-				Stack<State> toBeVisited = new Stack<>();
-				toBeVisited.push(region.getInitialState());
+				Set<LogicalLocation> visited = new HashSet<>();
+				Stack<LogicalLocation> toBeVisited = new Stack<>();
+				toBeVisited.push(region.getInitialStep());
 				while(!toBeVisited.isEmpty()) {
-					State current = toBeVisited.pop();
+					LogicalLocation current = toBeVisited.pop();
 					visited.add(current);
-					Double currentSS = parentLevelSSProb * meanSojournTimes.get(current)/parentLevelMeanSojourn;
+					double currentSS = parentLevelSSProb * meanSojournTimes.get(current)/parentLevelMeanSojourn;
 					subStateSSProbsTemporary.put(current.getName(), currentSS);
 
 					childrenSS+=currentSS;
@@ -113,14 +102,14 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 
 					//add successors on the same level of the hierarchy
 					if(StateUtils.isCompositeWithBorderExit(current)) {
-						CompositeState cState = (CompositeState) current;
-						for(State exitState : cState.getNextStatesConditional().keySet()) {
-							List<State> successors = cState.getNextStatesConditional().get(exitState);
+						CompositeStep cState = (CompositeStep) current;
+						for(LogicalLocation exitState : cState.getExitSteps().keySet()) {
+							List<LogicalLocation> successors = cState.getNextLocations(exitState);
 
-							for (State successor : successors) {
+							for (LogicalLocation successor : successors) {
 								if(!visited.contains(successor) && !toBeVisited.contains(successor)) {
 									//Check if its an exit state
-									if(!(successor instanceof ExitState || successor instanceof FinalState)) {
+									if(!(successor instanceof FinalLocation)) {
 										toBeVisited.add(successor);
 									}else
 										regionEnd=successor;
@@ -129,10 +118,10 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 
 						}
 					}else {
-						for (State successor : current.getNextStates()) {
+						for (LogicalLocation successor : current.getNextLocations()) {
 							if(!visited.contains(successor) && !toBeVisited.contains(successor)) {
 								//Check if its an exit state
-								if(!(successor instanceof ExitState || successor instanceof FinalState)) {
+								if(!(successor instanceof FinalLocation)) {
 									toBeVisited.add(successor);
 								}else
 									regionEnd=successor;
@@ -142,7 +131,7 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 				}
 
 				//normalization of Region type exit with different precision
-				for(Entry<String,Double> entry : subStateSSProbsTemporary.entrySet()) {
+				for(Map.Entry<String,Double> entry : subStateSSProbsTemporary.entrySet()) {
 
 					double ss = entry.getValue()/childrenSS * parentLevelSSProb;
 					subStateSSProbs.put(entry.getKey(), ss);
@@ -151,12 +140,12 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 
 				childrenSS = parentLevelSSProb;
 
-				for(State s : visited) {
+				for(LogicalLocation s : visited) {
 
 					SubstatesSteadyStateEvaluatorVisitorForced newVisitor = new SubstatesSteadyStateEvaluatorVisitorForced(
 							s,
-							subStateSSProbs.get(s.getName()), 
-							meanSojournTimes.get(s), 
+							subStateSSProbs.get(s.getName()),
+							meanSojournTimes.get(s),
 							meanSojournTimes,
 							meanSojournVmAvailableAtCycle,
 							meanSojournInnerAtCycle);
@@ -169,37 +158,37 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 			}else {
 
 
-				Set<State> visited = new HashSet<>();
-				Stack<State> toBeVisited = new Stack<>();
-				toBeVisited.push(region.getInitialState());
+				Set<LogicalLocation> visited = new HashSet<>();
+				Stack<LogicalLocation> toBeVisited = new Stack<>();
+				toBeVisited.push(region.getInitialStep());
 				while(!toBeVisited.isEmpty()) {
-					State current = toBeVisited.pop();
+					LogicalLocation current = toBeVisited.pop();
 					visited.add(current);
 
 
-					Double currentSS=0.0;
+					double currentSS=0.0;
 
 					if(current.getName().equals("Vm")) {
 
-						for(int i=0;i<meanSojournVmAvailableAtCycle.size();i++) {
-							currentSS+= parentLevelSSProb * meanSojournVmAvailableAtCycle.get(i)/parentLevelMeanSojourn;
+						for (Double aDouble : meanSojournVmAvailableAtCycle) {
+							currentSS += parentLevelSSProb * aDouble / parentLevelMeanSojourn;
 						}
 
 						subStateSSProbs.put(current.getName(), currentSS);
 					}else if(current.getDepth()>1) {
 
 						Double sum=0.0;
-						
+
 						for(int i=0;i<meanSojournInnerAtCycle.size();i++) {
 							sum+=meanSojournInnerAtCycle.get(current).get(i);
-							
+
 							double superparentLevelSSProb = parentLevelSSProb / parentLevelMeanSojourn;
 
 							currentSS+= superparentLevelSSProb * meanSojournInnerAtCycle.get(current).get(i);
 						}
 						subStateSSProbs.put(current.getName(), currentSS);
 						meanSojournTimes.put(current, sum);
-						
+
 					}else {
 
 
@@ -211,14 +200,14 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 
 					//add successors on the same level of the hierarchy
 					if(StateUtils.isCompositeWithBorderExit(current)) {
-						CompositeState cState = (CompositeState) current;
-						for(State exitState : cState.getNextStatesConditional().keySet()) {
-							List<State> successors = cState.getNextStatesConditional().get(exitState);
+						CompositeStep cState = (CompositeStep) current;
+						for(LogicalLocation exitState : cState.getExitSteps().keySet()) {
+							List<LogicalLocation> successors = cState.getNextLocations(exitState);
 
-							for (State successor : successors) {
+							for (LogicalLocation successor : successors) {
 								if(!visited.contains(successor) && !toBeVisited.contains(successor)) {
 									//Check if its an exit state
-									if(!(successor instanceof ExitState || successor instanceof FinalState)) {
+									if(!(successor instanceof FinalLocation)) {
 										toBeVisited.add(successor);
 									}else
 										regionEnd=successor;
@@ -227,10 +216,10 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 
 						}
 					}else {
-						for (State successor : current.getNextStates()) {
+						for (LogicalLocation successor : current.getNextLocations()) {
 							if(!visited.contains(successor) && !toBeVisited.contains(successor)) {
 								//Check if its an exit state
-								if(!(successor instanceof ExitState || successor instanceof FinalState)) {
+								if(!(successor instanceof FinalLocation)) {
 									toBeVisited.add(successor);
 								}else
 									regionEnd=successor;
@@ -243,8 +232,8 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 
 					SubstatesSteadyStateEvaluatorVisitorForced newVisitor = new SubstatesSteadyStateEvaluatorVisitorForced(
 							current,
-							subStateSSProbs.get(current.getName()), 
-							meanSojournTimes.get(current), 
+							subStateSSProbs.get(current.getName()),
+							meanSojournTimes.get(current),
 							meanSojournTimes,meanSojournVmAvailableAtCycle,
 							meanSojournInnerAtCycle);
 					current.accept(newVisitor);
@@ -253,13 +242,13 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 
 			}
 
-			if(region.getType()!=RegionType.NEVER) {
+			if(region.getType()!=RegionType.NEVERENDING) {
 				double endRegionSS = parentLevelSSProb - childrenSS;
 				if(endRegionSS<0. && endRegionSS>=- SS_ALLOWED_EPSILON) {
 					endRegionSS =0.;
 				}
 				if(endRegionSS< -SS_ALLOWED_EPSILON) {
-					System.out.println("Error: steady state of childrens is higher than steady state of parent "+ currentParent.getName());
+					//System.out.println("Error: steady state of childrens is higher than steady state of parent "+ currentParent.getName());
 				}
 				subStateSSProbs.put(regionEnd.getName(), endRegionSS);
 			}
@@ -268,10 +257,7 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements StateVisitor{
 	}
 
 	@Override
-	public void visit(FinalState state) { }
-
-	@Override
-	public void visit(ExitState state) { }
+	public void visit(FinalLocation finalLocation) { }
 
 	public Map<String, Double> getSubStateSSProbs() {
 		return subStateSSProbs;

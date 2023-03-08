@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,45 +17,34 @@
 
 package it.unifi.hierarchical.analysis;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.oristool.math.OmegaBigDecimal;
-
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.ExitState;
-import it.unifi.hierarchical.model.FinalState;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.SimpleState;
-import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.visitor.StateVisitor;
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.model.visitor.LogicalLocationVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
+import org.oristool.math.OmegaBigDecimal;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 //2.1- Navigate on the higher level searching for all possible state
 //2.2- For each one, evaluate the mean based on sojourn time distribution,
 //     if composite,
-public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
+public class MeanSojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 
-	private Map<State, NumericalValues> sojournTimeDistributions;
-	private Map<Region, NumericalValues> regionSojournTimeDistributions;
-	private Map<Region, TransientAnalyzer> regionTransientProbabilities;
-	private Map<State, Region> parentRegions;
-	private Map<Region, CompositeState> parentStates;
-	private Map<State, Double> meanSojournTimes;
-	private double timeLimit;
-	private boolean variableTimeStep;
+	private final Map<LogicalLocation, NumericalValues> sojournTimeDistributions;
+	private final Map<Region, NumericalValues> regionSojournTimeDistributions;
+	private final Map<Region, TransientAnalyzer> regionTransientProbabilities;
+	private final Map<LogicalLocation, Region> parentRegions;
+	private final Map<Region, CompositeStep> parentStates;
+	private final Map<LogicalLocation, Double> meanSojournTimes;
+	private final double timeLimit;
+	private final boolean variableTimeStep;
 
-	private Map<Region, Map<State, NumericalValues>> absorbingProbabilities;//Given a region that contain a state, give the distribution of time to be absorbed in such state
-	private Map<Region, NumericalValues> shiftedExitDistributions;//Given a target region, given the minimum exit distribution of parallel regions 
+	private final Map<Region, Map<LogicalLocation, NumericalValues>> absorbingProbabilities;//Given a region that contain a state, give the distribution of time to be absorbed in such state
+	private final Map<Region, NumericalValues> shiftedExitDistributions;//Given a target region, given the minimum exit distribution of parallel regions
 
 	/**
-	 * 
+	 *
 	 * @param initialState
 	 * @param sojournTimeDistributions
 	 * @param regionSojournTimeDistributions
@@ -63,7 +52,7 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 	 * @param variableTimeStep true if different timeSteps for regions and states are present
 	 * @param timeLimit
 	 */
-	public MeanSojournTimeEvaluatorVisitor(State initialState, Map<State, NumericalValues> sojournTimeDistributions, Map<Region, NumericalValues> regionSojournTimeDistributions, Map<Region, TransientAnalyzer> regionTransientProbabilities,boolean variableTimeStep, double timeLimit) {
+	public MeanSojournTimeEvaluatorVisitor(LogicalLocation initialState, Map<LogicalLocation, NumericalValues> sojournTimeDistributions, Map<Region, NumericalValues> regionSojournTimeDistributions, Map<Region, TransientAnalyzer> regionTransientProbabilities, boolean variableTimeStep, double timeLimit) {
 		this.sojournTimeDistributions = sojournTimeDistributions;
 		this.regionSojournTimeDistributions = regionSojournTimeDistributions;
 		this.regionTransientProbabilities = regionTransientProbabilities;
@@ -79,51 +68,49 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 	}
 
 	@Override
-	public void visit(SimpleState state) {
-
-		evaluateStateMeanSojournTime(state);
+	public void visit(SimpleStep simpleStep) {
+		evaluateStateMeanSojournTime(simpleStep);
 	}
 
 	@Override
-	public void visit(CompositeState state) {
-		evaluateStateMeanSojournTime(state);
-		for (Region region : state.getRegions()) {
-			if(meanSojournTimes.containsKey(region.getInitialState()))
+	public void visit(CompositeStep compositeStep) {
+		evaluateStateMeanSojournTime(compositeStep);
+
+		for (Region region : compositeStep.getRegions()) {
+			if (meanSojournTimes.containsKey(region.getInitialStep()))
 				continue;
-			region.getInitialState().accept(this);
+
+			region.getInitialStep().accept(this);
 		}
 	}
 
 	@Override
-	public void visit(FinalState state) {
+	public void visit(FinalLocation finalLocation) {
 		//Do nothing!
 	}
 
-	@Override
-	public void visit(ExitState state) {
-		//Do nothing!
-	}
-
-	private void evaluateStateMeanSojournTime(State state) {
-		if(state.getDepth() == 0) {//Top level sojourn time --> not affected by exit of any other region
+	private void evaluateStateMeanSojournTime(LogicalLocation state) {
+		if (state.getDepth() == 0) {//Top level sojourn time --> not affected by exit of any other region
 			evaluateTopLevelStateSojournTime(state);
-		}else { //Not top level sojourn time --> affected by exit in parallel regions
-			evaluateLowerLevelStateSojournTime(state);    
+		} else { //Not top level sojourn time --> affected by exit in parallel regions
+			evaluateLowerLevelStateSojournTime(state);
 		}
 
 		//Evaluate mean sojourn time also for successor states if required
 		if(StateUtils.isCompositeWithBorderExit(state)) {
-			CompositeState cState = (CompositeState) state;
-			for(State exitState : cState.getNextStatesConditional().keySet()) {
-				List<State> successors = cState.getNextStatesConditional().get(exitState);
-				for (State successor : successors) {
+			CompositeStep cState = (CompositeStep) state;
+
+			for (LogicalLocation exitState : cState.getExitSteps().keySet()) {
+				List<LogicalLocation> successors = cState.getNextLocations(exitState);
+
+				for (LogicalLocation successor : successors) {
 					if(meanSojournTimes.containsKey(successor))
 						continue;
 					successor.accept(this);
-				}    
+				}
 			}
 		}else {
-			for(State successor: state.getNextStates()) {
+			for(LogicalLocation successor: state.getNextLocations()) {
 				if(meanSojournTimes.containsKey(successor))
 					continue;
 				successor.accept(this);
@@ -131,11 +118,11 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 		}
 	}
 
-	public Map<State, Double> getMeanSojournTimes() {
+	public Map<LogicalLocation, Double> getMeanSojournTimes() {
 		return meanSojournTimes;
 	}
 
-	private void evaluateTopLevelStateSojournTime(State state) {
+	private void evaluateTopLevelStateSojournTime(LogicalLocation state) {
 		NumericalValues sojournDistrubution = sojournTimeDistributions.get(state);
 
 		double timeStep = sojournDistrubution.getStep();
@@ -146,25 +133,26 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 		meanSojournTimes.put(state, mean);
 	}
 
-	private void evaluateLowerLevelStateSojournTime(State state) {
+	private void evaluateLowerLevelStateSojournTime(LogicalLocation state) {
 
 		//1- Get region transient probabilities. Since it is not a top level state, it must belong to a region
 		Region parentRegion = parentRegions.get(state);
 		TransientAnalyzer parentRegionAnalysis = regionTransientProbabilities.get(parentRegion);
 
 		double greatestTimeStep = parentRegionAnalysis.getTimeStep();
-		NumericalValues transientNumerical = parentRegionAnalysis.getProbsFromTo(parentRegion.getInitialState(), state);
+		NumericalValues transientNumerical = parentRegionAnalysis.getTransientProbability(parentRegion.getInitialStep(), state);
 
 		//2- Get exit distributions of parallel regions at same level of the direct parent composite state
 		List<NumericalValues> exitDistributions = new ArrayList<>();
-		State parentState = parentStates.get(parentRegion);
-		if(!(parentState instanceof CompositeState))
+		CompositeStep parentState = parentStates.get(parentRegion);
+		if(!(parentState instanceof CompositeStep))
 			throw new IllegalStateException("A non composite state can't contains regions!");
-		CompositeState parentCState = (CompositeState) parentState;
-		for (Region r : parentCState.getRegions()) {
-			if(!r.getType().equals(Region.RegionType.EXIT))//If final (or Never), neglect parallel regions since they don't affect sojourn time
+		for (Region r : parentState.getRegions()) {
+			if(!parentState.getType().equals(CompositeStepType.FIRST))//If final (or Never), neglect parallel regions since they don't affect sojourn time
 				continue;
 			if(r.equals(parentRegion))//Consider only other regions, not the current one
+				continue;
+			if(r.getType()==RegionType.NEVERENDING)//Consider only other regions, not the current one
 				continue;
 			NumericalValues regDistro = regionSojournTimeDistributions.get(r);
 
@@ -182,7 +170,7 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 		if(state.getDepth() > 1) {
 
 			//3.1 Get parent exit distribution of previous level region
-			Region previousParentRegion = parentRegions.get(parentStates.get(parentRegion)); 
+			Region previousParentRegion = parentRegions.get(parentStates.get(parentRegion));
 			NumericalValues parentExitDistribution = shiftedExitDistributions.get(previousParentRegion);
 
 			noExitDistrib = true;
@@ -204,14 +192,15 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 			if(!noExitDistrib) {
 
 				//3.2 evaluate time to be absorbed in current state in the current region
-				if(absorbingProbabilities.get(previousParentRegion) == null)
-					absorbingProbabilities.put(previousParentRegion, new HashMap<>());
+				absorbingProbabilities.computeIfAbsent(previousParentRegion, k -> new HashMap<>());
+
+				//REMARK qui viene chiamato analyzer
 
 				if(absorbingProbabilities.get(previousParentRegion).get(parentState) == null) {
 
-					//CREATE ABSORBING PROBABILITIES: CHANGE THE MODEL FOR ABSORPTION!!				
-					TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(previousParentRegion.getInitialState(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, greatestTimeStep, parentState, variableTimeStep);
-					double[] absorbingResult = analyzer.getProbsFromTo(previousParentRegion.getInitialState(), parentState).getValues();
+					//CREATE ABSORBING PROBABILITIES: CHANGE THE MODEL FOR ABSORPTION!!
+					TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(previousParentRegion.getInitialStep(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, greatestTimeStep, parentState, variableTimeStep);
+					double[] absorbingResult = analyzer.getTransientProbability(previousParentRegion.getInitialStep(), parentState).getValues();
 					absorbingProbabilities.get(previousParentRegion).put(parentState, new NumericalValues(absorbingResult, greatestTimeStep));
 
 				}
@@ -225,8 +214,8 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 				//3.3 evaluate sojourn time conditioned to be absorbed (shift and project)
 
 				NumericalValues parallelExitDistribution = NumericalUtils.shiftAndProjectAndMinimum(
-						absorbingProbsRescaled, 
-						Arrays.asList(parentExitDistributionRescaled));
+						absorbingProbsRescaled,
+						List.of(parentExitDistributionRescaled));
 
 				//3.5 add to the "exitDistributions" array
 				exitDistributions.add(parallelExitDistribution);
@@ -260,7 +249,7 @@ public class MeanSojournTimeEvaluatorVisitor implements StateVisitor{
 		//5- Evaluate the exit distribution as the minimum and save it for lower regions
 		double[] finalExitDistribution = new double[NumericalUtils.computeTickNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + greatestTimeStep))];
 		if(exitDistributions.size() == 0) {
-			Arrays.fill(finalExitDistribution, 0.0);    
+			Arrays.fill(finalExitDistribution, 0.0);
 			finalExitDistribution[finalExitDistribution.length-1]=1.0;
 		}else if(exitDistributions.size() == 1) {
 			NumericalValues singleD = variableTimeStep ? NumericalUtils.rescaleCDF(exitDistributions.get(0), greatestTimeStep) : exitDistributions.get(0);

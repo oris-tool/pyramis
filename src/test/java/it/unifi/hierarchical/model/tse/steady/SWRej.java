@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,12 +17,9 @@
 
 package it.unifi.hierarchical.model.tse.steady;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import it.unifi.hierarchical.analysis.ErlangExp;
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.model.Region.RegionType;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.domain.DBMZone;
 import org.oristool.math.expression.Expolynomial;
@@ -30,14 +27,11 @@ import org.oristool.math.expression.Variable;
 import org.oristool.math.function.GEN;
 import org.oristool.math.function.PartitionedGEN;
 
-import it.unifi.hierarchical.analysis.ErlangExp;
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.ExitState;
-import it.unifi.hierarchical.model.HierarchicalSMP;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.SimpleState;
-import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class supports the definition of the HSMP model
@@ -46,7 +40,7 @@ import it.unifi.hierarchical.model.Region.RegionType;
  */
 public class SWRej {
 
-	public static HierarchicalSMP build() {
+	public static HSMP build() {
 
 		final double pstop=0.9997;
 
@@ -148,11 +142,11 @@ public class SWRej {
 
 		int depth = 2;
 
-		State E11 = new ExitState("E11",2);
-		State E12 = new ExitState("E12",2);
+		Step E11 = new ExitState("E11",2);
+		Step E12 = new ExitState("E12",2);
 
 		// VmF corresponds to VM_Failing in Figure 8
-		State VmF = new SimpleState(
+		Step VmF = new SimpleStep(
 				"VmF", 
 				new ErlangExp(new BigDecimal("0.0738004"), new BigDecimal("0.0171087")), 
 				Arrays.asList(E11), 
@@ -160,7 +154,7 @@ public class SWRej {
 				depth);
 
 		// VmRejW corresponds to VM_Rejuvenation_Waiting in Figure 8
-		State VmRejW = new SimpleState(
+		Step VmRejW = new SimpleStep(
 				"VmRejW", 
 				GEN.newDeterministic(new BigDecimal("24")), 
 				Arrays.asList(E12), 
@@ -168,7 +162,7 @@ public class SWRej {
 				depth);
 
 		// VmA corresponds to VM_Aging in Figure 8
-		State VmA = new SimpleState(
+		Step VmA = new SimpleStep(
 				"VmA", 
 				new ErlangExp( new BigDecimal("0.0138889"),new BigDecimal("0.0104167")), 
 				Arrays.asList(VmF), 
@@ -181,16 +175,16 @@ public class SWRej {
 		// Level depth 1
 		depth = 1;
 
-		State E2 = new ExitState("E2",depth);
-		State E3 = new ExitState("E3",depth);
+		Step E2 = new ExitState("E2",depth);
+		Step E3 = new ExitState("E3",depth);
 		
-		State Enever = new ExitState("Enever",depth);
+		Step Enever = new ExitState("Enever",depth);
 
-		Map<State, List<State>> nextMap = null;
-		Map<State, List<Double>> nextBranch=null;
+		Map<Step, List<Step>> nextMap = null;
+		Map<Step, List<Double>> nextBranch=null;
 
 		// VmmF corresponds to VMM_Failing in Figure 8
-		State VmmF = new SimpleState(
+		Step VmmF = new SimpleStep(
 				"VmmF", 
 				new ErlangExp( new BigDecimal("0.0378072"), new BigDecimal("0.00706464")), 
 				Arrays.asList(E2), 
@@ -198,7 +192,7 @@ public class SWRej {
 				depth);
 
 		// VmmA corresponds to VMM_Aging in Figure 8
-		State VmmA = new SimpleState(
+		Step VmmA = new SimpleStep(
 				"VmmA", 
 				new ErlangExp( new BigDecimal("0.00460392"), new BigDecimal("0.0021988")), 
 				Arrays.asList(VmmF), 
@@ -206,7 +200,7 @@ public class SWRej {
 				depth);
 
 		// VmmRejW corresponds to VMM_Rejuvenation_Waiting in Figure 8
-		State VmmRejW = new SimpleState(
+		Step VmmRejW = new SimpleStep(
 				"VmmRejW", 
 				GEN.newDeterministic(new BigDecimal("96")), 
 				Arrays.asList(E3), 
@@ -214,7 +208,7 @@ public class SWRej {
 				depth);
 
 		// Vm corresponds to VM_Rejuvenation_Waiting in Figure 8
-		State Vm = new CompositeState(
+		Step Vm = new CompositeStep(
 				"Vm",  
 				Arrays.asList(region1, region2), 
 				nextMap,  
@@ -222,7 +216,7 @@ public class SWRej {
 				depth);
 
 		// VmR corresponds to VM_Repairing in Figure 8
-		State VmR = new SimpleState(
+		Step VmR = new SimpleStep(
 				"VmR", 
 				vmRepairing_pFunction, 
 				Arrays.asList(Enever), 
@@ -230,7 +224,7 @@ public class SWRej {
 				depth);
 
 		// VmFD corresponds to VM_Failure_Detecting in Figure 8
-		State VmFD = new SimpleState(
+		Step VmFD = new SimpleStep(
 				"VmFD", 
 				GEN.newUniform(new OmegaBigDecimal("0.0"), new OmegaBigDecimal("0.4")), 
 				Arrays.asList(VmR), 
@@ -238,7 +232,7 @@ public class SWRej {
 				depth);
 
 		// VmRej corresponds to VM_Rejuvenating in Figure 8
-		State VmRej = new SimpleState(
+		Step VmRej = new SimpleStep(
 				"VmRej", 
 				vmRejuvenating_pFunction, 
 				Arrays.asList(Enever), 
@@ -246,20 +240,20 @@ public class SWRej {
 				depth);
 
 		// VmRes corresponds to VM_Restarting in Figure 8
-		State VmRes = new SimpleState(
+		Step VmRes = new SimpleStep(
 				"VmRes", 
 				vmRestarting_pFunction, 
 				Arrays.asList(Vm), 
 				Arrays.asList(1.0), 
 				depth);
 
-		((CompositeState) Vm).setNextStatesConditional(Map.of(
+		((CompositeStep) Vm).setNextStatesConditional(Map.of(
 				E11,
 				Arrays.asList(VmFD),
 				E12,
 				Arrays.asList(VmRej)));
 
-		((CompositeState) Vm).setBranchingProbsConditional(Map.of(
+		((CompositeStep) Vm).setBranchingProbsConditional(Map.of(
 				E11,
 				Arrays.asList(1.0),
 				E12,
@@ -268,12 +262,12 @@ public class SWRej {
 		// Level depth 0
 		depth = 0;
 
-		Map<State, List<State>> nextStates = null;//Required to avoid ambiguity
+		Map<Step, List<Step>> nextStates = null;//Required to avoid ambiguity
 		Region region3 = new Region(VmRes, RegionType.NEVER, true);
 		Region region4 = new Region(VmmA, RegionType.EXIT);
 		Region region5 = new Region(VmmRejW, RegionType.EXIT);
 
-		State S0 = new CompositeState(
+		Step S0 = new CompositeStep(
 				"S0",  
 				Arrays.asList(region3,region4,region5), 
 				nextStates, 
@@ -281,7 +275,7 @@ public class SWRej {
 				depth);
 
 		// VmmRes corresponds to VMM_Restarting in Figure 8
-		State VmmRes = new SimpleState(
+		Step VmmRes = new SimpleStep(
 				"VmmRes", 
 				vmmRestarting_pFunction,
 				Arrays.asList(S0), 
@@ -289,7 +283,7 @@ public class SWRej {
 				depth);
 
 		// VmmR corresponds to VMM_Repairing in Figure 8
-		State VmmR = new SimpleState(
+		Step VmmR = new SimpleStep(
 				"VmmR", 
 				vmmRepairing_pFunction,
 				Arrays.asList(VmmRes), 
@@ -297,7 +291,7 @@ public class SWRej {
 				depth);
 
 		// VmmFD corresponds to VMM_Failure_Detecting in Figure 8
-		State VmmFD = new SimpleState(
+		Step VmmFD = new SimpleStep(
 				"VmmFD", 
 				GEN.newUniform(new OmegaBigDecimal("0.0"), new OmegaBigDecimal("0.4")), 
 				Arrays.asList(VmmR), 
@@ -305,7 +299,7 @@ public class SWRej {
 				depth);
 
 		// VmmRej corresponds to VMM_Rejuvenating in Figure 8
-		State VmmRej = new SimpleState(
+		Step VmmRej = new SimpleStep(
 				"VmmRej", 
 				vmmRejuvenating_pFunction,
 				Arrays.asList(S0), 
@@ -313,20 +307,20 @@ public class SWRej {
 				depth);
 
 		// VmSW corresponds to VM_Stop_Waiting in Figure 8
-		State VmSW = new SimpleState(
+		Step VmSW = new SimpleStep(
 				"VmSW", 
 				GEN.newUniform(new OmegaBigDecimal("0.1"), new OmegaBigDecimal("0.2")), 
 				Arrays.asList(VmmRej), 
 				Arrays.asList(1.0), 
 				depth);
 
-		((CompositeState) S0).setNextStatesConditional(Map.of(
+		((CompositeStep) S0).setNextStatesConditional(Map.of(
 				E2,
 				Arrays.asList(VmmFD),
 				E3,
 				Arrays.asList(VmSW,VmmRej)));
 
-		((CompositeState) S0).setBranchingProbsConditional(Map.of(
+		((CompositeStep) S0).setBranchingProbsConditional(Map.of(
 				E2,
 				Arrays.asList(1.0),
 				E3,
@@ -337,6 +331,6 @@ public class SWRej {
 		VmR.setCyleLooping(true, true);
 		VmRej.setCyleLooping(true, true);
 
-		return new HierarchicalSMP(S0);
+		return new HSMP(S0);
 	}
 }

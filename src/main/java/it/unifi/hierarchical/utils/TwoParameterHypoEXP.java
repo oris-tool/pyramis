@@ -15,7 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package it.unifi.hierarchical.analysis;
+package it.unifi.hierarchical.utils;
+
 
 import org.oristool.math.domain.DBMZone;
 import org.oristool.math.expression.Expolynomial;
@@ -25,36 +26,33 @@ import org.oristool.math.function.Function;
 
 import java.math.BigDecimal;
 
-// FIXME: This class should be in some package related to the model, not to the analysis!
-// FIXME: Rename ErlangExp to HypoEXP or better TwoParameterHypoEXP.
-
 /**
  * The hypoExponential PDF with two parameters (i.e., sequence of two Exponential PDFs, each with their own rate).
  */
-public class ErlangExp implements Function {
+public class TwoParameterHypoEXP implements Function {
 
-    private EXP first;
-    private EXP second;
+    private final EXP first;
+    private final EXP second;
 
     /**
      * Builds the function {@code (lambda1 lambda2/(lambda1-lambda2)) (e^(-lambda2 x)-e^(-lambda1 x))} over {@code [0, +infty)}.
      *
-     * @param x PDF variable
      * @param lambda1 rate of the first Exponential PDF (before the negation)
-     * @param lambda1 rate of the second Exponential PDF (before the negation)
+     * @param lambda2 rate of the second Exponential PDF (before the negation)
      */
-    public ErlangExp(BigDecimal lambda1, BigDecimal lambda2) {
-    	first = new EXP(Variable.X, lambda1);
-    	second = new EXP(Variable.X, lambda2);
+    public TwoParameterHypoEXP(BigDecimal lambda1, BigDecimal lambda2) {
+        first = new EXP(Variable.X, lambda1);
+        second = new EXP(Variable.X, lambda2);
     }
 
     public EXP getFirst() {
-    	return first;
+        return first;
     }
+
     public EXP getSecond() {
-    	return second;
+        return second;
     }
-    
+
     // FIXME: Where is the density function built?
     @Override
     public Expolynomial getDensity() {
@@ -66,8 +64,8 @@ public class ErlangExp implements Function {
         return null;
     }
 
-	@Override
-	public String toMathematicaString() {
-		return null;
-	}
+    @Override
+    public String toMathematicaString() {
+        return null;
+    }
 }

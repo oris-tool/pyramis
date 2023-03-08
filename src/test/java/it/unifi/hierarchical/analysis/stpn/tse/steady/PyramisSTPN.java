@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,17 +17,8 @@
 
 package it.unifi.hierarchical.analysis.stpn.tse.steady;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
+import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.tse.trans.TFLVerbose;
 import org.oristool.models.stpn.RewardRate;
 import org.oristool.models.stpn.TransientSolution;
 import org.oristool.models.stpn.trans.RegTransient;
@@ -35,8 +26,12 @@ import org.oristool.models.stpn.trees.DeterministicEnablingState;
 import org.oristool.petrinet.Marking;
 import org.oristool.petrinet.PetriNet;
 
-import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.model.tse.trans.TFLVerbose;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.Callable;
 
 /**
  * This class supports the analysis of the STPN model corresponding to the HSMP model

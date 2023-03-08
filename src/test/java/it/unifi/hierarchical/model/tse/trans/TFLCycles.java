@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,27 +17,14 @@
 
 package it.unifi.hierarchical.model.tse.trans;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.utils.StateUtils;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.function.GEN;
 
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.ExitState;
-import it.unifi.hierarchical.model.FinalState;
-import it.unifi.hierarchical.model.HierarchicalSMP;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.SimpleState;
-import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.utils.StateUtils;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * This class supports the definition of the HSMP models with cycles 
@@ -58,73 +45,73 @@ public class TFLCycles {
 		return statesS;
 	}
 
-	public static LinkedList<State> firstLeaf;
+	public static LinkedList<Step> firstLeaf;
 
-	public static LinkedList<State> secondLeaf;
+	public static LinkedList<Step> secondLeaf;
 
-	public static LinkedList<State> thirdLeaf;
+	public static LinkedList<Step> thirdLeaf;
 
 	// for each step, all the (simple and composite) steps contained within its regions
-	public static Map<State,Set<State>> map;
-	public static Map<State,State> parentMap;
-	public static Map<State,State> doublesMap;
-	public static Map<State,State> doublesMapFrom2;
-	public static Map<State,Region> regMap;
+	public static Map<Step,Set<Step>> map;
+	public static Map<Step, Step> parentMap;
+	public static Map<Step, Step> doublesMap;
+	public static Map<Step, Step> doublesMapFrom2;
+	public static Map<Step,Region> regMap;
 
 	public static Map<String,String>  toCopy;
 
-	public static Set<State> compS;
+	public static Set<Step> compS;
 
-	public static Set<State> det;
-	public static Map<State,State> loopsMap;
+	public static Set<Step> det;
+	public static Map<Step, Step> loopsMap;
 	
 	// only the first step of the sequence is contained
-	public static Set<State> expDiffS;
-	public static Set<State> expS;
+	public static Set<Step> expDiffS;
+	public static Set<Step> expS;
 
 	public static Set<String> zeros;
 
 	public static Integer LOOP;
 
 
-	public static Set<State> statesP;
+	public static Set<Step> statesP;
 
-	public static HierarchicalSMP build(double rejPeriod, int leaf, int parallel, int depth, int sequence, boolean expolSame, RegionType regT, int LOOP) {
+	public static HSMP build(double rejPeriod, int leaf, int parallel, int depth, int sequence, boolean expolSame, RegionType regT, int LOOP) {
 		TFLCycles.c=0;
-		TFLCycles.map = new HashMap<State,Set<State>>();
-		TFLCycles.compS= new HashSet<State>();
-		TFLCycles.expS= new HashSet<State>();
-		TFLCycles.expDiffS= new HashSet<State>();
+		TFLCycles.map = new HashMap<Step,Set<Step>>();
+		TFLCycles.compS= new HashSet<Step>();
+		TFLCycles.expS= new HashSet<Step>();
+		TFLCycles.expDiffS= new HashSet<Step>();
 		
-		TFLCycles.det= new HashSet<State>();
+		TFLCycles.det= new HashSet<Step>();
 
 
-		TFLCycles.firstLeaf= new LinkedList<State>();
-		TFLCycles.secondLeaf= new LinkedList<State>();
-		TFLCycles.thirdLeaf= new LinkedList<State>();
+		TFLCycles.firstLeaf= new LinkedList<Step>();
+		TFLCycles.secondLeaf= new LinkedList<Step>();
+		TFLCycles.thirdLeaf= new LinkedList<Step>();
 		TFLCycles.LOOP= LOOP;
 
 		TFLCycles.zeros= new HashSet<String>();
 
 		// child, parent
-		TFLCycles.parentMap= new HashMap<State,State>();
+		TFLCycles.parentMap= new HashMap<Step, Step>();
 		TFLCycles.toCopy= new HashMap<String,String>();
-		TFLCycles.loopsMap= new HashMap<State,State>();
+		TFLCycles.loopsMap= new HashMap<Step, Step>();
 
 		// old1, old2
-		TFLCycles.doublesMap= new HashMap<State,State>();
+		TFLCycles.doublesMap= new HashMap<Step, Step>();
 		// old2,old1
-		TFLCycles.doublesMapFrom2= new HashMap<State,State>();
+		TFLCycles.doublesMapFrom2= new HashMap<Step, Step>();
 
 		// step, region contained in the parent step
-		TFLCycles.regMap= new HashMap<State,Region>();
+		TFLCycles.regMap= new HashMap<Step,Region>();
 
 		TFLCycles.parallelS=parallel;
 		TFLCycles.depthS=depth;
 		TFLCycles.sequenceS=sequence;
 
 		TFLCycles.statesS= new HashSet<String>();
-		TFLCycles.statesP= new HashSet<State>();
+		TFLCycles.statesP= new HashSet<Step>();
 
 		List<Region> rListAll = new LinkedList<Region>();
 		for(int i=0;i<parallelS;i++) {
@@ -135,15 +122,15 @@ public class TFLCycles {
 
 		//System.out.println("p="+parallelS+" d="+depthS+" s="+sequenceS);
 
-		List<State> nextStates = null;//Required to avoid ambiguity
+		List<Step> nextStates = null;//Required to avoid ambiguity
 
-		State S0 = new CompositeState(
+		Step S0 = new CompositeStep(
 				"S0",  
 				rListAll, 
 				nextStates, 
 				null, 
 				0);
-		map.put(S0, new HashSet<State>());
+		map.put(S0, new HashSet<Step>());
 		compS.add(S0);
 		statesS.add(S0.getName());
 		statesP.add(S0);
@@ -153,16 +140,16 @@ public class TFLCycles {
 
 		for(int i=0;i<parallelS;i++) {
 
-			State initial = buildInner(rejPeriod, leaf, rListAll.get(i), S0, 1, expolSame, regT, 0);
+			Step initial = buildInner(rejPeriod, leaf, rListAll.get(i), S0, 1, expolSame, regT, 0);
 			rListAll.get(i).setInitialState(initial);
 			System.out.println(rListAll.get(i));
 		}
 
 		System.out.println("c is "+ c);
-		return new HierarchicalSMP(S0);
+		return new HSMP(S0);
 	}
 
-	private static State buildInner(double rejPeriod,int leaf, Region parentRegion, State parent, int currentDepth, boolean expolSame, RegionType regT, int inCycleStatus) {
+	private static Step buildInner(double rejPeriod, int leaf, Region parentRegion, Step parent, int currentDepth, boolean expolSame, RegionType regT, int inCycleStatus) {
 
 		GEN expC = GEN.newExpolynomial("22.517 * Exp[-3.11427 x] * x + -22.517 * Exp[-3.11427 x] * x^2", OmegaBigDecimal.ZERO, OmegaBigDecimal.ONE);
 
@@ -185,9 +172,9 @@ public class TFLCycles {
 			}
 		}
 
-		State current = null;
+		Step current = null;
 
-		List<State> nextStates = null;//Required to avoid ambiguity
+		List<Step> nextStates = null;//Required to avoid ambiguity
 
 		if(!cycle && inCycleStatus!=1) {
 
@@ -202,7 +189,7 @@ public class TFLCycles {
 
 				//System.out.println("p="+parallelS+" d="+depthS+" s="+sequenceS);
 
-				current = new CompositeState(
+				current = new CompositeStep(
 						"normalComposite_"+currentDepth+"_"+c++,  
 						rListAll, 
 						nextStates, 
@@ -213,21 +200,21 @@ public class TFLCycles {
 				parentMap.put(current, parent);
 				regMap.put(current, parentRegion);
 
-				map.put(current, new HashSet<State>());
+				map.put(current, new HashSet<Step>());
 				map.get(parent).add(current);
 				statesS.add(current.getName());
 				statesP.add(current);
 
 				for(int i=0;i<parallelS;i++) {
 
-					State initial = buildInner(rejPeriod, leaf,rListAll.get(i), current, currentDepth+1, expolSame, regT, 0);
+					Step initial = buildInner(rejPeriod, leaf,rListAll.get(i), current, currentDepth+1, expolSame, regT, 0);
 
 					rListAll.get(i).setInitialState(initial);
 				}
 
 			} else  {
 
-				current = new SimpleState(
+				current = new SimpleStep(
 						"zeroNotCycle_"+currentDepth+"_"+c++,
 						GEN.newDeterministic(new BigDecimal(0)),
 						nextStates,
@@ -243,24 +230,24 @@ public class TFLCycles {
 				zeros.add(current.getName());
 			}
 
-			State E = new FinalState("e_"+c++, currentDepth);
+			Step E = new FinalLocation("e_"+c++, currentDepth);
 
-			State stateD112 = new SimpleState(
+			Step stateD112 = new SimpleStep(
 					"d1_"+currentDepth+"_"+c++,
 					expC,
 					Arrays.asList(E), 
 					Arrays.asList(1.0), 
 					currentDepth); 
 
-			State stateD122 = new SimpleState(
+			Step stateD122 = new SimpleStep(
 					"d2_"+currentDepth+"_"+c++,
 					expC,
 					Arrays.asList(E), 
 					Arrays.asList(1.0), 
 					currentDepth); 
 
-			State old1= stateD112;
-			State old2= stateD122;
+			Step old1= stateD112;
+			Step old2= stateD122;
 			map.get(parent).add(old1);
 			map.get(parent).add(old2);
 			statesS.add(old1.getName());
@@ -277,14 +264,14 @@ public class TFLCycles {
 
 			for(int r=1;r<sequenceS;r++) {
 
-				State stateD111 = new SimpleState(
+				Step stateD111 = new SimpleStep(
 						"d1--_"+currentDepth+"_"+c++,
 						expC,
 						Arrays.asList(old1), 
 						Arrays.asList(1.0), 
 						currentDepth); 
 
-				State stateD121 = new SimpleState(
+				Step stateD121 = new SimpleStep(
 						"d2--_"+currentDepth+"_"+c++,
 						expC,
 						Arrays.asList(old2), 
@@ -314,7 +301,7 @@ public class TFLCycles {
 
 		} else if(cycle) {
 			
-			current = new SimpleState(
+			current = new SimpleStep(
 					"zeroCycle_"+currentDepth+"_"+c++,
 					GEN.newDeterministic(new BigDecimal(0)),
 					nextStates,
@@ -331,15 +318,15 @@ public class TFLCycles {
 			zeros.add(current.getName());
 
 
-			State[] sA= new State[LOOP];
-			State[] sEmpty = new State[LOOP];
+			Step[] sA= new Step[LOOP];
+			Step[] sEmpty = new Step[LOOP];
 
-			State[] End1= new State[LOOP];
-			State[] End2= new State[LOOP];
+			Step[] End1= new Step[LOOP];
+			Step[] End2= new Step[LOOP];
 
 			for(int i=0;i<LOOP;i++) {
 				
-				State empty = new SimpleState(
+				Step empty = new SimpleStep(
 						"emptyLoop_"+c++,
 						GEN.newDeterministic(new BigDecimal(0)),
 						nextStates,
@@ -356,7 +343,7 @@ public class TFLCycles {
 				rListAll.add(newR2);
 
 
-				State cyc = new CompositeState(
+				Step cyc = new CompositeStep(
 						"loop_"+currentDepth+"_"+c++,  
 						rListAll, 
 						nextStates, 
@@ -380,24 +367,24 @@ public class TFLCycles {
 				parentMap.put(cyc, parent);
 				regMap.put(cyc, parentRegion);
 
-				map.put(cyc, new HashSet<State>());
+				map.put(cyc, new HashSet<Step>());
 				map.get(parent).add(cyc);
 				statesS.add(cyc.getName());
 				statesP.add(cyc);
 				
 				sA[i]=cyc;
 
-				State initial1 = buildInner(rejPeriod, leaf,rListAll.get(0), cyc, currentDepth+1, expolSame, regT, 1);
+				Step initial1 = buildInner(rejPeriod, leaf,rListAll.get(0), cyc, currentDepth+1, expolSame, regT, 1);
 				
 				rListAll.get(0).setInitialState(initial1);
 				
-				State end1 = StateUtils.findEndState(rListAll.get(0));
+				Step end1 = StateUtils.findEndState(rListAll.get(0));
 				End1[i]=end1;
 				
-				State endinit= new ExitState("eLoopDet_"+c++,currentDepth+1);
+				Step endinit= new ExitState("eLoopDet_"+c++,currentDepth+1);
 				End2[i]=endinit;
 							
-				State initial2 = new SimpleState(
+				Step initial2 = new SimpleStep(
 						"init_"+currentDepth+"_"+c++,
 						GEN.newDeterministic(new BigDecimal(rejPeriod)),
 						Arrays.asList(endinit),
@@ -417,24 +404,24 @@ public class TFLCycles {
 
 			}
 			
-			State E = new ExitState("exitOfCycleRegion_"+c++, currentDepth);
+			Step E = new ExitState("exitOfCycleRegion_"+c++, currentDepth);
 
-			State stateD112 = new SimpleState(
+			Step stateD112 = new SimpleStep(
 					"d1CycleReg_"+currentDepth+"_"+c++,
 					expC,
 					Arrays.asList(E), 
 					Arrays.asList(1.0), 
 					currentDepth); 
 
-			State stateD122 = new SimpleState(
+			Step stateD122 = new SimpleStep(
 					"d2CycleReg_"+currentDepth+"_"+c++,
 					expC,
 					Arrays.asList(E), 
 					Arrays.asList(1.0), 
 					currentDepth); 
 
-			State old1= stateD112;
-			State old2= stateD122;
+			Step old1= stateD112;
+			Step old2= stateD122;
 			map.get(parent).add(old1);
 			map.get(parent).add(old2);
 			statesS.add(old1.getName());
@@ -451,14 +438,14 @@ public class TFLCycles {
 
 			for(int r=1;r<sequenceS;r++) {
 
-				State stateD111 = new SimpleState(
+				Step stateD111 = new SimpleStep(
 						"d1--_"+currentDepth+"_"+c++,
 						expC,
 						Arrays.asList(old1), 
 						Arrays.asList(1.0), 
 						currentDepth); 
 
-				State stateD121 = new SimpleState(
+				Step stateD121 = new SimpleStep(
 						"d2--_"+currentDepth+"_"+c++,
 						expC,
 						Arrays.asList(old2), 
@@ -487,13 +474,13 @@ public class TFLCycles {
 			for(int i=0;i<LOOP-1;i++) {
 				loopsMap.put(sA[i], sA[i+1]);
 				
-				((CompositeState) sA[i]).setNextStatesConditional(Map.of(
+				((CompositeStep) sA[i]).setNextStatesConditional(Map.of(
 						End1[i],
 						Arrays.asList(old1,old2),
 						End2[i],
 						Arrays.asList(sEmpty[i])));
 
-				((CompositeState) sA[i]).setBranchingProbsConditional(Map.of(
+				((CompositeStep) sA[i]).setBranchingProbsConditional(Map.of(
 						End1[i],
 						Arrays.asList(0.5,0.5),
 						End2[i],
@@ -517,9 +504,9 @@ public class TFLCycles {
 
 			//System.out.println("p="+parallelS+" d="+depthS+" s="+sequenceS);
 			
-			State E = new ExitState("exitInsideCycle_"+c++, currentDepth);
+			Step E = new ExitState("exitInsideCycle_"+c++, currentDepth);
 
-			current = new CompositeState(
+			current = new CompositeStep(
 					"compInCycle_"+currentDepth+"_"+c++,  
 					rListAll, 
 					nextStates, 
@@ -530,14 +517,14 @@ public class TFLCycles {
 			parentMap.put(current, parent);
 			regMap.put(current, parentRegion);
 
-			map.put(current, new HashSet<State>());
+			map.put(current, new HashSet<Step>());
 			map.get(parent).add(current);
 			statesS.add(current.getName());
 			statesP.add(current);
 
 			for(int i=0;i<parallelS;i++) {
 
-				State initial = buildInner(rejPeriod,leaf,rListAll.get(i), current, currentDepth+1, expolSame, regT, 2);
+				Step initial = buildInner(rejPeriod,leaf,rListAll.get(i), current, currentDepth+1, expolSame, regT, 2);
 
 				rListAll.get(i).setInitialState(initial);
 			}

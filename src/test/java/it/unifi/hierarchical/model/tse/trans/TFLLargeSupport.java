@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,25 +17,13 @@
 
 package it.unifi.hierarchical.model.tse.trans;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.model.Region.RegionType;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.function.GEN;
 
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.FinalState;
-import it.unifi.hierarchical.model.HierarchicalSMP;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.model.SimpleState;
-import it.unifi.hierarchical.model.State;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * This class supports the definition of the HSMP models with large support PDFs 
@@ -57,56 +45,56 @@ public class TFLLargeSupport {
 	}
 
 	// for each step, all the (simple and composite) steps contained within its regions
-	public static Map<State,Set<State>> map;
-	public static Map<State,State> parentMap;
-	public static Map<State,State> doublesMap;
-	public static Map<State,State> doublesMapFrom2;
-	public static Map<State,Region> regMap;
+	public static Map<Step,Set<Step>> map;
+	public static Map<Step, Step> parentMap;
+	public static Map<Step, Step> doublesMap;
+	public static Map<Step, Step> doublesMapFrom2;
+	public static Map<Step,Region> regMap;
 
-	public static Set<State> compS;
+	public static Set<Step> compS;
 
 	// only the first step of the sequence is contained
-	public static Set<State> expDiffS;
-	public static Set<State> expS;
+	public static Set<Step> expDiffS;
+	public static Set<Step> expS;
 
 	public static Set<String> zeros;
 
-	public static Set<State> firstLeaf;
-	public static Set<State> secondLeaf;
-	public static Set<State> thirdLeaf;
+	public static Set<Step> firstLeaf;
+	public static Set<Step> secondLeaf;
+	public static Set<Step> thirdLeaf;
 
-	public static Set<State> statesP;
+	public static Set<Step> statesP;
 
-	public static HierarchicalSMP build(int leaf, int parallel, int depth, int sequence, boolean expolSame, RegionType regT) {
+	public static HSMP build(int leaf, int parallel, int depth, int sequence, boolean expolSame, RegionType regT) {
 		TFLLargeSupport.c=0;
-		TFLLargeSupport.map = new HashMap<State,Set<State>>();
-		TFLLargeSupport.compS= new HashSet<State>();
-		TFLLargeSupport.expS= new HashSet<State>();
-		TFLLargeSupport.expDiffS= new HashSet<State>();
+		TFLLargeSupport.map = new HashMap<Step,Set<Step>>();
+		TFLLargeSupport.compS= new HashSet<Step>();
+		TFLLargeSupport.expS= new HashSet<Step>();
+		TFLLargeSupport.expDiffS= new HashSet<Step>();
 
-		TFLLargeSupport.firstLeaf= new HashSet<State>();
-		TFLLargeSupport.secondLeaf= new HashSet<State>();
-		TFLLargeSupport.thirdLeaf= new HashSet<State>();
+		TFLLargeSupport.firstLeaf= new HashSet<Step>();
+		TFLLargeSupport.secondLeaf= new HashSet<Step>();
+		TFLLargeSupport.thirdLeaf= new HashSet<Step>();
 
 		TFLLargeSupport.zeros= new HashSet<String>();
 
 		// child, parent
-		TFLLargeSupport.parentMap= new HashMap<State,State>();
+		TFLLargeSupport.parentMap= new HashMap<Step, Step>();
 
 		// old1, old2
-		TFLLargeSupport.doublesMap= new HashMap<State,State>();
+		TFLLargeSupport.doublesMap= new HashMap<Step, Step>();
 		// old2,old1
-		TFLLargeSupport.doublesMapFrom2= new HashMap<State,State>();
+		TFLLargeSupport.doublesMapFrom2= new HashMap<Step, Step>();
 
 		// step, region contained in the parent step
-		TFLLargeSupport.regMap= new HashMap<State,Region>();
+		TFLLargeSupport.regMap= new HashMap<Step,Region>();
 
 		TFLLargeSupport.parallelS=parallel;
 		TFLLargeSupport.depthS=depth;
 		TFLLargeSupport.sequenceS=sequence;
 
 		TFLLargeSupport.statesS= new HashSet<String>();
-		TFLLargeSupport.statesP= new HashSet<State>();
+		TFLLargeSupport.statesP= new HashSet<Step>();
 
 		List<Region> rListAll = new LinkedList<Region>();
 		for(int i=0;i<parallelS;i++) {
@@ -117,15 +105,15 @@ public class TFLLargeSupport {
 		
 		//System.out.println("p="+parallelS+" d="+depthS+" s="+sequenceS);
 
-		List<State> nextStates = null;//Required to avoid ambiguity
+		List<Step> nextStates = null;//Required to avoid ambiguity
 
-		State S0 = new CompositeState(
+		Step S0 = new CompositeStep(
 				"S0",  
 				rListAll, 
 				nextStates, 
 				null, 
 				0);
-		map.put(S0, new HashSet<State>());
+		map.put(S0, new HashSet<Step>());
 		compS.add(S0);
 		statesS.add(S0.getName());
 		statesP.add(S0);
@@ -134,23 +122,23 @@ public class TFLLargeSupport {
 
 		for(int i=0;i<parallelS;i++) {
 
-			State initial = buildInner(leaf, rListAll.get(i), S0, 1, expolSame, regT);
+			Step initial = buildInner(leaf, rListAll.get(i), S0, 1, expolSame, regT);
 			rListAll.get(i).setInitialState(initial);
 		}
 
 		System.out.println("c is "+ c);
-		return new HierarchicalSMP(S0);
+		return new HSMP(S0);
 	}
 
-	private static State buildInner(int leaf, Region parentRegion, State parent, int currentDepth, boolean expolSame, RegionType regT) {
+	private static Step buildInner(int leaf, Region parentRegion, Step parent, int currentDepth, boolean expolSame, RegionType regT) {
 
 		GEN exp = GEN.newExpolynomial("22.517 * Exp[-3.11427 x] * x + -22.517 * Exp[-3.11427 x] * x^2", OmegaBigDecimal.ZERO, OmegaBigDecimal.ONE);
 
 		GEN expLong = GEN.newExpolynomial("0.22517 * Exp[-0.311427 x] * x + -0.022517 * Exp[-0.311427 x] * x^2", OmegaBigDecimal.ZERO, OmegaBigDecimal.TEN); 
 
-		State current;
+		Step current;
 
-		List<State> nextStates = null;//Required to avoid ambiguity
+		List<Step> nextStates = null;//Required to avoid ambiguity
 
 		if(currentDepth!=TFLLargeSupport.depthS) {
 			List<Region> rListAll = new LinkedList<Region>();
@@ -162,7 +150,7 @@ public class TFLLargeSupport {
 
 			//System.out.println("p="+parallelS+" d="+depthS+" s="+sequenceS);
 
-			current = new CompositeState(
+			current = new CompositeStep(
 					"comp_"+currentDepth+"_"+c++,  
 					rListAll, 
 					nextStates, 
@@ -173,20 +161,20 @@ public class TFLLargeSupport {
 			parentMap.put(current, parent);
 			regMap.put(current, parentRegion);
 
-			map.put(current, new HashSet<State>());
+			map.put(current, new HashSet<Step>());
 			map.get(parent).add(current);
 			statesS.add(current.getName());
 			statesP.add(current);
 
 			for(int i=0;i<parallelS;i++) {
 
-				State initial = buildInner(leaf,rListAll.get(i), current, currentDepth+1, expolSame, regT);
+				Step initial = buildInner(leaf,rListAll.get(i), current, currentDepth+1, expolSame, regT);
 
 				rListAll.get(i).setInitialState(initial);
 			}
 		} else {
 
-			current = new SimpleState(
+			current = new SimpleStep(
 					"zero_"+currentDepth+"_"+c++,
 					GEN.newDeterministic(new BigDecimal(0)),
 					nextStates,
@@ -202,7 +190,7 @@ public class TFLLargeSupport {
 			zeros.add(current.getName());
 		}
 
-		State E = new FinalState("e_"+c++, currentDepth);
+		Step E = new FinalLocation("e_"+c++, currentDepth);
 
 		GEN expC=null;
 
@@ -214,22 +202,22 @@ public class TFLLargeSupport {
 			expC=exp;
 		}
 
-		State stateD112 = new SimpleState(
+		Step stateD112 = new SimpleStep(
 				"d1_"+currentDepth+"_"+c++,
 				expC,
 				Arrays.asList(E), 
 				Arrays.asList(1.0), 
 				currentDepth); 
 
-		State stateD122 = new SimpleState(
+		Step stateD122 = new SimpleStep(
 				"d2_"+currentDepth+"_"+c++,
 				expC,
 				Arrays.asList(E), 
 				Arrays.asList(1.0), 
 				currentDepth); 
 
-		State old1= stateD112;
-		State old2= stateD122;
+		Step old1= stateD112;
+		Step old2= stateD122;
 		map.get(parent).add(old1);
 		map.get(parent).add(old2);
 		statesS.add(old1.getName());
@@ -259,14 +247,14 @@ public class TFLLargeSupport {
 
 		for(int r=1;r<sequenceS;r++) {
 
-			State stateD111 = new SimpleState(
+			Step stateD111 = new SimpleStep(
 					"d1--_"+currentDepth+"_"+c++,
 					expC,
 					Arrays.asList(old1), 
 					Arrays.asList(1.0), 
 					currentDepth); 
 
-			State stateD121 = new SimpleState(
+			Step stateD121 = new SimpleStep(
 					"d2--_"+currentDepth+"_"+c++,
 					expC,
 					Arrays.asList(old2), 

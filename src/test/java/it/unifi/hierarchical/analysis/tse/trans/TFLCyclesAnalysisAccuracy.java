@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,25 +17,20 @@
 
 package it.unifi.hierarchical.analysis.tse.trans;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import it.unifi.hierarchical.model.CompositeStep;
+import it.unifi.hierarchical.model.HSMP;
+import it.unifi.hierarchical.model.Region;
+import it.unifi.hierarchical.model.Region.RegionType;
+import it.unifi.hierarchical.model.Step;
+import it.unifi.hierarchical.model.tse.trans.TFLCycles;
+import it.unifi.hierarchical.utils.StateUtils;
+
+import java.io.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import it.unifi.hierarchical.model.CompositeState;
-import it.unifi.hierarchical.model.HierarchicalSMP;
-import it.unifi.hierarchical.model.Region;
-import it.unifi.hierarchical.model.State;
-import it.unifi.hierarchical.model.Region.RegionType;
-import it.unifi.hierarchical.model.tse.trans.TFLCycles;
-import it.unifi.hierarchical.utils.StateUtils;
 
 /**
  * This class supports the comparison of the analysis results with the ground truth
@@ -110,27 +105,27 @@ public class TFLCyclesAnalysisAccuracy {
 				store[i]=searchAliases;
 
 				System.out.println("nide");
-				HierarchicalSMP model1 = TFLCycles.build(rpV,l,3,2,3,true, RegionType.EXIT, i);
-				State initial1 = model1.getInitialState();
+				HSMP model1 = TFLCycles.build(rpV,l,3,2,3,true, RegionType.EXIT, i);
+				Step initial1 = model1.getInitialState();
 
 				searchAliases.put(initial1.getName(), "s0");
 				for(int r=0;r<3;r++) {
 					
-					Region reg = ((CompositeState) initial1).getRegions().get(r);
+					Region reg = ((CompositeStep) initial1).getRegions().get(r);
 
-					State in = reg.getInitialState();
+					Step in = reg.getInitialState();
 					searchAliases.put(in.getName(), r+"in");
-					if(in instanceof CompositeState) {
+					if(in instanceof CompositeStep) {
 						for(int r2=0;r2<3;r2++) {
-							Region reg2 = ((CompositeState) in).getRegions().get(r2);
-							State in2 =reg2.getInitialState();
+							Region reg2 = ((CompositeStep) in).getRegions().get(r2);
+							Step in2 =reg2.getInitialState();
 							searchAliases.put(in2.getName(), r2+"_"+r+"in");
-							State a = in2.getNextStates().get(0);
-							State b = in2.getNextStates().get(1);
-							State c = a.getNextStates().get(0);
-							State d = b.getNextStates().get(0);
-							State e = c.getNextStates().get(0);
-							State f = d.getNextStates().get(0);
+							Step a = in2.getNextStates().get(0);
+							Step b = in2.getNextStates().get(1);
+							Step c = a.getNextStates().get(0);
+							Step d = b.getNextStates().get(0);
+							Step e = c.getNextStates().get(0);
+							Step f = d.getNextStates().get(0);
 
 							searchAliases.put(a.getName(), r2+"_"+r+"ain");
 							searchAliases.put(b.getName(), r2+"_"+r+"bin");
@@ -139,12 +134,12 @@ public class TFLCyclesAnalysisAccuracy {
 							searchAliases.put(e.getName(), r2+"_"+r+"ein");
 							searchAliases.put(f.getName(), r2+"_"+r+"fin");
 						}
-						State a = in.getNextStates().get(0);
-						State b = in.getNextStates().get(1);
-						State c = a.getNextStates().get(0);
-						State d = b.getNextStates().get(0);
-						State e = c.getNextStates().get(0);
-						State f = d.getNextStates().get(0);
+						Step a = in.getNextStates().get(0);
+						Step b = in.getNextStates().get(1);
+						Step c = a.getNextStates().get(0);
+						Step d = b.getNextStates().get(0);
+						Step e = c.getNextStates().get(0);
+						Step f = d.getNextStates().get(0);
 						searchAliases.put(a.getName(), r+"ain");
 						searchAliases.put(b.getName(), r+"bin");
 						searchAliases.put(c.getName(), r+"cin");
@@ -153,26 +148,26 @@ public class TFLCyclesAnalysisAccuracy {
 						searchAliases.put(f.getName(), r+"fin");
 
 					}else {
-						State loop= in.getNextStates().get(0);
+						Step loop= in.getNextStates().get(0);
 						System.out.println(r+ "loop");
 						
 						searchAliases.put(loop.getName(), r+"loopComp");
 
-						State cycleIn = ((CompositeState)loop).getRegions().get(0).getInitialState();
+						Step cycleIn = ((CompositeStep)loop).getRegions().get(0).getInitialState();
 						searchAliases.put(cycleIn.getName(), r+"cycleIn");
 
 						for(int rC=0;rC<3;rC++) {
-							Region regCyc = ((CompositeState) cycleIn).getRegions().get(rC);
+							Region regCyc = ((CompositeStep) cycleIn).getRegions().get(rC);
 
-							State inIn = regCyc.getInitialState();
+							Step inIn = regCyc.getInitialState();
 							searchAliases.put(inIn.getName(), r+"inCyc"+rC+"in");
 
-							State a = inIn.getNextStates().get(0);
-							State b = inIn.getNextStates().get(1);
-							State c = a.getNextStates().get(0);
-							State d = b.getNextStates().get(0);
-							State e = c.getNextStates().get(0);
-							State f = d.getNextStates().get(0);
+							Step a = inIn.getNextStates().get(0);
+							Step b = inIn.getNextStates().get(1);
+							Step c = a.getNextStates().get(0);
+							Step d = b.getNextStates().get(0);
+							Step e = c.getNextStates().get(0);
+							Step f = d.getNextStates().get(0);
 							searchAliases.put(e.getName(), r+"inCyc"+rC+"ein");
 							searchAliases.put(f.getName(),r+"inCyc"+rC+"fin");
 							searchAliases.put(a.getName(), r+"inCyc"+rC+"ain");
@@ -181,19 +176,19 @@ public class TFLCyclesAnalysisAccuracy {
 							searchAliases.put(d.getName(), r+"inCyc"+rC+"din");
 						}
 
-						State det = ((CompositeState)loop).getRegions().get(1).getInitialState();
+						Step det = ((CompositeStep)loop).getRegions().get(1).getInitialState();
 						searchAliases.put(det.getName(), r+"det");
 
-						Map<State, List<State>>  mapCyc =((CompositeState)loop).getNextStatesConditional();
-						List<State> list2= mapCyc.get(StateUtils.findEndState(((CompositeState)loop).getRegions().get(0)));
-						List<State> list1= mapCyc.get(StateUtils.findEndState(((CompositeState)loop).getRegions().get(1)));
+						Map<Step, List<Step>>  mapCyc =((CompositeStep)loop).getNextStatesConditional();
+						List<Step> list2= mapCyc.get(StateUtils.findEndState(((CompositeStep)loop).getRegions().get(0)));
+						List<Step> list1= mapCyc.get(StateUtils.findEndState(((CompositeStep)loop).getRegions().get(1)));
 
-						State a = list2.get(0);
-						State b = list2.get(1);
-						State c = a.getNextStates().get(0);
-						State d = b.getNextStates().get(0);
-						State e = c.getNextStates().get(0);
-						State f = d.getNextStates().get(0);
+						Step a = list2.get(0);
+						Step b = list2.get(1);
+						Step c = a.getNextStates().get(0);
+						Step d = b.getNextStates().get(0);
+						Step e = c.getNextStates().get(0);
+						Step f = d.getNextStates().get(0);
 
 						searchAliases.put(a.getName(), r+"ain");
 						searchAliases.put(b.getName(), r+"bin");
@@ -206,24 +201,24 @@ public class TFLCyclesAnalysisAccuracy {
 
 							System.out.println(i+" loop "+ k);
 
-							State loop2=list1.get(0).getNextStates().get(0);
+							Step loop2=list1.get(0).getNextStates().get(0);
 							System.out.println(loop2.getName());
 
 							searchAliases.put(loop2.getName(), r+"loopComp");
 
-							State cycleInDouble = ((CompositeState)loop2).getRegions().get(0).getInitialState();
+							Step cycleInDouble = ((CompositeStep)loop2).getRegions().get(0).getInitialState();
 							searchAliases.put(cycleInDouble.getName(), r+"cycleIn");
 
 							for(int rC=0;rC<3;rC++) {
-								Region regCyc = ((CompositeState) cycleInDouble).getRegions().get(rC);
+								Region regCyc = ((CompositeStep) cycleInDouble).getRegions().get(rC);
 
-								State inIn = regCyc.getInitialState();
+								Step inIn = regCyc.getInitialState();
 								searchAliases.put(inIn.getName(), r+"inCyc"+rC+"in");
 
-								State a2 = inIn.getNextStates().get(0);
-								State b2 = inIn.getNextStates().get(1);
-								State c2 = a2.getNextStates().get(0);
-								State d2 = b2.getNextStates().get(0);
+								Step a2 = inIn.getNextStates().get(0);
+								Step b2 = inIn.getNextStates().get(1);
+								Step c2 = a2.getNextStates().get(0);
+								Step d2 = b2.getNextStates().get(0);
 //								State e2 = c.getNextStates().get(0);
 //								State f2 = d.getNextStates().get(0);
 
@@ -235,13 +230,13 @@ public class TFLCyclesAnalysisAccuracy {
 								searchAliases.put(f.getName(),r+"inCyc"+rC+"fin");
 							}
 
-							State det2 = ((CompositeState)loop2).getRegions().get(1).getInitialState();
+							Step det2 = ((CompositeStep)loop2).getRegions().get(1).getInitialState();
 							searchAliases.put(det2.getName(), r+"det");
 
-							Map<State, List<State>>  mapCyc2 =((CompositeState)loop2).getNextStatesConditional();
+							Map<Step, List<Step>>  mapCyc2 =((CompositeStep)loop2).getNextStatesConditional();
 
 							if(k<i-1)
-								list1= mapCyc2.get(StateUtils.findEndState(((CompositeState)loop2).getRegions().get(1)));
+								list1= mapCyc2.get(StateUtils.findEndState(((CompositeStep)loop2).getRegions().get(1)));
 						}
 					}
 				}

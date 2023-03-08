@@ -15,22 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package it.unifi.hierarchical.analysis;
+package it.unifi.hierarchical.model.visitor;
 
-import it.unifi.hierarchical.model.LogicalLocation;
-
-import java.util.List;
-
+import it.unifi.hierarchical.model.*;
+import it.unifi.hierarchical.model.CompositeStep;
+import it.unifi.hierarchical.model.FinalLocation;
 /**
- * Common interface of methods for transient analysis of the semi-Markov process underlying a {@link it.unifi.stlab.hierarchical.model.Region}.
+ * Interface that defines the methods that a visitor of logical locations must implement
  */
-public interface TransientAnalyzer {
+public interface LogicalLocationVisitor {
 
-    public double getTimeLimit();
+    /**
+     * Visit method for simple steps
+     * @param simpleStep simple step to be visited
+     */
+    void visit(SimpleStep simpleStep);
 
-    public double getTimeStep();
+    /**
+     * Visit method for composite steps
+     * @param compositeStep composite step to be visited
+     */
+    void visit(CompositeStep compositeStep);
 
-    public List<LogicalLocation> getStates();
-
-    public NumericalValues getTransientProbability(LogicalLocation from, LogicalLocation to);
+    /**
+     * Visit method for final locations
+     * @param finalLocation final location to be visited
+     */
+    void visit(FinalLocation finalLocation);
 }

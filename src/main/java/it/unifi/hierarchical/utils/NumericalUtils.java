@@ -1,5 +1,5 @@
 /* This program is part of the PYRAMIS library for compositional analysis of hierarchical UML statecharts.
- * Copyright (C) 2019-2021 The PYRAMIS Authors.
+ * Copyright (C) 2019-2023 The PYRAMIS Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,18 +17,8 @@
 
 package it.unifi.hierarchical.utils;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import it.unifi.hierarchical.analysis.ErlangExp;
+import it.unifi.hierarchical.analysis.NumericalValues;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.expression.Variable;
 import org.oristool.math.function.EXP;
@@ -36,48 +26,49 @@ import org.oristool.math.function.GEN;
 import org.oristool.math.function.PartitionedFunction;
 import org.oristool.math.function.PartitionedGEN;
 
-import it.unifi.hierarchical.analysis.ErlangExp;
-import it.unifi.hierarchical.analysis.NumericalValues;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.*;
 
 // FIXME: May commented methods turn out to be useful or can they be eliminated?
 // FIXME: Check whether evaluateEXP, evaluateGEN, evaluatePartitioneGEN, and isDeterministic are methods of the SIRIO library.
 public class NumericalUtils {
 
-	/*public static double[] convolveCDFs(double[] first, double[] second, double step) {
-		double[] firstPDF = computePDFFromCDF(first, new BigDecimal("" + step));
-		double[] secondPDF = computePDFFromCDF(second, new BigDecimal("" + step));
-		double[] resultPDF = convolvePDFs(firstPDF, secondPDF, step);
-		return computeCDFFromPDF(resultPDF, new BigDecimal("" + step));
-	}
-
-	public static double[] convolvePDFs(double[] first, double[] second, double step) {
-
-		if (first == null || second == null)
-			throw new IllegalArgumentException("Convolution parameter can't be null");
-
-		final int firstLen = first.length;
-		final int secondLen = second.length;
-
-		if (firstLen == 0 || secondLen == 0) {
-			throw new IllegalArgumentException("Convolution parameter can't be empty");
-		}
-		if (firstLen != secondLen) {
-			throw new IllegalArgumentException("Convolution parameter must have the same length");
-		}
-
-		int resultLength = firstLen;
-
-		double[] result = new double[resultLength];
-		// Evaluate every element of the final result
-		for (int i = 0; i < resultLength; i++) {
-			result[i] = 0;
-			// For every element of the second array. If j>i is not evaluated because it will have a negative index
-			for (int j = 0; j <= i; j++) {
-				result[i] += first[j] * step * second[i - j];
-			}
-		}
-		return result;
-	}*/
+	//	public static double[] convolveCDFs(double[] first, double[] second, double step) {
+	//		double[] firstPDF = computePDFFromCDF(first, new BigDecimal("" + step));
+	//		double[] secondPDF = computePDFFromCDF(second, new BigDecimal("" + step));
+	//		double[] resultPDF = convolvePDFs(firstPDF, secondPDF, step);
+	//		return computeCDFFromPDF(resultPDF, new BigDecimal("" + step));
+	//	}
+	//
+	//	public static double[] convolvePDFs(double[] first, double[] second, double step) {
+	//
+	//		if (first == null || second == null)
+	//			throw new IllegalArgumentException("Convolution parameter can't be null");
+	//
+	//		final int firstLen = first.length;
+	//		final int secondLen = second.length;
+	//
+	//		if (firstLen == 0 || secondLen == 0) {
+	//			throw new IllegalArgumentException("Convolution parameter can't be empty");
+	//		}
+	//		if (firstLen != secondLen) {
+	//			throw new IllegalArgumentException("Convolution parameter must have the same length");
+	//		}
+	//
+	//		int resultLength = firstLen;
+	//
+	//		double[] result = new double[resultLength];
+	//		// Evaluate every element of the final result
+	//		for (int i = 0; i < resultLength; i++) {
+	//			result[i] = 0;
+	//			// For every element of the second array. If j>i is not evaluated because it will have a negative index
+	//			for (int j = 0; j <= i; j++) {
+	//				result[i] += first[j] * step * second[i - j];
+	//			}
+	//		}
+	//		return result;
+	//	}
 
 	public static NumericalValues maxCDF(Collection<NumericalValues> distributions) {
 
@@ -107,20 +98,20 @@ public class NumericalUtils {
 	}
 
 
-	/*public static NumericalValues minPDF(Collection<NumericalValues> pdfs) {
-
-		List<NumericalValues> distributions = new ArrayList<>();
-
-		for (NumericalValues pdf : pdfs) {
-			BigDecimal stepBD = new BigDecimal(""+pdf.getStep());
-			distributions.add(new NumericalValues(computeCDFFromPDF(pdf.getValues(), stepBD), pdf.getStep()));
-		}
-
-		NumericalValues minCDF = minCDF(distributions);
-		BigDecimal stepBD = new BigDecimal(""+minCDF.getStep());
-
-		return new NumericalValues(computePDFFromCDF(minCDF.getValues(),stepBD), minCDF.getStep());
-	}*/
+	//	public static NumericalValues minPDF(Collection<NumericalValues> pdfs) {
+	//
+	//		List<NumericalValues> distributions = new ArrayList<>();
+	//
+	//		for (NumericalValues pdf : pdfs) {
+	//			BigDecimal stepBD = new BigDecimal(""+pdf.getStep());
+	//			distributions.add(new NumericalValues(computeCDFFromPDF(pdf.getValues(), stepBD), pdf.getStep()));
+	//		}
+	//
+	//		NumericalValues minCDF = minCDF(distributions);
+	//		BigDecimal stepBD = new BigDecimal(""+minCDF.getStep());
+	//
+	//		return new NumericalValues(computePDFFromCDF(minCDF.getValues(),stepBD), minCDF.getStep());
+	//	}
 
 	public static NumericalValues minCDF(Collection<NumericalValues> distributions) {
 
@@ -158,9 +149,9 @@ public class NumericalUtils {
 			double previousValue = i == 0 ? 0.0 : cdf[i - 1];
 			double newValue = previousValue + pdf[i] * step.doubleValue();
 			cdf[i] = newValue > 1 ? 1 : newValue;
-			//REMARK Reduces possible errors from overexstimation but 
-			//does nothing to assure that once no more values !=0 
-			//are present the CDF is =1, which is a consequence 
+			//REMARK Reduces possible errors from overexstimation but
+			//does nothing to assure that once no more values !=0
+			//are present the CDF is =1, which is a consequence
 			//of having a choosen truncation point
 		}
 
@@ -193,7 +184,7 @@ public class NumericalUtils {
 			throw new UnsupportedOperationException("Not yet supported higher level timeSteps finer than the lower levels ");
 		}
 
-		//REMARK Gives errors when for example 0.2 and 0.3 are compared, because 
+		//REMARK Gives errors when for example 0.2 and 0.3 are compared, because
 		//we don't allow interpolation, only exact multiples
 		int multiplier = (int) Math.round(newStep/oldStep);
 		if(multiplier==1) {
@@ -207,7 +198,7 @@ public class NumericalUtils {
 
 		//does not care about PDFs need to rescale immediate!!
 		//old version newValues[i]=origValues[i*multiplier];
-		//old version meant that each cdf[t] was the value of cdf in t-, current version, 
+		//old version meant that each cdf[t] was the value of cdf in t-, current version,
 		//in agreement with analysis and evaluateFunction has cdf[t] = value of cdf in (t+1)-
 
 		for(int i=0; i<newSize-1;i++) {
@@ -215,52 +206,50 @@ public class NumericalUtils {
 		}
 		newValues[newSize-1] = origValues[oldSize-1];
 
-		NumericalValues rescaled = new NumericalValues(newValues, newStep);
-
 		//System.out.println(Arrays.toString(rescaled.getValues()));
 
-		return rescaled;
+		return new NumericalValues(newValues, newStep);
 	}
 
-	/**
-	 *Given a NumericalValues PDF with step A, returns a NumericalValues with step newStep
-	 */
-	/*public static NumericalValues rescalePDF(NumericalValues pdf, double newStep) {
-
-		if(pdf==null) {
-			return null;
-		}
-
-		double oldStep = pdf.getStep();
-
-		if(oldStep > newStep + 1e-9) {
-			throw new UnsupportedOperationException("Not yet supported higher level timeSteps finer than the lower levels ");
-
-		}
-
-		int multiplier = (int) Math.round(newStep/oldStep);
-		if(multiplier==1) {
-			return pdf;
-		}
-
-
-		double[] origValuesCDF = computeCDFFromPDF(pdf.getValues(), new BigDecimal(""+pdf.getStep()));
-
-		int oldSize = origValuesCDF.length;
-		int newSize = ((oldSize-1)/ multiplier) +1;
-
-		double[] newValuesCDF = new double[newSize];
-
-		for(int i=0; i<newSize;i++) {
-			newValuesCDF[i]=origValuesCDF[i*multiplier];
-		}
-
-		double[] newValuesPDF = computePDFFromCDF(newValuesCDF, new BigDecimal(""+newStep));
-
-
-		NumericalValues rescaled = new NumericalValues(newValuesPDF, newStep);
-		return rescaled;
-	}*/
+	//		/**
+	//		 *Given a NumericalValues PDF with step A, returns a NumericalValues with step newStep
+	//		 */
+	//		public static NumericalValues rescalePDF(NumericalValues pdf, double newStep) {
+	//
+	//			if(pdf==null) {
+	//				return null;
+	//			}
+	//
+	//			double oldStep = pdf.getStep();
+	//
+	//			if(oldStep > newStep + 1e-9) {
+	//				throw new UnsupportedOperationException("Not yet supported higher level timeSteps finer than the lower levels ");
+	//
+	//			}
+	//
+	//			int multiplier = (int) Math.round(newStep/oldStep);
+	//			if(multiplier==1) {
+	//				return pdf;
+	//			}
+	//
+	//
+	//			double[] origValuesCDF = computeCDFFromPDF(pdf.getValues(), new BigDecimal(""+pdf.getStep()));
+	//
+	//			int oldSize = origValuesCDF.length;
+	//			int newSize = ((oldSize-1)/ multiplier) +1;
+	//
+	//			double[] newValuesCDF = new double[newSize];
+	//
+	//			for(int i=0; i<newSize;i++) {
+	//				newValuesCDF[i]=origValuesCDF[i*multiplier];
+	//			}
+	//
+	//			double[] newValuesPDF = computePDFFromCDF(newValuesCDF, new BigDecimal(""+newStep));
+	//
+	//
+	//			NumericalValues rescaled = new NumericalValues(newValuesPDF, newStep);
+	//			return rescaled;
+	//		}
 
 	public static int computeTickNumber(OmegaBigDecimal timeLimit, BigDecimal timeStep) {
 		return timeLimit.divide(timeStep, MathContext.DECIMAL128).intValue() + 1;
@@ -269,8 +258,8 @@ public class NumericalUtils {
 	public static double[] evaluateFunction(PartitionedFunction density, OmegaBigDecimal timeLimit, BigDecimal timeStep) {
 		if(density instanceof EXP)
 			return evaluateEXP((EXP) density, timeLimit, timeStep);
-		else if( density instanceof ErlangExp)
-			return evaluateErlangExp((ErlangExp) density, timeLimit, timeStep);
+		else if( density instanceof TwoParameterHypoEXP)
+			return evaluateErlangExp((TwoParameterHypoEXP) density, timeLimit, timeStep);
 		else if(density instanceof GEN)
 			return evaluateGEN((GEN) density, timeLimit, timeStep);
 		else if(density instanceof PartitionedGEN)
@@ -280,7 +269,7 @@ public class NumericalUtils {
 	}
 
 
-	public static double[] evaluateErlangExp(ErlangExp density,  OmegaBigDecimal timeLimit, BigDecimal timeStep) {
+	public static double[] evaluateErlangExp(TwoParameterHypoEXP density, OmegaBigDecimal timeLimit, BigDecimal timeStep) {
 		double[] val1;
 		double[] val2;
 
@@ -384,24 +373,20 @@ public class NumericalUtils {
 			return false;
 		GEN gen = pGen.getFunctions().get(0);
 
-		if (gen.getDomain().getCoefficient(Variable.X, Variable.TSTAR)
-				.compareTo(gen.getDomain().getCoefficient(Variable.TSTAR, Variable.X).negate()) == 0)
-			return true;
-		return false;
+		return gen.getDomain().getCoefficient(Variable.X, Variable.TSTAR)
+				.compareTo(gen.getDomain().getCoefficient(Variable.TSTAR, Variable.X).negate()) == 0;
 	}
 
 	public static boolean isDeterministic(GEN gen) {
-		if (gen.getDomain().getCoefficient(Variable.X, Variable.TSTAR)
-				.compareTo(gen.getDomain().getCoefficient(Variable.TSTAR, Variable.X).negate()) == 0)
-			return true;
-		return false;
+		return gen.getDomain().getCoefficient(Variable.X, Variable.TSTAR)
+				.compareTo(gen.getDomain().getCoefficient(Variable.TSTAR, Variable.X).negate()) == 0;
 	}
 
 	public static NumericalValues conditionDistributionToFire(NumericalValues fired, List<NumericalValues> others, double timeLimit, double greatestTimeStep, boolean variableTimeStep) {
 
 		double[] finalExitDistribution = new double[NumericalUtils.computeTickNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + greatestTimeStep))];
 		if(others.size() == 0) {
-			System.out.println("Composite with single Region!! Care!!");
+			//System.out.println("Composite with single Region!! Care!!");
 			return fired;
 		} else if(others.size() == 1) {
 			NumericalValues singleD = variableTimeStep ? NumericalUtils.rescaleCDF(others.get(0), greatestTimeStep) : others.get(0);
@@ -480,8 +465,6 @@ public class NumericalUtils {
 			}
 		}
 
-		System.out.println("shift and Project");
-
 		//Shift and project
 		double[] shiftedPDF = new double[firstPDF.length];
 
@@ -516,7 +499,7 @@ public class NumericalUtils {
 		if(distributions.size() == 0)
 			return null;
 		else if(distributions.size() == 1)
-			return Arrays.asList(1.0);
+			return List.of(1.0);
 		else if(distributions.size() == 2)
 			return evaluateFireFirstProbabilitiesS2(distributions.get(0), distributions.get(1), regionTimeStep);
 		else if(distributions.size() == 3)
