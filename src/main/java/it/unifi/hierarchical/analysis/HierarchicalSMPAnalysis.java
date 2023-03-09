@@ -66,8 +66,7 @@ public class HierarchicalSMPAnalysis {
      *                  over which the calculation must be executed, in case of unbounded distributions a truncation point must be
      *                  identified in an educated way
      */
-    public Map<String, Double> evaluateSteadyState(double timeStep, double timeLimit) {
-        //TODO RINOMINARE
+    public Map<String, Double> evaluate(double timeStep, double timeLimit) {
 
         //0 - checking model does not contains exits on borders of initial states
         // LAURA: si assume che il primo stato non sia un composite first con diversa next step pdf per ogni regione
@@ -132,7 +131,7 @@ public class HierarchicalSMPAnalysis {
 
         //		System.out.println("Evaluate Steady State");
         //4- steady state (Use solution of 2 and 3 to evaluate steady)
-        Map<String, Double> result = evaluateSteadyState();
+        Map<String, Double> result = evaluate();
 
         // LAURA: questo serve per rimappare le prob degli alias sugli step originali
         if (compositeCycles) {
@@ -499,7 +498,7 @@ public class HierarchicalSMPAnalysis {
         return dtmc;
     }
 
-    private Map<String, Double> evaluateSteadyState() {
+    private Map<String, Double> evaluate() {
         //4.1- At higher level use the standard solution method for SS of an SMP
         Map<String, Double> ss = new HashMap<>();
         double denominator = 0.0;
