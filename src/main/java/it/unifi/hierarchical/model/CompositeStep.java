@@ -115,8 +115,7 @@ public class CompositeStep extends Step {
     public CompositeStep(CompositeStep compositeStep, int id, List<Region> regions) {
         super(compositeStep.name + "_" + id, compositeStep.depth, compositeStep.timeStep);
         type = compositeStep.type;
-        // FIXME: considerare se c'è bisogno di fare deep copy delle regioni, ma anche delle final location che fanno
-        //  parte dello step composito
+        // FIXME: check whether a deep copy of regions is needed, including final locations within the composite step
         this.regions = new ArrayList<>(regions);
         exitSteps = new HashMap<>();
         //exitSteps = new HashMap<>(compositeStep.exitSteps);

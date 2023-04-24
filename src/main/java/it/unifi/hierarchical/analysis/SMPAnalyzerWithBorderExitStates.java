@@ -16,9 +16,6 @@
  */
 
 package it.unifi.hierarchical.analysis;
-
-//FIXME: This class be removed and its methods integrated with those of class SMPAnalyzer.
-
 import it.unifi.hierarchical.model.*;
 import it.unifi.hierarchical.model.visitor.LogicalLocationVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
@@ -28,7 +25,7 @@ import org.oristool.math.OmegaBigDecimal;
 import java.math.BigDecimal;
 import java.util.*;
 
-//FIXME: This class be removed and its methods integrated with those of class SMPAnalyzer.
+//FIXME: This class may be removed and its methods integrated with those of class SMPAnalyzer.
 /**
  * Extend the SMPAnalyzer so as to handle the case of composite states with exits on the border
  */
@@ -55,10 +52,6 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 	public SMPAnalyzerWithBorderExitStates(LogicalLocation initialState, Map<LogicalLocation, NumericalValues> sojournTimeDistributions, Map<Region, NumericalValues> regionSojournTimeDistributions, double timeLimit, double timeStep, LogicalLocation absorbingState, boolean variable) {
 		this(initialState, sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, timeStep, absorbingState, variable, 0);
 	}
-
-	// analyzer da dove � chiamato? Da Sojourn per valutare il tempo di soggiorno in una regione: prob from to
-	// Si riferisce solo ad una regione di volta in volta vero? SI
-	// Quindi la riconversione � fatta regione per regione immediatamente
 	/**
 	 *
 	 * @param initialState
@@ -126,7 +119,6 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 
 		fired = variableTime ? NumericalUtils.rescaleCDF(fired, timeStep) : fired;
 
-		//condiziona basato su altre
 		fired = NumericalUtils.conditionDistributionToFire(fired,vl,timeLimit,timeStep,variableTime);
 
 		return fired;
@@ -196,7 +188,7 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		return states;
 	}
 
-	//FIXME trattare il caso in cui si ha una neverending in parallelo a regioni con exitOnBorder
+	//FIXME manage composite steps of type FIRST with NEVERENDING regions
 	/**
 	 * For each composite state that has exits on border, create a dummy state for each region.
 	 * For each state that has a composite state having exits on border, change the branching probs considering probability that a region is faster
@@ -234,7 +226,7 @@ public class SMPAnalyzerWithBorderExitStates implements TransientAnalyzer{
 		List<Double> branchingProbs = new ArrayList<>();
 		List<LogicalLocation> nextStates = new ArrayList<>();
 
-		//fo un self loop, ogni uscita � riportata sullo stesso
+
 		if(oldstate.equals(absorbingState)) {
 			branchingProbs.add(1.0);
 			nextStates.add(newState);

@@ -26,7 +26,7 @@ import org.oristool.math.OmegaBigDecimal;
 import java.math.BigDecimal;
 import java.util.*;
 
-//FIXME: Can this class be removed and its methods integrated with those of class SojournTimeEvaluatorVisitor?
+//FIXME: This class may be removed and its methods integrated with those of class SojournTimeEvaluatorVisitor
 
 public class SojournTimeEvaluatorVisitorForced implements LogicalLocationVisitor {
 
@@ -79,11 +79,11 @@ public class SojournTimeEvaluatorVisitorForced implements LogicalLocationVisitor
 
 		double[] values;
 
-		double up = simpleStep.getUpperBound(); // LAURA: se >0 e' uno stato esterno da trattare a precisione massima
+		double up = simpleStep.getUpperBound();
 		if(up>0.) {
 
-			if(simpleStep.getDepth()!=0) {// LAURA: e' un check su come e' creato il modello
-				System.out.println("ERRORE ARBITRARY PRECISION NOT IN TOPLEVEL!! - SojournTimeEvaluatorForced");
+			if(simpleStep.getDepth()!=0) {
+				System.out.println("ERROR ARBITRARY PRECISION NOT IN TOPLEVEL!! - SojournTimeEvaluatorForced");
 				return;
 			}
 
@@ -133,7 +133,7 @@ public class SojournTimeEvaluatorVisitorForced implements LogicalLocationVisitor
 		CompositeStepType regionsType = compositeStep.getType();
 
 		NumericalValues sojournTimeDistribution = null;
-		//non c'� mai il caso never
+		//FIXME manage NEVERENDING regions
 		switch (regionsType) {
 			case FIRST:
 				if(timeStep<0.0) {
@@ -206,11 +206,8 @@ public class SojournTimeEvaluatorVisitorForced implements LogicalLocationVisitor
 		System.out.println("SojournTimeDistributions -> Analyzer");
 		TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(region.getInitialStep(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, variableSteps);
 
-		//REMARK ottiene prob di passare da init a end in un certo tempo, richiede che i due siano stati presenti in analyzer, quindi non borderExit
 		NumericalValues sojournTimeDistribution = analyzer.getTransientProbability(initialState, endState);
 
-
-		//FIXME TRANSIENTE RICHIEDE UNLOOPING, CONOSCENZA REGIONI VICINE / FORZA BRUTA UN CERTO NUM
 		regionSojournTimeDistributions.put(region, sojournTimeDistribution);
 		regionTransientProbabilities.put(region, analyzer);
 		return sojournTimeDistribution;

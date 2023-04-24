@@ -36,14 +36,14 @@ public class SMPAnalyzer implements TransientAnalyzer{
 	private final double timeLimit;
 	private final double timeStep;
 
-	// FIXME: Can this attribute be eliminated?
+	// FIXME: This attribute may be eliminated
 	private final LogicalLocation absorbingState;
 
-	// FIXME: This attribute can be replaced by a local variable
+	// FIXME: This attribute may be replaced by a local variable
 	private static final long timeElapsed = 0;
 
-	// FIXME: Can this constructor be eliminated?
-	//absorbing state NON serve a niente, in quanto quando viene passato si � avuta una chiamata a SMPAWithBorderExit che ha reso lo stato assorbente un selflooping
+	// FIXME: This constructor may be eliminated
+	//FIXME: absorbingState may be eliminated
 	public SMPAnalyzer(List<LogicalLocation> states, Map<LogicalLocation, NumericalValues> sojournTimeDistributions, double timeLimit, double timeStep) {
 		this(states, sojournTimeDistributions, timeLimit, timeStep, null);
 	}
@@ -93,9 +93,6 @@ public class SMPAnalyzer implements TransientAnalyzer{
 		//Date d3 = new Date();
 		//time = d3.getTime() - d2.getTime();
 		//System.out.println(time+ "  kernelQQQ");
-
-		//FIXME qui mette direttamente a 1 la prob di essere al tempo zero in se stesso, mentre per immediate forse
-		//vuole 0? e 1 sui finali?
 
 		//Init transient probs array
 		probs = new double[states.size()][states.size()][ticks];

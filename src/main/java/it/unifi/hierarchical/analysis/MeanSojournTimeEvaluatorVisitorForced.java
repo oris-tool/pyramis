@@ -26,7 +26,7 @@ import org.oristool.math.OmegaBigDecimal;
 import java.math.BigDecimal;
 import java.util.*;
 
-//FIXME: Can this class be removed and its methods integrated with those of class MeanSojournTimeEvaluatorVisitor?
+//FIXME: This class may be removed and its methods integrated with those of class MeanSojournTimeEvaluatorVisitor
 
 //2.1- Navigate on the higher level searching for all possible state
 //2.2- For each one, evaluate the mean based on sojourn time distribution,
@@ -160,8 +160,7 @@ public class MeanSojournTimeEvaluatorVisitorForced implements LogicalLocationVis
 	}
 
 
-	//INFO: I calcoli si basano sul fatto che il ciclo � tale da non permettere mai l'uscita!!
-	// Reaching prob nella never � sempre 1!!
+	//We assume that cycles cannot be left
 	private void evaluateLowerLevelStateSojournTime(LogicalLocation state) {
 
 
@@ -180,22 +179,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements LogicalLocationVis
 		if(insideVm){
 			meanSojournInnerAtCycle.put(state, new LinkedList<>());
 		}
-
-
-
-
-		//			prima non mi preoccupavo di nulla potevo direttamente
-		//			usare lo studio transiente della regione ai differenti tempi (sommavano a 1 con sufficienti cicli extra)
-		//
-		//			adesso devo "ricostruire" la prob della regione!!
-		//
-		//			e devo mantenere info dei CYCLE differenti per poter calcolare sugli stati lower!!
-		//
-		//
-		//			trattamento diverso anche per gli stati interni, magari usare direttamente il nome?
-		//					check state.getName() ??
-
-
 
 		double greatestTimeStep;
 		TransientAnalyzer parentRegionAnalysis;
@@ -247,7 +230,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements LogicalLocationVis
 				return;
 			}
 
-			// i tempi di arrivo in Vm sono i tempi di conclusione di ogni ciclo + il tempo di soggiorno di VmRes
 			arrivalsInVm = cycleTransientList.getProbsFromToList(parentRegion.getInitialStep(), endState);
 			arrivalsInVm.add(0, sojournTimeDistributions.get(res));
 			arrivalsInVm.remove(arrivalsInVm.size()-1);
@@ -263,7 +245,7 @@ public class MeanSojournTimeEvaluatorVisitorForced implements LogicalLocationVis
 
 		}
 
-		//FIXME SE CASO NEVER + FINAL QUI IL FINAL NON VIENE CONSIDERATO (PER ORA CONSIDERA SOLO NEVER + EXIT* )
+		//FIXME We do not manage composite steps of type LAST that contain NEVERENDING regions
 		//2- Get exit distributions of parallel regions at same level of the direct parent composite state
 		List<NumericalValues> exitDistributions = new ArrayList<>();
 		CompositeStep parentState = parentStates.get(parentRegion);
@@ -287,7 +269,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements LogicalLocationVis
 
 		double reachingProbability = 1;
 
-		// PER I FIGLI TROVA LA DISTRIBUZIONE PER ENTRARE NEL PADRE E SHIFTA LE PARALLELE DEL PADRE ALL INGRESSO
 		//3- Get exit distribution of parallel regions at higher level. Note that distribution must have
 		//the same time origin and thus need to be shifted
 		if(state.getDepth() > 1) {
@@ -327,7 +308,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements LogicalLocationVis
 
 
 
-				// calcola separatamente alle exit modificate, la probabilit� che non falliscano prima
 				//4- Evaluate reaching probability of target sub-state, given that we are in the parent state
 
 
@@ -343,7 +323,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements LogicalLocationVis
 				}
 
 
-				//TODO raggruppa questi per regione...
 				//5- Evaluate the exit distribution as the minimum and save it for lower regions
 				double[] finalExitDistribution = new double[NumericalUtils.computeTickNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + greatestTimeStep))];
 				if(exitDistribCycle.size() == 0) {
@@ -394,7 +373,6 @@ public class MeanSojournTimeEvaluatorVisitorForced implements LogicalLocationVis
 		}
 
 
-		//TODO raggruppa questi per regione...
 		//5- Evaluate the exit distribution as the minimum and save it for lower regions
 		double[] finalExitDistribution = new double[NumericalUtils.computeTickNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + greatestTimeStep))];
 		if(exitDistributions.size() == 0) {
@@ -426,7 +404,7 @@ public class MeanSojournTimeEvaluatorVisitorForced implements LogicalLocationVis
 			}
 		}
 
-		//FIXME viene fatto pi� volte...
+		//FIXME this is done more times than necessary
 		shiftedExitDistributions.put(parentRegion, new NumericalValues(finalExitDistribution, greatestTimeStep));
 
 		if(vm) {

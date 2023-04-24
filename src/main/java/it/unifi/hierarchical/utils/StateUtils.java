@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-// FIXME: Could some of these methods be methods of the classes Region etc.?
+// FIXME: Some of these methods may be methods of the classes Region etc.
 
 public class StateUtils {
 

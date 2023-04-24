@@ -22,7 +22,7 @@ package it.unifi.hierarchical.model;
  */
 
 public class HSMP {
-    // TODO: Servono distribuzioni perché ci potrebbero essere più stati iniziali
+    // TODO: Manage the case of multiple initial states
 
     /**
      * Initial step from which the HSMP unfolds

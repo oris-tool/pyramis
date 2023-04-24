@@ -17,7 +17,7 @@
 
 package it.unifi.hierarchical.analysis;
 
-//FIXME: This class can be removed and its methods integrated with those of class SubstatesSteadyStateEvaluatorVisitor.
+//FIXME: This class may be removed and its methods integrated with those of class SubstatesSteadyStateEvaluatorVisitor.
 
 import it.unifi.hierarchical.model.*;
 import it.unifi.hierarchical.model.visitor.LogicalLocationVisitor;
@@ -79,7 +79,6 @@ public class SubstatesSteadyStateEvaluatorVisitorForced implements LogicalLocati
 			Double childrenSS=0.0;
 
 
-			//FIXME NON FATTO CON DIFFERENTI PRECISIONI PER NEVER / FIGLI NEVER
 			// if the region is of type exit, theres no time spent on the exit state,
 			//so we can smooth the steady state based on the one calculated on the parent
 			//if the region is of type final, no normalization can be applied

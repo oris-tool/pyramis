@@ -101,8 +101,6 @@ public class SMPAnalyzerForCycle implements TransientAnalyzer{
 		for(int rr=0; rr<CYCLE;rr++) {
 
 			//System.out.println("ciclo "+rr);
-			//FIXME qui mette direttamente a 1 la prob di essere al tempo zero in se stesso, mentre per immediate forse
-			//vuole 0? e 1 sui finali?
 
 			//Init transient probs array
 			double[][][] probs = new double[states.size()][states.size()][ticks];

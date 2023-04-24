@@ -194,7 +194,7 @@ public class MeanSojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 				//3.2 evaluate time to be absorbed in current state in the current region
 				absorbingProbabilities.computeIfAbsent(previousParentRegion, k -> new HashMap<>());
 
-				//REMARK qui viene chiamato analyzer
+				//REMARK here we call analyzer
 
 				if(absorbingProbabilities.get(previousParentRegion).get(parentState) == null) {
 

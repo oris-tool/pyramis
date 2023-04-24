@@ -61,9 +61,6 @@ public class CycleVisitor implements LogicalLocationVisitor {
 			successor.accept(this);
 		}
 	}
-
-	//FIXME aggiungo tutti gli stati direttamente,
-	//ma in realt� il ciclo non coinvolge generalmente tutto
 	@Override
 	public void visit(CompositeStep compositeStep) {
 		evaluated.add(compositeStep);

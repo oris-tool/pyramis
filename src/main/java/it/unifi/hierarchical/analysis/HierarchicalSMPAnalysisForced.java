@@ -25,7 +25,7 @@ import org.oristool.models.gspn.chains.DTMCStationary;
 
 import java.util.*;
 
-//FIXME: This class be removed and its methods integrated with those of class HierarchicalSMPAnalysis.
+//FIXME: This class has to be removed and its methods integrated with those of class HierarchicalSMPAnalysis.
 
 
 /**

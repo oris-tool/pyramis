@@ -36,7 +36,7 @@ public class HierarchicalSMPAnalysis {
         this(model, 0);
     }
 
-    // LAURA: se CYCLE==0 allora chiama analyzer normale, altrimenti chiama analyzer for cycle
+    //if CYCLE==0 then the standard analyzer method is called, otherwise the one specific for cycles
     public HierarchicalSMPAnalysis(HSMP model, int CYCLE) {
         this.model = model;
         this.CYCLE_UNROLLING = CYCLE;
@@ -69,7 +69,7 @@ public class HierarchicalSMPAnalysis {
     public Map<String, Double> evaluate(double timeStep, double timeLimit) {
 
         //0 - checking model does not contains exits on borders of initial states
-        // LAURA: si assume che il primo stato non sia un composite first con diversa next step pdf per ogni regione
+        //We assume that the first step is not a composite step of type FIRST with different next step pdf for each region
         boolean noExitInitials;
         Set<LogicalLocation> offendingStateSet = new HashSet<>();
         noExitInitials = checkInitialsNoBorder(offendingStateSet);
@@ -86,16 +86,12 @@ public class HierarchicalSMPAnalysis {
 
         //0.1 - unrolling all cycles forcibly: use a fixed number of unrollings,
         //TODO add treatment to specify a confidence and identify correct number of unrolls
-        //     (LAURA: siamo noi a dire quanti unroll deve fare)
+        //     (the user specifies how many times a cycle is unrolled)
         //TODO add correct treatment if cycles are present in multiple levels
         //TODO add correct treatment if multiple cycles connect the same nodes
-        //     (LAURA: "otto volante")
         //TODO add correct treatment for cycles in regions containing nodes not in the cycle
-        //     (LAURA: qui si sta dicendo che se è un cerchio dal quale posso uscrire, allora non è trattato, forse)
-        //qui tratto solo il caso di cicli che occupano completamente una neverending reg
-        // e composite che contengono solo stati simple
-        // (LAURA: deve esserci un unico ciclo, e la regione deve essere never-ending,
-        // si assume che i composite del ciclo siano tutti di tipo simple)
+
+        // We consider single cycles within neverending regions and composite steps that contain only simple steps
         if (CYCLE_UNROLLING != 0)
             identifyAndUnrollCycles();
 
@@ -133,7 +129,7 @@ public class HierarchicalSMPAnalysis {
         //4- steady state (Use solution of 2 and 3 to evaluate steady)
         Map<String, Double> result = evaluate();
 
-        // LAURA: questo serve per rimappare le prob degli alias sugli step originali
+        //This is used to map alias' probabilities over original steps
         if (compositeCycles) {
             for (LogicalLocation s : aliasStates.keySet()) {
                 Double res = 0.;
@@ -173,10 +169,8 @@ public class HierarchicalSMPAnalysis {
         }
     }
 
-    // LAURA: questo copia gli archi (sulla base della mappa)
-    // inner vale true se siamo dentro il ciclo, false altrimenti
-    // si assume che il primo stato del ciclo sia un simple step
-    //FIXME !isCycle considers only simples at the start
+    //This method makes a copy or arcs (inner is true if we're inside a cycle, false otherwise).
+    //We assume that cycle's first state is a simple step.
     private void linkStates(LogicalLocation s, boolean inner) {
 
         //System.out.println("linko "+s.getName()+" "+inner);
@@ -342,9 +336,8 @@ public class HierarchicalSMPAnalysis {
         }
     }
 
-    // LAURA: crea una copia dello step che viene passato
-    // (se è un composite copia anche le regioni ecc.),
-    // non si occupa degli archi
+    //This method creates a copy of the parameter s
+    // (if s is a composite step, then the method copies regions; the method does not copy arcs)
     private void createStateCopy(LogicalLocation s) {
 
         aliasStates.put(s, new LinkedList<>());
@@ -371,7 +364,7 @@ public class HierarchicalSMPAnalysis {
                     aliasRegion.get(r).add(copy);
                 }
 
-                // Si va a duplicare anche le regioni
+                // We duplicate regions too
                 aliasStates.get(s).add(sC.makeCopy(i, listR));
             }
 

@@ -26,8 +26,7 @@ import org.oristool.math.OmegaBigDecimal;
 import java.math.BigDecimal;
 import java.util.*;
 
-// LAURA: questo e il gemello si differenziano in quanto qui abbiamo unrolling e non ci preoccupiamo quindi dei cicli
-// E se invece non facciamo l'unrolling allora siamo costretti a trattare i cicli con la classe forced.
+// Here cycles are unrolled (and so the cycle is not present anymore)
 
 public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 
@@ -121,10 +120,10 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 		CompositeStepType regionsType = compositeStep.getType();
 
 		NumericalValues sojournTimeDistribution = null;
-		//non c'� mai il caso never
+		//FIXME Manage NEVERENDING regions
 		switch (regionsType) {
 			case FIRST:
-				if(timeStep<0.0) { // LAURA: se timeStep<0 allora il timeStep è variabile e va preso quello giusto dello statp
+				if(timeStep<0.0) {// FIXME: if timeStep<0 then we have different timeStep for different steps
 					sojournTimeDistribution = NumericalUtils.minCDFvar(mapSojournTimeDistributions.values(), compositeStep.getTimeStep());
 				}else {
 					sojournTimeDistribution = NumericalUtils.minCDF(mapSojournTimeDistributions.values());
@@ -166,7 +165,7 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 		}
 	}
 
-	// LAURA: calcola la CDF
+	// Calculate CDF
 	private NumericalValues evaluateRegionSojournTime(Region region) {
 
 		RegionType type= region.getType();
@@ -205,10 +204,6 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 		//timeX = d2.getTime() - d1.getTime();
 		//System.out.println(timeX+ "  sojournPPP");
 
-		//REMARK ottiene prob di passare da init a end in un certo tempo, richiede che i due siano stati presenti in analyzer, quindi non borderExit
-		// LAURA: initialState è lo stato iniziale della regione, che non può masi essere un borderexit
-		// endState è la finalLocation
-		// se uno step è borderExit, dentro analyzer ci sono i suoi stati regione
 		NumericalValues sojournTimeDistribution = analyzer.getTransientProbability(initialState, endState);
 
 		regionSojournTimeDistributions.put(region, sojournTimeDistribution);
