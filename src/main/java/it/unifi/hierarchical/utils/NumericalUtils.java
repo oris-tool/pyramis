@@ -145,6 +145,22 @@ public class NumericalUtils {
 
 	public static double[] computeCDFFromPDF(double[] pdf, BigDecimal step) {
 		double[] cdf = new double[pdf.length];
+		cdf[0] = 0;
+		for (int t = 1; t < pdf.length; t++) {
+			double newValue = cdf[t - 1] + pdf[t] * step.doubleValue();
+			cdf[t] = newValue > 1 ? 1 : newValue;
+			//REMARK Reduces possible errors from overexstimation but
+			//does nothing to assure that once no more values !=0
+			//are present the CDF is =1, which is a consequence
+			//of having a choosen truncation point
+		}
+	//		cdf[cdf.length-1] = 1;
+		return cdf;
+	}
+
+	@Deprecated
+	public static double[] computeCDFFromPDFOLD(double[] pdf, BigDecimal step) {
+		double[] cdf = new double[pdf.length];
 		for (int i = 0; i < pdf.length; i++) {
 			double previousValue = i == 0 ? 0.0 : cdf[i - 1];
 			double newValue = previousValue + pdf[i] * step.doubleValue();
@@ -159,6 +175,19 @@ public class NumericalUtils {
 	}
 
 	public static double[] computePDFFromCDF(double[] cdf, BigDecimal step) {
+		double[] pdf = new double[cdf.length];
+		double sum = 0;
+		for (int t = 1; t < cdf.length; t++) {
+			pdf[t] = (cdf[t] - cdf[t-1]) / step.doubleValue();
+			sum += pdf[t];
+		}
+		pdf[0] = 1 - sum;
+		return pdf;
+	}
+
+	@Deprecated
+	public static double[] computePDFFromCDFOLD(double[] cdf, BigDecimal step) {
+		System.out.println("From PDF to CDF");
 		double[] pdf = new double[cdf.length];
 		for (int i = 0; i < cdf.length; i++) {
 			double previousValue = i == 0 ? 0.0 : cdf[i - 1];
