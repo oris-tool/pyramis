@@ -96,20 +96,6 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 		PartitionedGEN partitionedGEN = new PartitionedGEN(gens);
 		values = NumericalUtils.evaluateFunction(partitionedGEN, new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+step));
 
-
-		// TODO committa con: calcolo della CDF in forma simbolina anziché numerica per poi campionare con il metodo pre-esistente.
-//		if (isExp && domainsLFT.isFinite()){
-//			//
-//			values = new double[new OmegaBigDecimal(String.valueOf(timeLimit)).divide(new BigDecimal(String.valueOf(timeStep)), MathContext.DECIMAL128).intValue() + 1];
-//			for(int t = 0; t< values.length; t++ ){
-//				values[t] = CDF(t*timeStep, density.getExponentialRate().doubleValue(), domainsEFT.doubleValue(), domainsLFT.doubleValue() );
-//			}
-//
-//		}else {
-//			values = NumericalUtils.evaluateFunction(simpleStep.getDensityFunction(), new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+step));
-//			values = NumericalUtils.computeCDFFromPDF(values,  new BigDecimal(""+step));
-//		}
-
 		sojournTimeDistributions.put(simpleStep, new NumericalValues(values, step));
 
 		//Visit successors not yet visited
