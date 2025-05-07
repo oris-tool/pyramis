@@ -21,9 +21,16 @@ import it.unifi.hierarchical.model.*;
 import it.unifi.hierarchical.model.visitor.LogicalLocationVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
+import it.unifi.hierarchical.utils.TwoParameterHypoEXP;
+import org.oristool.eulero.modeling.stochastictime.TruncatedExponentialTime;
 import org.oristool.math.OmegaBigDecimal;
+import org.oristool.math.domain.DBMZone;
+import org.oristool.math.expression.Expolynomial;
+import org.oristool.math.expression.Variable;
+import org.oristool.math.function.*;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.*;
 
 // Here cycles are unrolled (and so the cycle is not present anymore)
@@ -70,20 +77,38 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 			step= timeStep;
 		}
 
+		double[] values;
 
-		double[] values = NumericalUtils.evaluateFunction(simpleStep.getDensityFunction(), new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+step));
+		Expolynomial density = simpleStep.getDensityFunction().getDensities().get(0);
+		OmegaBigDecimal domainsEFT = simpleStep.getDensityFunction().getDomainsEFT();
+		OmegaBigDecimal domainsLFT = simpleStep.getDensityFunction().getDomainsLFT();
+		boolean isExp = ((GEN) simpleStep.getDensityFunction()).getDensity().isExponential();
 
-		//		System.out.println("step= "+step);
-		//		System.out.println("pdf simple");
-		//		System.out.println(Arrays.toString(values));
+		PartitionedFunction densityFunction = simpleStep.getDensityFunction();
+		List<GEN> gens = new ArrayList<>();
+		for(Function f : densityFunction.getFunctions()){
+
+			Expolynomial expol = new Expolynomial(f.getDensity().integrate(Variable.X));
+			DBMZone zone = f.getDomain();
+			GEN gen = new GEN(zone, expol);
+			gens.add(gen);
+		}
+		PartitionedGEN partitionedGEN = new PartitionedGEN(gens);
+		values = NumericalUtils.evaluateFunction(partitionedGEN, new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+step));
 
 
-		values = NumericalUtils.computeCDFFromPDF(values,  new BigDecimal(""+step));
-
-		//		System.out.println("cdf simple");
-		//		System.out.println(Arrays.toString(values));
-		//
-
+		// TODO committa con: calcolo della CDF in forma simbolina anziché numerica per poi campionare con il metodo pre-esistente.
+//		if (isExp && domainsLFT.isFinite()){
+//			//
+//			values = new double[new OmegaBigDecimal(String.valueOf(timeLimit)).divide(new BigDecimal(String.valueOf(timeStep)), MathContext.DECIMAL128).intValue() + 1];
+//			for(int t = 0; t< values.length; t++ ){
+//				values[t] = CDF(t*timeStep, density.getExponentialRate().doubleValue(), domainsEFT.doubleValue(), domainsLFT.doubleValue() );
+//			}
+//
+//		}else {
+//			values = NumericalUtils.evaluateFunction(simpleStep.getDensityFunction(), new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+step));
+//			values = NumericalUtils.computeCDFFromPDF(values,  new BigDecimal(""+step));
+//		}
 
 		sojournTimeDistributions.put(simpleStep, new NumericalValues(values, step));
 
@@ -94,6 +119,18 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 				continue;
 			successor.accept(this);
 		}
+	}
+
+	public double CDF(double t, double rate, double a, double b) {
+		double c = rate > 0 ? a : b;
+		if(t < a){
+			return 0;
+		}
+
+		if(t > b){
+			return 1;
+		}
+		return (Math.abs(rate) * Math.exp(rate * c)) / (rate * (1 - Math.exp(-Math.abs(rate) * (b - a)))) * (Math.exp(-rate * a) - Math.exp(-rate * t));
 	}
 
 	@Override
