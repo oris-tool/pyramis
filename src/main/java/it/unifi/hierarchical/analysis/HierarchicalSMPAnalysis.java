@@ -42,6 +42,14 @@ public class HierarchicalSMPAnalysis {
         this.CYCLE_UNROLLING = CYCLE;
     }
 
+    public Map<LogicalLocation, NumericalValues> getSojournTimeDistributions(){
+        return this.sojournTimeDistributions;
+    }
+
+    public Map<Region, NumericalValues> getRegionSojournTimeDistributions(){
+        return this.regionSojournTimeDistributions;
+    }
+
     /**
      * If it not exists, create an edge in the DTMC between from and to with specified value.
      * If the edge already exists sums values

@@ -44,17 +44,16 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 	private final double timeStep;
 	private final double timeLimit;
 
-
-	public SojournTimeEvaluatorVisitor(double timeLimit){
+	public SojournTimeEvaluatorVisitor(double timeLimit) {
 		this(-1.0, timeLimit);
 	}
 
 	/**
 	 *
-	 * @param timeStep if <0 then calculations must account for variable steps
+	 * @param timeStep  if <0 then calculations must account for variable steps
 	 * @param timeLimit limit of the interval of interest
 	 */
-	public SojournTimeEvaluatorVisitor(double timeStep, double timeLimit){
+	public SojournTimeEvaluatorVisitor(double timeStep, double timeLimit) {
 		this.sojournTimeDistributions = new HashMap<>();
 		this.regionSojournTimeDistributions = new HashMap<>();
 		this.regionTransientProbabilities = new HashMap<>();
@@ -89,9 +88,14 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 		for(Function f : densityFunction.getFunctions()){
 
 			Expolynomial expol = new Expolynomial(f.getDensity().integrate(Variable.X));
+    		Map<Variable, OmegaBigDecimal> timePoint = new HashMap<>();
+    		timePoint.put(Variable.X, new OmegaBigDecimal("" + f.getDomainsEFT()));
+    		expol.sub(Expolynomial.newConstantInstance(expol.evaluate(timePoint)));
+
 			DBMZone zone = f.getDomain();
 			GEN gen = new GEN(zone, expol);
 			gens.add(gen);
+			
 		}
 		PartitionedGEN partitionedGEN = new PartitionedGEN(gens);
 		values = NumericalUtils.evaluateFunction(partitionedGEN, new OmegaBigDecimal(""+timeLimit), new BigDecimal(""+step));
@@ -109,79 +113,82 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 
 	public double CDF(double t, double rate, double a, double b) {
 		double c = rate > 0 ? a : b;
-		if(t < a){
+		if (t < a) {
 			return 0;
 		}
 
-		if(t > b){
+		if (t > b) {
 			return 1;
 		}
-		return (Math.abs(rate) * Math.exp(rate * c)) / (rate * (1 - Math.exp(-Math.abs(rate) * (b - a)))) * (Math.exp(-rate * a) - Math.exp(-rate * t));
+		return (Math.abs(rate) * Math.exp(rate * c)) / (rate * (1 - Math.exp(-Math.abs(rate) * (b - a))))
+				* (Math.exp(-rate * a) - Math.exp(-rate * t));
 	}
 
 	@Override
 	public void visit(CompositeStep compositeStep) {
 
 		evaluated.add(compositeStep);
-		//Evaluate children sojourn time distribution
-		//In case of Never simply study ignoring parent's peculiarity
+		// Evaluate children sojourn time distribution
+		// In case of Never simply study ignoring parent's peculiarity
 		List<Region> regions = compositeStep.getRegions();
 		for (Region region : regions) {
 			region.getInitialStep().accept(this);
 		}
 
-		//Evaluate regions distribution
+		// Evaluate regions distribution
 		Map<Region, NumericalValues> mapSojournTimeDistributions = new HashMap<>();
 
-		//if Region is Never put a null in mapSojournTimeDistribution
+		// if Region is Never put a null in mapSojournTimeDistribution
 		for (Region region : regions) {
 			NumericalValues regionSojournTimeDistribution = evaluateRegionSojournTime(region);
-			if(regionSojournTimeDistribution!= null)
+			if (regionSojournTimeDistribution != null)
 				mapSojournTimeDistributions.put(region, regionSojournTimeDistribution);
 		}
 
 		CompositeStepType regionsType = compositeStep.getType();
 
 		NumericalValues sojournTimeDistribution = null;
-		//FIXME Manage NEVERENDING regions
+		// FIXME Manage NEVERENDING regions
 		switch (regionsType) {
 			case FIRST:
-				if(timeStep<0.0) {// FIXME: if timeStep<0 then we have different timeStep for different steps
-					sojournTimeDistribution = NumericalUtils.minCDFvar(mapSojournTimeDistributions.values(), compositeStep.getTimeStep());
-				}else {
+				if (timeStep < 0.0) {// FIXME: if timeStep<0 then we have different timeStep for different steps
+					sojournTimeDistribution = NumericalUtils.minCDFvar(mapSojournTimeDistributions.values(),
+							compositeStep.getTimeStep());
+				} else {
 					sojournTimeDistribution = NumericalUtils.minCDF(mapSojournTimeDistributions.values());
 				}
 				break;
 			case LAST:
-				if(timeStep<0.0) {
-					sojournTimeDistribution = NumericalUtils.maxCDFvar(mapSojournTimeDistributions.values(), compositeStep.getTimeStep());
-				}else {
+				if (timeStep < 0.0) {
+					sojournTimeDistribution = NumericalUtils.maxCDFvar(mapSojournTimeDistributions.values(),
+							compositeStep.getTimeStep());
+				} else {
 					sojournTimeDistribution = NumericalUtils.maxCDF(mapSojournTimeDistributions.values());
 				}
 				break;
 		}
 
-		//		System.out.println("composite");
-		//		System.out.println(Arrays.toString(sojournTimeDistribution.getValues()));
+		// System.out.println("composite");
+		// System.out.println(Arrays.toString(sojournTimeDistribution.getValues()));
 		//
 
 		sojournTimeDistributions.put(compositeStep, sojournTimeDistribution);
-		//Visit successors not yet visited
-		if(StateUtils.isCompositeWithBorderExit(compositeStep)) {
+		// Visit successors not yet visited
+		if (StateUtils.isCompositeWithBorderExit(compositeStep)) {
 
-			for(LogicalLocation exitState : compositeStep.getExitSteps().keySet()) {
+			for (LogicalLocation exitState : compositeStep.getExitSteps().keySet()) {
 				List<LogicalLocation> successors = compositeStep.getNextLocations(exitState);
 
 				for (LogicalLocation successor : successors) {
-					if(evaluated.contains(successor))
+					if (evaluated.contains(successor))
 						continue;
 					successor.accept(this);
 				}
 			}
-		}else {
+		} else {
 			List<LogicalLocation> successors = compositeStep.getNextLocations();
 			for (LogicalLocation successor : successors) {
-				if(evaluated.contains(successor))
+				if (evaluated.contains(successor))
 					continue;
 				successor.accept(this);
 			}
@@ -191,41 +198,43 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 	// Calculate CDF
 	private NumericalValues evaluateRegionSojournTime(Region region) {
 
-		RegionType type= region.getType();
+		RegionType type = region.getType();
 
 		LogicalLocation initialState = region.getInitialStep();
 		List<LogicalLocation> smpStates = StateUtils.getReachableStates(region.getInitialStep());
 
 		boolean variableSteps;
 		double time;
-		if(timeStep<0) {
-			time=region.getTimeStep();
-			variableSteps=true;
-		}else {
-			time=timeStep;
-			variableSteps=false;
+		if (timeStep < 0) {
+			time = region.getTimeStep();
+			variableSteps = true;
+		} else {
+			time = timeStep;
+			variableSteps = false;
 		}
 
-		if(type==RegionType.NEVERENDING) {
+		if (type == RegionType.NEVERENDING) {
 			regionSojournTimeDistributions.put(region, null);
-			TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(region.getInitialStep(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, variableSteps);
+			TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(region.getInitialStep(),
+					sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, variableSteps);
 			regionTransientProbabilities.put(region, analyzer);
 			return null;
 		}
 
 		LogicalLocation endState = StateUtils.findFinalLocation(smpStates);
 
-		//		System.out.println("SojournTimeDistributions -> Analyzer");
+		// System.out.println("SojournTimeDistributions -> Analyzer");
 
-		//Date d1 = new Date();
+		// Date d1 = new Date();
 
-		//long timeX;
+		// long timeX;
 
-		TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(region.getInitialStep(), sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, variableSteps);
-		//Date d2 = new Date();
+		TransientAnalyzer analyzer = new SMPAnalyzerWithBorderExitStates(region.getInitialStep(),
+				sojournTimeDistributions, regionSojournTimeDistributions, timeLimit, time, variableSteps);
+		// Date d2 = new Date();
 
-		//timeX = d2.getTime() - d1.getTime();
-		//System.out.println(timeX+ "  sojournPPP");
+		// timeX = d2.getTime() - d1.getTime();
+		// System.out.println(timeX+ " sojournPPP");
 
 		NumericalValues sojournTimeDistribution = analyzer.getTransientProbability(initialState, endState);
 
@@ -248,7 +257,7 @@ public class SojournTimeEvaluatorVisitor implements LogicalLocationVisitor {
 		return regionSojournTimeDistributions;
 	}
 
-	public Map<Region, TransientAnalyzer> getRegionTransientProbabilities(){
+	public Map<Region, TransientAnalyzer> getRegionTransientProbabilities() {
 		return regionTransientProbabilities;
 	}
 

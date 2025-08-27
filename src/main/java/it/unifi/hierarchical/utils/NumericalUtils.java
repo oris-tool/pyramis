@@ -34,41 +34,45 @@ import java.util.*;
 // FIXME: Check whether evaluateEXP, evaluateGEN, evaluatePartitioneGEN, and isDeterministic are methods of the SIRIO library.
 public class NumericalUtils {
 
-	//	public static double[] convolveCDFs(double[] first, double[] second, double step) {
-	//		double[] firstPDF = computePDFFromCDF(first, new BigDecimal("" + step));
-	//		double[] secondPDF = computePDFFromCDF(second, new BigDecimal("" + step));
-	//		double[] resultPDF = convolvePDFs(firstPDF, secondPDF, step);
-	//		return computeCDFFromPDF(resultPDF, new BigDecimal("" + step));
-	//	}
+	// public static double[] convolveCDFs(double[] first, double[] second, double
+	// step) {
+	// double[] firstPDF = computePDFFromCDF(first, new BigDecimal("" + step));
+	// double[] secondPDF = computePDFFromCDF(second, new BigDecimal("" + step));
+	// double[] resultPDF = convolvePDFs(firstPDF, secondPDF, step);
+	// return computeCDFFromPDF(resultPDF, new BigDecimal("" + step));
+	// }
 	//
-	//	public static double[] convolvePDFs(double[] first, double[] second, double step) {
+	// public static double[] convolvePDFs(double[] first, double[] second, double
+	// step) {
 	//
-	//		if (first == null || second == null)
-	//			throw new IllegalArgumentException("Convolution parameter can't be null");
+	// if (first == null || second == null)
+	// throw new IllegalArgumentException("Convolution parameter can't be null");
 	//
-	//		final int firstLen = first.length;
-	//		final int secondLen = second.length;
+	// final int firstLen = first.length;
+	// final int secondLen = second.length;
 	//
-	//		if (firstLen == 0 || secondLen == 0) {
-	//			throw new IllegalArgumentException("Convolution parameter can't be empty");
-	//		}
-	//		if (firstLen != secondLen) {
-	//			throw new IllegalArgumentException("Convolution parameter must have the same length");
-	//		}
+	// if (firstLen == 0 || secondLen == 0) {
+	// throw new IllegalArgumentException("Convolution parameter can't be empty");
+	// }
+	// if (firstLen != secondLen) {
+	// throw new IllegalArgumentException("Convolution parameter must have the same
+	// length");
+	// }
 	//
-	//		int resultLength = firstLen;
+	// int resultLength = firstLen;
 	//
-	//		double[] result = new double[resultLength];
-	//		// Evaluate every element of the final result
-	//		for (int i = 0; i < resultLength; i++) {
-	//			result[i] = 0;
-	//			// For every element of the second array. If j>i is not evaluated because it will have a negative index
-	//			for (int j = 0; j <= i; j++) {
-	//				result[i] += first[j] * step * second[i - j];
-	//			}
-	//		}
-	//		return result;
-	//	}
+	// double[] result = new double[resultLength];
+	// // Evaluate every element of the final result
+	// for (int i = 0; i < resultLength; i++) {
+	// result[i] = 0;
+	// // For every element of the second array. If j>i is not evaluated because it
+	// will have a negative index
+	// for (int j = 0; j <= i; j++) {
+	// result[i] += first[j] * step * second[i - j];
+	// }
+	// }
+	// return result;
+	// }
 
 	public static NumericalValues maxCDF(Collection<NumericalValues> distributions) {
 
@@ -77,7 +81,7 @@ public class NumericalUtils {
 
 		for (int i = 0; i < resultCDF.length; i++) {
 			resultCDF[i] = distributionsList.get(0).getValues()[i];
-			for(int d = 1; d < distributionsList.size(); d++) {
+			for (int d = 1; d < distributionsList.size(); d++) {
 				resultCDF[i] *= distributionsList.get(d).getValues()[i];
 			}
 		}
@@ -90,28 +94,29 @@ public class NumericalUtils {
 	public static NumericalValues maxCDFvar(Collection<NumericalValues> distributions, double regionTimeStep) {
 		Set<NumericalValues> newDistributions = new HashSet<>();
 
-		for(NumericalValues distribution : distributions) {
+		for (NumericalValues distribution : distributions) {
 			NumericalValues newDistribution = rescaleCDF(distribution, regionTimeStep);
 			newDistributions.add(newDistribution);
 		}
 		return maxCDF(newDistributions);
 	}
 
-
-	//	public static NumericalValues minPDF(Collection<NumericalValues> pdfs) {
+	// public static NumericalValues minPDF(Collection<NumericalValues> pdfs) {
 	//
-	//		List<NumericalValues> distributions = new ArrayList<>();
+	// List<NumericalValues> distributions = new ArrayList<>();
 	//
-	//		for (NumericalValues pdf : pdfs) {
-	//			BigDecimal stepBD = new BigDecimal(""+pdf.getStep());
-	//			distributions.add(new NumericalValues(computeCDFFromPDF(pdf.getValues(), stepBD), pdf.getStep()));
-	//		}
+	// for (NumericalValues pdf : pdfs) {
+	// BigDecimal stepBD = new BigDecimal(""+pdf.getStep());
+	// distributions.add(new NumericalValues(computeCDFFromPDF(pdf.getValues(),
+	// stepBD), pdf.getStep()));
+	// }
 	//
-	//		NumericalValues minCDF = minCDF(distributions);
-	//		BigDecimal stepBD = new BigDecimal(""+minCDF.getStep());
+	// NumericalValues minCDF = minCDF(distributions);
+	// BigDecimal stepBD = new BigDecimal(""+minCDF.getStep());
 	//
-	//		return new NumericalValues(computePDFFromCDF(minCDF.getValues(),stepBD), minCDF.getStep());
-	//	}
+	// return new NumericalValues(computePDFFromCDF(minCDF.getValues(),stepBD),
+	// minCDF.getStep());
+	// }
 
 	public static NumericalValues minCDF(Collection<NumericalValues> distributions) {
 
@@ -120,7 +125,7 @@ public class NumericalUtils {
 
 		for (int i = 0; i < resultCDF.length; i++) {
 			resultCDF[i] = 1 - distributionsList.get(0).getValues()[i];
-			for(int d = 1; d < distributionsList.size(); d++) {
+			for (int d = 1; d < distributionsList.size(); d++) {
 				resultCDF[i] *= 1 - distributionsList.get(d).getValues()[i];
 			}
 
@@ -136,7 +141,7 @@ public class NumericalUtils {
 
 		Set<NumericalValues> newDistributions = new HashSet<>();
 
-		for(NumericalValues distribution : distributions) {
+		for (NumericalValues distribution : distributions) {
 			NumericalValues newDistribution = rescaleCDF(distribution, regionTimeStep);
 			newDistributions.add(newDistribution);
 		}
@@ -149,12 +154,12 @@ public class NumericalUtils {
 		for (int t = 1; t < pdf.length; t++) {
 			double newValue = cdf[t - 1] + pdf[t] * step.doubleValue();
 			cdf[t] = newValue > 1 ? 1 : newValue;
-			//REMARK Reduces possible errors from overexstimation but
-			//does nothing to assure that once no more values !=0
-			//are present the CDF is =1, which is a consequence
-			//of having a choosen truncation point
+			// REMARK Reduces possible errors from overexstimation but
+			// does nothing to assure that once no more values !=0
+			// are present the CDF is =1, which is a consequence
+			// of having a choosen truncation point
 		}
-	//		cdf[cdf.length-1] = 1;
+		// cdf[cdf.length-1] = 1;
 		return cdf;
 	}
 
@@ -165,10 +170,10 @@ public class NumericalUtils {
 			double previousValue = i == 0 ? 0.0 : cdf[i - 1];
 			double newValue = previousValue + pdf[i] * step.doubleValue();
 			cdf[i] = newValue > 1 ? 1 : newValue;
-			//REMARK Reduces possible errors from overexstimation but
-			//does nothing to assure that once no more values !=0
-			//are present the CDF is =1, which is a consequence
-			//of having a choosen truncation point
+			// REMARK Reduces possible errors from overexstimation but
+			// does nothing to assure that once no more values !=0
+			// are present the CDF is =1, which is a consequence
+			// of having a choosen truncation point
 		}
 
 		return cdf;
@@ -178,7 +183,7 @@ public class NumericalUtils {
 		double[] pdf = new double[cdf.length];
 		double sum = 0;
 		for (int t = 1; t < cdf.length; t++) {
-			pdf[t] = (cdf[t] - cdf[t-1]) / step.doubleValue();
+			pdf[t] = (cdf[t] - cdf[t - 1]) / step.doubleValue();
 			sum += pdf[t];
 		}
 		pdf[0] = 1 - sum;
@@ -198,107 +203,117 @@ public class NumericalUtils {
 	}
 
 	/**
-	 *Given a NumericalValues CDF with step A, returns a NumericalValues with step newStep, by skipping intermediate values
+	 * Given a NumericalValues CDF with step A, returns a NumericalValues with step
+	 * newStep, by skipping intermediate values
 	 */
 	public static NumericalValues rescaleCDF(NumericalValues cdf, double newStep) {
 
-		if(cdf==null) {
+		if (cdf == null) {
 			return null;
 		}
 
 		double[] origValues = cdf.getValues();
 		double oldStep = cdf.getStep();
 
-		if(oldStep > newStep + 1e-9) {
-			throw new UnsupportedOperationException("Not yet supported higher level timeSteps finer than the lower levels ");
+		if (oldStep > newStep + 1e-9) {
+			throw new UnsupportedOperationException(
+					"Not yet supported higher level timeSteps finer than the lower levels ");
 		}
 
-		//REMARK Gives errors when for example 0.2 and 0.3 are compared, because
-		//we don't allow interpolation, only exact multiples
-		int multiplier = (int) Math.round(newStep/oldStep);
-		if(multiplier==1) {
+		// REMARK Gives errors when for example 0.2 and 0.3 are compared, because
+		// we don't allow interpolation, only exact multiples
+		int multiplier = (int) Math.round(newStep / oldStep);
+		if (multiplier == 1) {
 			return cdf;
 		}
 
 		int oldSize = origValues.length;
-		int newSize = ((oldSize-1)/ multiplier) +1;
+		int newSize = ((oldSize - 1) / multiplier) + 1;
 
 		double[] newValues = new double[newSize];
 
-		//does not care about PDFs need to rescale immediate!!
-		//old version newValues[i]=origValues[i*multiplier];
-		//old version meant that each cdf[t] was the value of cdf in t-, current version,
-		//in agreement with analysis and evaluateFunction has cdf[t] = value of cdf in (t+1)-
+		// does not care about PDFs need to rescale immediate!!
+		// old version newValues[i]=origValues[i*multiplier];
+		// old version meant that each cdf[t] was the value of cdf in t-, current
+		// version,
+		// in agreement with analysis and evaluateFunction has cdf[t] = value of cdf in
+		// (t+1)-
 
-		for(int i=0; i<newSize-1;i++) {
-			newValues[i]=origValues[(i+1)*multiplier-1];
+		for (int i = 0; i < newSize - 1; i++) {
+			newValues[i] = origValues[(i + 1) * multiplier - 1];
 		}
-		newValues[newSize-1] = origValues[oldSize-1];
+		newValues[newSize - 1] = origValues[oldSize - 1];
 
-		//System.out.println(Arrays.toString(rescaled.getValues()));
+		// System.out.println(Arrays.toString(rescaled.getValues()));
 
 		return new NumericalValues(newValues, newStep);
 	}
 
-	//		/**
-	//		 *Given a NumericalValues PDF with step A, returns a NumericalValues with step newStep
-	//		 */
-	//		public static NumericalValues rescalePDF(NumericalValues pdf, double newStep) {
+	// /**
+	// *Given a NumericalValues PDF with step A, returns a NumericalValues with step
+	// newStep
+	// */
+	// public static NumericalValues rescalePDF(NumericalValues pdf, double newStep)
+	// {
 	//
-	//			if(pdf==null) {
-	//				return null;
-	//			}
+	// if(pdf==null) {
+	// return null;
+	// }
 	//
-	//			double oldStep = pdf.getStep();
+	// double oldStep = pdf.getStep();
 	//
-	//			if(oldStep > newStep + 1e-9) {
-	//				throw new UnsupportedOperationException("Not yet supported higher level timeSteps finer than the lower levels ");
+	// if(oldStep > newStep + 1e-9) {
+	// throw new UnsupportedOperationException("Not yet supported higher level
+	// timeSteps finer than the lower levels ");
 	//
-	//			}
+	// }
 	//
-	//			int multiplier = (int) Math.round(newStep/oldStep);
-	//			if(multiplier==1) {
-	//				return pdf;
-	//			}
-	//
-	//
-	//			double[] origValuesCDF = computeCDFFromPDF(pdf.getValues(), new BigDecimal(""+pdf.getStep()));
-	//
-	//			int oldSize = origValuesCDF.length;
-	//			int newSize = ((oldSize-1)/ multiplier) +1;
-	//
-	//			double[] newValuesCDF = new double[newSize];
-	//
-	//			for(int i=0; i<newSize;i++) {
-	//				newValuesCDF[i]=origValuesCDF[i*multiplier];
-	//			}
-	//
-	//			double[] newValuesPDF = computePDFFromCDF(newValuesCDF, new BigDecimal(""+newStep));
+	// int multiplier = (int) Math.round(newStep/oldStep);
+	// if(multiplier==1) {
+	// return pdf;
+	// }
 	//
 	//
-	//			NumericalValues rescaled = new NumericalValues(newValuesPDF, newStep);
-	//			return rescaled;
-	//		}
+	// double[] origValuesCDF = computeCDFFromPDF(pdf.getValues(), new
+	// BigDecimal(""+pdf.getStep()));
+	//
+	// int oldSize = origValuesCDF.length;
+	// int newSize = ((oldSize-1)/ multiplier) +1;
+	//
+	// double[] newValuesCDF = new double[newSize];
+	//
+	// for(int i=0; i<newSize;i++) {
+	// newValuesCDF[i]=origValuesCDF[i*multiplier];
+	// }
+	//
+	// double[] newValuesPDF = computePDFFromCDF(newValuesCDF, new
+	// BigDecimal(""+newStep));
+	//
+	//
+	// NumericalValues rescaled = new NumericalValues(newValuesPDF, newStep);
+	// return rescaled;
+	// }
 
 	public static int computeTickNumber(OmegaBigDecimal timeLimit, BigDecimal timeStep) {
 		return timeLimit.divide(timeStep, MathContext.DECIMAL128).intValue() + 1;
 	}
 
-	public static double[] evaluateFunction(PartitionedFunction density, OmegaBigDecimal timeLimit, BigDecimal timeStep) {
-		if(density instanceof EXP)
+	public static double[] evaluateFunction(PartitionedFunction density, OmegaBigDecimal timeLimit,
+			BigDecimal timeStep) {
+		if (density instanceof EXP)
 			return evaluateEXP((EXP) density, timeLimit, timeStep);
-		else if( density instanceof TwoParameterHypoEXP)
+		else if (density instanceof TwoParameterHypoEXP)
 			return evaluateErlangExp((TwoParameterHypoEXP) density, timeLimit, timeStep);
-		else if(density instanceof GEN)
+		else if (density instanceof GEN)
 			return evaluateGEN((GEN) density, timeLimit, timeStep);
-		else if(density instanceof PartitionedGEN)
-			return evaluatePartitionedGEN((PartitionedGEN)density, timeLimit, timeStep);
+		else if (density instanceof PartitionedGEN)
+			return evaluatePartitionedGEN((PartitionedGEN) density, timeLimit, timeStep);
 		else
 			throw new IllegalArgumentException("Unsupported type!");
 	}
 
-
-	public static double[] evaluateErlangExp(TwoParameterHypoEXP density, OmegaBigDecimal timeLimit, BigDecimal timeStep) {
+	public static double[] evaluateErlangExp(TwoParameterHypoEXP density, OmegaBigDecimal timeLimit,
+			BigDecimal timeStep) {
 		double[] val1;
 		double[] val2;
 
@@ -307,10 +322,10 @@ public class NumericalUtils {
 
 		double[] val = new double[val1.length];
 
-		for(int t0=0; t0< val1.length; t0++) {
-			for(int t1=0; t1< val2.length; t1++) {
-				if(t0+t1<val.length) {
-					val[t0+t1]+= val1[t0]*val2[t1] * timeStep.doubleValue();
+		for (int t0 = 0; t0 < val1.length; t0++) {
+			for (int t1 = 0; t1 < val2.length; t1++) {
+				if (t0 + t1 < val.length) {
+					val[t0 + t1] += val1[t0] * val2[t1] * timeStep.doubleValue();
 				}
 			}
 		}
@@ -328,10 +343,10 @@ public class NumericalUtils {
 
 			if (isDeterministic(density)) {
 				// Special case: IMMEDIATE or DETERMINISTIC
-				//old version: function.getDomain().contains(timePoint)
+				// old version: function.getDomain().contains(timePoint)
 				double detImpulse = density.getDomain().getCoefficient(Variable.X, Variable.TSTAR).doubleValue();
 
-				if (detImpulse>=time && detImpulse<time+timeStep.doubleValue())
+				if (detImpulse >= time && detImpulse < time + timeStep.doubleValue())
 					values[t] = BigDecimal.ONE.divide(timeStep, MathContext.DECIMAL128).doubleValue();
 				else
 					values[t] = 0;
@@ -363,24 +378,34 @@ public class NumericalUtils {
 		return values;
 	}
 
-	public static double[] evaluatePartitionedGEN(PartitionedGEN density, OmegaBigDecimal timeLimit, BigDecimal timeStep) {
+	public static double[] evaluatePartitionedGEN(PartitionedGEN density, OmegaBigDecimal timeLimit,
+			BigDecimal timeStep) {
 		List<GEN> functions = density.getFunctions();
 
 		int stepsNumber = computeTickNumber(timeLimit, timeStep);
 		double[] values = new double[stepsNumber];
 
-		for (int t = 0; t < stepsNumber; t++) {
+		int eftStep = computeTickNumber(density.getDomainsEFT(), timeStep) - 1;
+		int lftStep = computeTickNumber(density.getDomainsLFT(), timeStep);
+		
+		Arrays.fill(values, 0 , eftStep,  0.);
+
+		int actualLeftSamplingStep = eftStep > 0 ? eftStep : 0;
+		int actualRightSamplingStep = lftStep + 1 < stepsNumber ? lftStep + 1 : stepsNumber;
+
+		for (int t = actualLeftSamplingStep; t < actualRightSamplingStep; t++) {
 			double time = t * timeStep.doubleValue();
+			time = time > density.getDomainsLFT().doubleValue() ? density.getDomainsLFT().doubleValue() : time;
 			Map<Variable, OmegaBigDecimal> timePoint = new HashMap<>();
 			timePoint.put(Variable.X, new OmegaBigDecimal("" + time));
 
 			if (isDeterministic(density)) {
 				// Special case: IMMEDIATE or DETERMINISTIC
 				GEN function = functions.get(0);
-				//old version: function.getDomain().contains(timePoint)
+				// old version: function.getDomain().contains(timePoint)
 				double detImpulse = function.getDomain().getCoefficient(Variable.X, Variable.TSTAR).doubleValue();
 
-				if (detImpulse>=time && detImpulse<time+timeStep.doubleValue())
+				if (detImpulse >= time && detImpulse < time + timeStep.doubleValue())
 					values[t] = BigDecimal.ONE.divide(timeStep, MathContext.DECIMAL128).doubleValue();
 				else
 					values[t] = 0;
@@ -393,6 +418,20 @@ public class NumericalUtils {
 				}
 			}
 		}
+		
+
+		// if(density.getDomainsLFT().doubleValue() % timeLimit.doubleValue() !=0 && stepsNumber >= lftStep + 1 ){ 
+		// if(stepsNumber >= lftStep + 1 ){ 
+		// 	for (GEN function : functions) {
+		// 		Map<Variable, OmegaBigDecimal> lftPoint = new HashMap<>();
+		// 		lftPoint.put(Variable.X, new OmegaBigDecimal("" + density.getDomainsLFT()));
+		// 		values[lftStep] = function.getDensity().evaluate(lftPoint).doubleValue();
+		// 	}
+		// }
+
+		Arrays.fill(values, actualRightSamplingStep , stepsNumber, values[actualRightSamplingStep - 1] );
+		
+		
 
 		return values;
 	}
@@ -411,33 +450,36 @@ public class NumericalUtils {
 				.compareTo(gen.getDomain().getCoefficient(Variable.TSTAR, Variable.X).negate()) == 0;
 	}
 
-	public static NumericalValues conditionDistributionToFire(NumericalValues fired, List<NumericalValues> others, double timeLimit, double greatestTimeStep, boolean variableTimeStep) {
+	public static NumericalValues conditionDistributionToFire(NumericalValues fired, List<NumericalValues> others,
+			double timeLimit, double greatestTimeStep, boolean variableTimeStep) {
 
-		double[] finalExitDistribution = new double[NumericalUtils.computeTickNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + greatestTimeStep))];
-		if(others.size() == 0) {
-			//System.out.println("Composite with single Region!! Care!!");
+		double[] finalExitDistribution = new double[NumericalUtils
+				.computeTickNumber(new OmegaBigDecimal("" + timeLimit), new BigDecimal("" + greatestTimeStep))];
+		if (others.size() == 0) {
+			// System.out.println("Composite with single Region!! Care!!");
 			return fired;
-		} else if(others.size() == 1) {
-			NumericalValues singleD = variableTimeStep ? NumericalUtils.rescaleCDF(others.get(0), greatestTimeStep) : others.get(0);
+		} else if (others.size() == 1) {
+			NumericalValues singleD = variableTimeStep ? NumericalUtils.rescaleCDF(others.get(0), greatestTimeStep)
+					: others.get(0);
 
 			finalExitDistribution = singleD.getValues();
 		} else {
 
 			List<NumericalValues> exitD;
-			if(variableTimeStep) {
+			if (variableTimeStep) {
 				exitD = new LinkedList<>();
-				for(NumericalValues exitDistro: others) {
+				for (NumericalValues exitDistro : others) {
 					exitD.add(NumericalUtils.rescaleCDF(exitDistro, greatestTimeStep));
 				}
 
-			}else {
+			} else {
 				exitD = others;
 			}
 
 			for (int t = 0; t < finalExitDistribution.length; t++) {
 				double product = 1;
-				for(NumericalValues exitDistro: exitD) {
-					product*= (1 - exitDistro.getValues()[t]);
+				for (NumericalValues exitDistro : exitD) {
+					product *= (1 - exitDistro.getValues()[t]);
 				}
 				finalExitDistribution[t] = 1 - product;
 			}
@@ -448,15 +490,15 @@ public class NumericalUtils {
 		double[] firedPDF = computePDFFromCDF(fired.getValues(), new BigDecimal("" + fired.getStep()));
 		double[] firstPDF = computePDFFromCDF(first.getValues(), new BigDecimal("" + first.getStep()));
 
-		//Successor probability
+		// Successor probability
 		double prob = 0;
 		for (int t1 = 0; t1 < firedPDF.length; t1++) {
 			for (int t2 = t1; t2 < firstPDF.length; t2++) {
-				prob+= firedPDF[t1] * firstPDF[t2] * fired.getStep() * first.getStep();
+				prob += firedPDF[t1] * firstPDF[t2] * fired.getStep() * first.getStep();
 			}
 		}
 
-		//Shift and project
+		// Shift and project
 		double[] conditionedPdf = new double[firstPDF.length];
 
 		for (int t0 = 0; t0 < firedPDF.length; t0++) {
@@ -465,7 +507,7 @@ public class NumericalUtils {
 			}
 		}
 
-		for(int t=0; t < firstPDF.length; t++) {
+		for (int t = 0; t < firstPDF.length; t++) {
 			conditionedPdf[t] = conditionedPdf[t] / prob;
 		}
 
@@ -474,9 +516,10 @@ public class NumericalUtils {
 		return new NumericalValues(resultCDF, greatestTimeStep);
 	}
 
-	//Not generic version--> easier than the version with an unspecified version of dimension
+	// Not generic version--> easier than the version with an unspecified version of
+	// dimension
 	public static NumericalValues shiftAndProjectAndMinimum(NumericalValues fired, List<NumericalValues> others) {
-		if(others.size() == 1) {
+		if (others.size() == 1) {
 			return shiftAndProjectAndMinimumS1(fired, others.get(0));
 		}
 		throw new UnsupportedOperationException("Not yet supported joint distribution of dimension " + others.size());
@@ -486,68 +529,75 @@ public class NumericalUtils {
 		double[] firedPDF = computePDFFromCDF(fired.getValues(), new BigDecimal("" + fired.getStep()));
 		double[] firstPDF = computePDFFromCDF(first.getValues(), new BigDecimal("" + first.getStep()));
 
-		//Successor probability
+		// Successor probability
 		double p0 = 0;
 		for (int t1 = 0; t1 < firstPDF.length; t1++) {
 			for (int t2 = t1; t2 < firstPDF.length; t2++) {
-				p0+= firedPDF[t1] * firstPDF[t2] * fired.getStep() * first.getStep();
+				p0 += firedPDF[t1] * firstPDF[t2] * fired.getStep() * first.getStep();
 			}
 		}
 
-		//Shift and project
+		// Shift and project
 		double[] shiftedPDF = new double[firstPDF.length];
 
 		for (int t1 = 0; t1 < firstPDF.length; t1++) {
 			for (int t0 = 0; t0 < firedPDF.length; t0++) {
-				if(t1- t0 >= 0)//Guarantee to be in the domain where fired distribution fire first
+				if (t1 - t0 >= 0)// Guarantee to be in the domain where fired distribution fire first
 					shiftedPDF[t1 - t0] += firedPDF[t0] * firstPDF[t1] * first.getStep();
 			}
 		}
 
-		//Normalizing using p0
-		for(int t=0; t < firstPDF.length; t++) {
+		// Normalizing using p0
+		for (int t = 0; t < firstPDF.length; t++) {
 			shiftedPDF[t] = shiftedPDF[t] / p0;
 		}
 
-		//Evaluate minimum
-		//Do nothing here since its only a single r.v. distribution
+		// Evaluate minimum
+		// Do nothing here since its only a single r.v. distribution
 		double[] resultCDF = computeCDFFromPDF(shiftedPDF, new BigDecimal("" + first.getStep()));
 
 		return new NumericalValues(resultCDF, first.getStep());
 	}
 
 	/**
-	 *Given N independent distributions, evaluate the probability that each of that firez first
+	 * Given N independent distributions, evaluate the probability that each of that
+	 * firez first
 	 *
 	 * @param distributions
-	 * @param regionTimeStep if >0.0 then all the distribution of sojourn time are rescaled to that step value
+	 * @param regionTimeStep if >0.0 then all the distribution of sojourn time are
+	 *                       rescaled to that step value
 	 * @return
 	 */
-	public static List<Double> evaluateFireFirstProbabilities(List<NumericalValues> distributions, double regionTimeStep) {
-		//FIXME Implement the cases where N>3 (e.g., repeatedly evaluate the probability that a variable is lower than another variable)
-		if(distributions.size() == 0)
+	public static List<Double> evaluateFireFirstProbabilities(List<NumericalValues> distributions,
+			double regionTimeStep) {
+		// FIXME Implement the cases where N>3 (e.g., repeatedly evaluate the
+		// probability that a variable is lower than another variable)
+		if (distributions.size() == 0)
 			return null;
-		else if(distributions.size() == 1)
+		else if (distributions.size() == 1)
 			return List.of(1.0);
-		else if(distributions.size() == 2)
+		else if (distributions.size() == 2)
 			return evaluateFireFirstProbabilitiesS2(distributions.get(0), distributions.get(1), regionTimeStep);
-		else if(distributions.size() == 3)
-			return evaluateFireFirstProbabilitiesS3(distributions.get(0), distributions.get(1), distributions.get(2), regionTimeStep);
+		else if (distributions.size() == 3)
+			return evaluateFireFirstProbabilitiesS3(distributions.get(0), distributions.get(1), distributions.get(2),
+					regionTimeStep);
 		else
-			throw new UnsupportedOperationException("Evaluation of successor probabilities for N>3 dimensions not yet implemented");
+			throw new UnsupportedOperationException(
+					"Evaluation of successor probabilities for N>3 dimensions not yet implemented");
 	}
 
-	//can account for different timeSteps
-	private static List<Double> evaluateFireFirstProbabilitiesS2(NumericalValues aCDF, NumericalValues bCDF, double regionTimeStep) {
+	// can account for different timeSteps
+	private static List<Double> evaluateFireFirstProbabilitiesS2(NumericalValues aCDF, NumericalValues bCDF,
+			double regionTimeStep) {
 
 		double[] aPDF;
 		double[] bPDF;
 
-		if(regionTimeStep>0) {
+		if (regionTimeStep > 0) {
 			NumericalValues aRescaledCDF = rescaleCDF(aCDF, regionTimeStep);
 			NumericalValues bRescaledCDF = rescaleCDF(bCDF, regionTimeStep);
-			aPDF = computePDFFromCDF(aRescaledCDF.getValues(), new BigDecimal(""+regionTimeStep));
-			bPDF = computePDFFromCDF(bRescaledCDF.getValues(), new BigDecimal(""+regionTimeStep));
+			aPDF = computePDFFromCDF(aRescaledCDF.getValues(), new BigDecimal("" + regionTimeStep));
+			bPDF = computePDFFromCDF(bRescaledCDF.getValues(), new BigDecimal("" + regionTimeStep));
 		} else {
 			aPDF = computePDFFromCDF(aCDF.getValues(), new BigDecimal("" + aCDF.getStep()));
 			bPDF = computePDFFromCDF(bCDF.getValues(), new BigDecimal("" + bCDF.getStep()));
@@ -556,28 +606,29 @@ public class NumericalUtils {
 		double p0 = 0;
 		for (int timeStepA = 0; timeStepA < bPDF.length; timeStepA++) {
 			for (int timeStepB = 0; timeStepB < timeStepA; timeStepB++) {
-				p0+= aPDF[timeStepB] * bPDF[timeStepA] * aCDF.getStep() * bCDF.getStep();
+				p0 += aPDF[timeStepB] * bPDF[timeStepA] * aCDF.getStep() * bCDF.getStep();
 			}
 		}
-		return Arrays.asList(p0, 1-p0);
+		return Arrays.asList(p0, 1 - p0);
 	}
 
-	private static List<Double> evaluateFireFirstProbabilitiesS3(NumericalValues aCDF, NumericalValues bCDF, NumericalValues cCDF, double regionTimeStep) {
-		//Evaluate A first
+	private static List<Double> evaluateFireFirstProbabilitiesS3(NumericalValues aCDF, NumericalValues bCDF,
+			NumericalValues cCDF, double regionTimeStep) {
+		// Evaluate A first
 		NumericalValues minBC;
 
-		if(regionTimeStep>0) {
+		if (regionTimeStep > 0) {
 			minBC = minCDFvar(Arrays.asList(bCDF, cCDF), regionTimeStep);
-		}else {
+		} else {
 			minBC = minCDF(Arrays.asList(bCDF, cCDF));
 		}
 		double pa = evaluateFireFirstProbabilitiesS2(aCDF, minBC, regionTimeStep).get(0);
 
 		NumericalValues minAC;
 
-		if(regionTimeStep>0) {
+		if (regionTimeStep > 0) {
 			minAC = minCDFvar(Arrays.asList(aCDF, cCDF), regionTimeStep);
-		}else {
+		} else {
 			minAC = minCDF(Arrays.asList(aCDF, cCDF));
 		}
 
