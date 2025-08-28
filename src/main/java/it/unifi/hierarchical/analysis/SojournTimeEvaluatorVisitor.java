@@ -22,7 +22,6 @@ import it.unifi.hierarchical.model.visitor.LogicalLocationVisitor;
 import it.unifi.hierarchical.utils.NumericalUtils;
 import it.unifi.hierarchical.utils.StateUtils;
 import it.unifi.hierarchical.utils.TwoParameterHypoEXP;
-import org.oristool.eulero.modeling.stochastictime.TruncatedExponentialTime;
 import org.oristool.math.OmegaBigDecimal;
 import org.oristool.math.domain.DBMZone;
 import org.oristool.math.expression.Expolynomial;
